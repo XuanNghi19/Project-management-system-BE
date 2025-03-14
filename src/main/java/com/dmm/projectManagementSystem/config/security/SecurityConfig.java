@@ -39,7 +39,8 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return idNum -> {
             try {
-                return userRepo.findByIdNum(idNum); // Truy vấn user từ database theo idNum
+                return userRepo.findByIdNum(idNum)
+                        .orElseThrow(() -> new RuntimeException("Khong tim thay user voi idNum: " + idNum)); // Truy vấn user từ database theo idNum
             } catch (RuntimeException e) {
                 throw new UsernameNotFoundException("Không tìm thấy sinh viên hoặc giáo viên!");
             }

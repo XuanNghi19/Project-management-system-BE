@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,11 @@ public class Department {
     private String name;
 
     private String description;
+
+    static public Department fromCRUDDepartment(CRUDDepartment crudDepartment) {
+        return Department.builder()
+                .name(crudDepartment.getName())
+                .description(crudDepartment.getDescription())
+                .build();
+    }
 }

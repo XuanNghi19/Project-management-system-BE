@@ -1,4 +1,6 @@
 package com.dmm.projectManagementSystem.model;
+import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
+import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,6 +39,7 @@ public class User implements UserDetails {
     private String sex;
     private String avatarUrl;
     private String address;
+    private boolean active;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -53,14 +56,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "majorID")
     private Major major;
 
-    @ManyToOne
-    @JoinColumn(name = "dutyID")
-    private Duty duty;
-
-    @ManyToOne
-    @JoinColumn(name = "councilID")
-    private Council council;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -71,5 +66,46 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return idNum;
+    }
+
+    static public User fromCreateUserRequest(
+            CreateUserRequest request,
+            String passwordEncode,
+            Role role
+    ) {
+        return User.builder()
+                .password(passwordEncode)
+                .role(role)
+                .name(request.getName())
+                .age(request.getAge())
+                .dob(request.getDob())
+                .cccd(request.getCccd())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .sex(request.getSex())
+                .avatarUrl(request.getAvatarUrl())
+                .address(request.getAddress())
+                .active(true)
+                .build();
+    }
+
+    static public User fromUpdateUserRequest(
+            UpdateUserRequest request,
+            String passwordEncode
+    ) {
+        return User.builder()
+                .password(passwordEncode)
+                .role(request.getRole())
+                .name(request.getName())
+                .age(request.getAge())
+                .dob(request.getDob())
+                .cccd(request.getCccd())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .sex(request.getSex())
+                .avatarUrl(request.getAvatarUrl())
+                .address(request.getAddress())
+                .active(true)
+                .build();
     }
 }
