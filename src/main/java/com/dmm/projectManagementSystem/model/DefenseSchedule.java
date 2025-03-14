@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "defense_schedule")
 @NoArgsConstructor
@@ -17,17 +19,17 @@ public class DefenseSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String startTime;
+    private LocalDateTime startTime;
     private String location;
     private String note;
-    private String endTime;
+    private LocalDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "councilID")
     private Council council;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicId")
+    private Topic topic;
 }
 

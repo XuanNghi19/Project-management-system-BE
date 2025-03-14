@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "council")
 @NoArgsConstructor
@@ -18,6 +20,9 @@ public class Council {
 
     private String name;
     private String fileUrl;
+    private String location;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "courseID")

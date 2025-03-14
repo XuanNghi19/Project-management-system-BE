@@ -20,7 +20,7 @@ public class FilesUrl {
     private String uri;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicID")
+    private Topic topic;
 }
 

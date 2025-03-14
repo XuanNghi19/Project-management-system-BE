@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "meeting")
 @NoArgsConstructor
@@ -18,12 +20,13 @@ public class Meeting {
     private Long id;
 
     private String title;
-    private String startTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String location;
     private String note;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicID")
+    private Topic topic;
 }
 

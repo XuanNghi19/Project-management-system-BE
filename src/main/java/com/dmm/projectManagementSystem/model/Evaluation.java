@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "evaluation")
 @NoArgsConstructor
@@ -19,14 +21,14 @@ public class Evaluation {
     private Long id;
 
     private String comment;
-    private String dateCommented;
+    private LocalDateTime dateCommented;
     private String grade;
 
     @Enumerated(EnumType.STRING)
     private GradeType gradeType;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicID")
+    private Topic topic;
 }
 

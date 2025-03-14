@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "task")
 @NoArgsConstructor
@@ -19,11 +21,12 @@ public class Task {
 
     private String title;
     private String describe;
-    private String deadline;
+    private LocalDateTime deadline;
     private String comment;
+    private boolean status;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicID")
+    private Topic topic;
 }
 

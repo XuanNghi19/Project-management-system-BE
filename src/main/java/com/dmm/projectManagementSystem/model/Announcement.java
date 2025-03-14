@@ -22,7 +22,7 @@ public class Announcement {
     private String datePosted;
 
     @ManyToOne
-    @JoinColumn(name = "projectID")
-    private Project project;
+    @JoinColumn(name = "topicID")
+    private Topic topic;
 }
 
