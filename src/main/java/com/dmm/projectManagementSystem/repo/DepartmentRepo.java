@@ -13,7 +13,7 @@ public interface DepartmentRepo extends JpaRepository<Department, Long> {
 
     @Query("""
         select d from Department d where (:name is null or lower(d.name) like lower(concat( '%', :name, '%')))
-        order by id desc
+        order by d.id desc
     """)
     Page<Department> findAllDepartment(@Param("name") String name, Pageable pageable);
 }

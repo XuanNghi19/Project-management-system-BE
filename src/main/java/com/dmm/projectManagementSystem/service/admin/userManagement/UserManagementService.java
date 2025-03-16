@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.service.admin.userManagement;
 
 import com.dmm.projectManagementSystem.dto.user.*;
+import com.dmm.projectManagementSystem.enums.Role;
 import com.dmm.projectManagementSystem.model.Department;
 
 import java.util.List;
@@ -12,7 +13,6 @@ public interface UserManagementService {
     boolean updateUser(UpdateUserRequest updateUserRequest);
     boolean deleteUser(String idNum);
 
-    UserListByPageResponse getAllTeacher(Long departmentId, String name, int page, int limit);
-    UserListByPageResponse getAllStudent(Long majorId, Long courseId, String name, int page, int limit);
-    UserListByPageResponse getAllAdmin(Long departmentId, String name, int page, int limit);
+    UserListByPageResponse getAllUser(Role role, Long departmentId, Long majorId, Long courseId, String name, int page, int limit);
+    boolean changePassword(String newPassword, String idNum);
 }

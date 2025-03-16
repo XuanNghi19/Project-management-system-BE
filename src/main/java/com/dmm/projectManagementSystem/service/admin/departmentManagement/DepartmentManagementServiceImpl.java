@@ -32,6 +32,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         }
     }
 
+    @Transactional
     @Override
     public boolean updateDepartment(CRUDDepartment uDepartment) {
         try {
@@ -43,6 +44,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         }
     }
 
+    @Transactional
     @Override
     public boolean deleteDepartment(Long id) {
         if(departmentRepo.existsById(id)) {

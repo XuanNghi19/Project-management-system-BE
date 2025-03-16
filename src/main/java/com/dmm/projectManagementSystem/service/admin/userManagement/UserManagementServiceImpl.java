@@ -1,6 +1,6 @@
 package com.dmm.projectManagementSystem.service.admin.userManagement;
 
-import com.dmm.projectManagementSystem.Utils.StringUtils;
+import com.dmm.projectManagementSystem.utils.StringUtils;
 import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UserListByPageResponse;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserManagementServiceImpl implements UserManagementService{
+public class UserManagementServiceImpl implements UserManagementService {
 
     final private UserRepo userRepo;
     final private PasswordEncoder passwordEncoder;
@@ -100,6 +100,7 @@ public class UserManagementServiceImpl implements UserManagementService{
         }
     }
 
+    @Transactional
     @Override
     public boolean updateUser(UpdateUserRequest updateUserRequest) {
         try {
@@ -108,7 +109,7 @@ public class UserManagementServiceImpl implements UserManagementService{
             User updateUser = new User();
             String encodePassword = passwordEncoder.encode(updateUserRequest.getPassword());
 
-            if(exUser.getRole() == Role.ADMIN || exUser.getRole() == Role.INSTRUCTORS) {
+            if (exUser.getRole() == Role.ADMIN || exUser.getRole() == Role.INSTRUCTORS) {
                 Department department = departmentRepo.findById(updateUserRequest.getDepartmentId())
                         .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + updateUserRequest.getDepartmentId()));
 
@@ -138,10 +139,28 @@ public class UserManagementServiceImpl implements UserManagementService{
 
     @Transactional
     @Override
+    public boolean changePassword(String newPassword, String idNum) {
+        try {
+            User exUser = userRepo.findByIdNum(idNum)
+                    .orElseThrow(() -> new RuntimeException("khong tim thay user voi idNum: " + idNum));
+
+            String encodePassword = passwordEncoder.encode(newPassword);
+            exUser.setPassword(encodePassword);
+            userRepo.save(exUser);
+
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex);
+            return false;
+        }
+    }
+
+    @Transactional
+    @Override
     public boolean deleteUser(String idNum) {
         Optional<User> exUser = userRepo.findByIdNum(idNum);
         try {
-            if(exUser.isPresent()) {
+            if (exUser.isPresent()) {
                 exUser.get().setActive(false);
                 userRepo.save(exUser.get());
 
@@ -155,44 +174,27 @@ public class UserManagementServiceImpl implements UserManagementService{
     }
 
     @Override
-    public UserListByPageResponse getAllTeacher(Long departmentId, String name, int page, int limit) {
+    public UserListByPageResponse getAllUser(Role role, Long departmentId, Long majorId, Long courseId, String name, int page, int limit) {
         Department department = null;
-
-        if(departmentId != null) {
-            department = departmentRepo.findById(departmentId)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + departmentId));
-        }
-
-        Page<UserResponse> userResponsePage = userRepo.findAllUser(
-                        Role.INSTRUCTORS,
-                        department,
-                        null,
-                        null,
-                        name,
-                        PageRequest.of(page, limit)
-                )
-                .map(UserResponse::fromUser);
-
-        return UserListByPageResponse.fromSplitPage(userResponsePage.getContent(), userResponsePage.getTotalPages(), page, limit);
-    }
-
-    @Override
-    public UserListByPageResponse getAllStudent(Long majorId, Long courseId, String name, int page, int limit) {
         Major major = null;
         Course course = null;
 
-        if(majorId != null) {
+        if (departmentId != null) {
+            department = departmentRepo.findById(departmentId)
+                    .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + departmentId));
+        }
+        if (majorId != null) {
             major = majorRepo.findById(majorId)
                     .orElseThrow(() -> new RuntimeException("Khong tim thay majorId: " + majorId));
         }
-        if(courseId != null) {
+        if (courseId != null) {
             course = courseRepo.findById(courseId)
                     .orElseThrow(() -> new RuntimeException("Khong tim thay courseId: " + courseId));
         }
 
         Page<UserResponse> userResponsePage = userRepo.findAllUser(
-                        Role.INSTRUCTORS,
-                        null,
+                        role,
+                        department,
                         major,
                         course,
                         name,
@@ -203,25 +205,4 @@ public class UserManagementServiceImpl implements UserManagementService{
         return UserListByPageResponse.fromSplitPage(userResponsePage.getContent(), userResponsePage.getTotalPages(), page, limit);
     }
 
-    @Override
-    public UserListByPageResponse getAllAdmin(Long departmentId, String name, int page, int limit) {
-        Department department = null;
-
-        if(departmentId != null) {
-            department = departmentRepo.findById(departmentId)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + departmentId));
-        }
-
-        Page<UserResponse> userResponsePage = userRepo.findAllUser(
-                        Role.ADMIN,
-                        department,
-                        null,
-                        null,
-                        name,
-                        PageRequest.of(page, limit)
-                )
-                .map(UserResponse::fromUser);
-
-        return UserListByPageResponse.fromSplitPage(userResponsePage.getContent(), userResponsePage.getTotalPages(), page, limit);
-    }
 }
