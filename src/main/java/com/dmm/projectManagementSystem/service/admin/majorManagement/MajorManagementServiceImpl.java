@@ -8,10 +8,13 @@ import com.dmm.projectManagementSystem.model.Department;
 import com.dmm.projectManagementSystem.model.Major;
 import com.dmm.projectManagementSystem.repo.DepartmentRepo;
 import com.dmm.projectManagementSystem.repo.MajorRepo;
+import com.dmm.projectManagementSystem.repo.StudentTableRepo;
+import com.dmm.projectManagementSystem.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +24,7 @@ import java.util.List;
 public class MajorManagementServiceImpl implements MajorManagementService{
 
     final private MajorRepo majorRepo;
-    final private DepartmentRepo departmentRepo;
+    final private UserRepo userRepo;
 
     @Transactional
     @Override
@@ -51,12 +54,19 @@ public class MajorManagementServiceImpl implements MajorManagementService{
 
     @Transactional
     @Override
-    public boolean deleteMajor(Long id) {
+    public Pair<String, Boolean> deleteMajor(Long id) {
+
         if(majorRepo.existsById(id)) {
+            Major major = majorRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Khong ton tai major voi id: " + id));
+            if(userRepo.existsByMajor(major)) {
+                return Pair.of("Still have students in major!", false);
+            }
+
             majorRepo.deleteById(id);
-            return true;
+            return Pair.of("Deleted!", true);
         }
-        return false;
+        return Pair.of("Still have students in major!", false);
     }
 
     @Override

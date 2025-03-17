@@ -22,7 +22,7 @@ public class Major {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID", nullable = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {

@@ -35,6 +35,9 @@ public interface UserRepo extends JpaRepository<User, Long> {
             @Param("name") String name,
             Pageable pageable
     );
+
+    boolean existsByMajor(Major major);
+    boolean existsByDepartment(Department department);
 }
 
 

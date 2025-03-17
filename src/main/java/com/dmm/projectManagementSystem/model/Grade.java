@@ -19,7 +19,7 @@ public class Grade {
 
     private Double progressScore;
     private Double reportScore;
-    private Double defenseScore;
     private Double reviewScore;
+    private Double defenseScore;
     private Double finalScore;
 }

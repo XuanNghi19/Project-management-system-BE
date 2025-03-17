@@ -18,4 +18,6 @@ public interface MajorRepo extends JpaRepository<Major, Long> {
         order by m.id desc
     """)
     Page<Major> findAllMajor(@Param("name") String name,@Param("department") Department department, Pageable pageable);
+
+    boolean existsByDepartment(Department department);
 }

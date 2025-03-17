@@ -3,11 +3,15 @@ package com.dmm.projectManagementSystem.service.admin.departmentManagement;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.department.DepartmentListByPageResponse;
 import com.dmm.projectManagementSystem.model.Department;
+import com.dmm.projectManagementSystem.repo.CouncilRepo;
 import com.dmm.projectManagementSystem.repo.DepartmentRepo;
+import com.dmm.projectManagementSystem.repo.MajorRepo;
+import com.dmm.projectManagementSystem.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +21,9 @@ import java.util.List;
 public class DepartmentManagementServiceImpl implements DepartmentManagementService{
 
     final private DepartmentRepo departmentRepo;
+    final private MajorRepo majorRepo;
+    final private UserRepo userRepo;
+    final private CouncilRepo councilRepo;
 
     @Transactional
     @Override
@@ -46,12 +53,17 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
 
     @Transactional
     @Override
-    public boolean deleteDepartment(Long id) {
+    public Pair<String, Boolean> deleteDepartment(Long id) {
         if(departmentRepo.existsById(id)) {
+            Department department = departmentRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException());
+            if(majorRepo.existsByDepartment(department) || userRepo.existsByDepartment(department) || councilRepo.existsByDepartment(department)) {
+               return Pair.of("still exists in the department!", false);
+            }
             departmentRepo.deleteById(id);
-            return true;
+            return Pair.of("Deleted!", true);
         }
-        return false;
+        return Pair.of(String.format("department with id does not exist: %d", id), false);
     }
 
     @Override

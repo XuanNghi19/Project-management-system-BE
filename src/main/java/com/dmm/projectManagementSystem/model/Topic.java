@@ -30,8 +30,16 @@ public class Topic {
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
-    @ManyToOne
-    @JoinColumn(name = "gradeID")
+    @OneToOne
+    @JoinColumn(name = "grade_id")
     private Grade grade;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
 }
 
