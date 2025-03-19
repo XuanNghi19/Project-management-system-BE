@@ -83,7 +83,6 @@ public class User implements UserDetails {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
-                .avatarUrl(request.getAvatarUrl())
                 .address(request.getAddress())
                 .active(true)
                 .build();
@@ -91,7 +90,8 @@ public class User implements UserDetails {
 
     static public User fromUpdateUserRequest(
             UpdateUserRequest request,
-            String passwordEncode
+            String passwordEncode,
+            String avatarUrl
     ) {
         return User.builder()
                 .password(passwordEncode)
@@ -103,7 +103,7 @@ public class User implements UserDetails {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
-                .avatarUrl(request.getAvatarUrl())
+                .avatarUrl(avatarUrl)
                 .address(request.getAddress())
                 .active(true)
                 .build();

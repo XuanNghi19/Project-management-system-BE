@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "graduation_project")
+@Table(name = "topic")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,7 +30,7 @@ public class Topic {
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "grade_id")
     private Grade grade;
 

@@ -20,6 +20,10 @@ public class Major {
     private Long id;
 
     private String name;
+    private int progressPercentage;
+    private int reportPercentage;
+    private int defensePercentage;
+    private int reviewPercentage;
 
     @ManyToOne
     @JoinColumn(name = "department_id", nullable = false)
@@ -28,6 +32,10 @@ public class Major {
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {
         return Major.builder()
                 .name(crudMajor.getName())
+                .progressPercentage(crudMajor.getProgressPercentage())
+                .reportPercentage(crudMajor.getReportPercentage())
+                .defensePercentage(crudMajor.getDefensePercentage())
+                .reviewPercentage(crudMajor.getReviewPercentage())
                 .department(crudMajor.getDepartment())
                 .build();
     }

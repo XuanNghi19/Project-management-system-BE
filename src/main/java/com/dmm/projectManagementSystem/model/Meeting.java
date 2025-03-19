@@ -26,7 +26,7 @@ public class Meeting {
     private String note;
 
     @ManyToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

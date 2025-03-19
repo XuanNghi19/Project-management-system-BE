@@ -11,4 +11,6 @@ public interface TopicManagementService {
     Pair<String, Boolean> approveGrade(String idNum);
     Pair<String, Boolean> deleteTopic(String idNum);
     TopicListByPageResponse getAllTopic(String name, Long courseID, Long majorID, int page, int limit);
+
+    // getDetail topic
 }

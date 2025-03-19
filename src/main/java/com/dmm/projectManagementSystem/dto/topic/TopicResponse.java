@@ -4,6 +4,7 @@ import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.Course;
 import com.dmm.projectManagementSystem.model.Grade;
 import com.dmm.projectManagementSystem.model.Major;
+import com.dmm.projectManagementSystem.model.Topic;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,4 +26,17 @@ public class TopicResponse {
 
     private ProjectStage projectStage;
     private Grade grade;
+
+    static public TopicResponse fromTopic(Topic topic) {
+        return TopicResponse.builder()
+                .idNum(topic.getIdNum())
+                .startTime(topic.getStartTime())
+                .endTime(topic.getEndTime())
+                .name(topic.getName())
+                .startSubmissionDate(topic.getStartSubmissionDate())
+                .endSubmissionDate(topic.getEndSubmissionDate())
+                .projectStage(topic.getProjectStage())
+                .grade(topic.getGrade())
+                .build();
+    }
 }

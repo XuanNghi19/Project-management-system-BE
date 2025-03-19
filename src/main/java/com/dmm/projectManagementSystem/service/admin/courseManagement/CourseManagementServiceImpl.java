@@ -6,11 +6,15 @@ import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.department.DepartmentListByPageResponse;
 import com.dmm.projectManagementSystem.model.Course;
 import com.dmm.projectManagementSystem.model.Department;
+import com.dmm.projectManagementSystem.repo.CouncilRepo;
 import com.dmm.projectManagementSystem.repo.CourseRepo;
+import com.dmm.projectManagementSystem.repo.TopicRepo;
+import com.dmm.projectManagementSystem.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,9 @@ import java.util.List;
 public class CourseManagementServiceImpl implements CourseManagementService{
 
     final private CourseRepo courseRepo;
+    final private UserRepo userRepo;
+    final private TopicRepo topicRepo;
+    final private CouncilRepo councilRepo;
 
     @Transactional
     @Override
@@ -49,12 +56,17 @@ public class CourseManagementServiceImpl implements CourseManagementService{
 
     @Transactional
     @Override
-    public boolean deleteCourse(Long id) {
+    public Pair<String, Boolean> deleteCourse(Long id) {
         if(courseRepo.existsById(id)) {
+            Course exCourse = courseRepo.findById(id)
+                            .orElseThrow(() -> new RuntimeException("Khong tim thay course voi id: " + id));
+            if(userRepo.existsByCourse(exCourse) || topicRepo.existsByCourse(exCourse) || councilRepo.existsByCourse(exCourse)) {
+                return Pair.of("still exists in the course!", false);
+            }
             courseRepo.deleteById(id);
-            return true;
+            return Pair.of("Deleted!", true);
         }
-        return false;
+        return Pair.of(String.format("ID doesn't exists: %d", id), false);
     }
 
     @Override

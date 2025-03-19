@@ -6,10 +6,7 @@ import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.major.MajorListByPageResponse;
 import com.dmm.projectManagementSystem.model.Department;
 import com.dmm.projectManagementSystem.model.Major;
-import com.dmm.projectManagementSystem.repo.DepartmentRepo;
-import com.dmm.projectManagementSystem.repo.MajorRepo;
-import com.dmm.projectManagementSystem.repo.StudentTableRepo;
-import com.dmm.projectManagementSystem.repo.UserRepo;
+import com.dmm.projectManagementSystem.repo.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +22,7 @@ public class MajorManagementServiceImpl implements MajorManagementService{
 
     final private MajorRepo majorRepo;
     final private UserRepo userRepo;
+    final private TopicRepo topicRepo;
 
     @Transactional
     @Override
@@ -62,7 +60,9 @@ public class MajorManagementServiceImpl implements MajorManagementService{
             if(userRepo.existsByMajor(major)) {
                 return Pair.of("Still have students in major!", false);
             }
-
+            if(topicRepo.existsByMajor(major)) {
+                return Pair.of("Still have topic in major!", false);
+            }
             majorRepo.deleteById(id);
             return Pair.of("Deleted!", true);
         }

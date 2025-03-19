@@ -1,6 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
-import com.dmm.projectManagementSystem.enums.GradeType;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ public class Evaluation {
     private String grade;
 
     @Enumerated(EnumType.STRING)
-    private GradeType gradeType;
+    private ProjectStage projectStage;
 
     @ManyToOne
     @JoinColumn(name = "topicID")

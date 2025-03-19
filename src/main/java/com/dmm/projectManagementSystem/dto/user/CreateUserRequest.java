@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.dto.user;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +17,6 @@ public class CreateUserRequest {
     String email;
     String phoneNumber;
     String sex;
-    String avatarUrl;
     String address;
 
     Long courseId;

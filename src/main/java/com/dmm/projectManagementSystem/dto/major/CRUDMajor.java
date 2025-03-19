@@ -14,12 +14,20 @@ import lombok.experimental.FieldDefaults;
 public class CRUDMajor {
     Long id;
     String name;
+    int progressPercentage;
+    int reportPercentage;
+    int defensePercentage;
+    int reviewPercentage;
     Department department;
 
     static public CRUDMajor fromMajor(Major major) {
         return CRUDMajor.builder()
                 .id(major.getId())
                 .name(major.getName())
+                .progressPercentage(major.getProgressPercentage())
+                .reportPercentage(major.getReportPercentage())
+                .defensePercentage(major.getDefensePercentage())
+                .reviewPercentage(major.getReviewPercentage())
                 .department(major.getDepartment())
                 .build();
     }

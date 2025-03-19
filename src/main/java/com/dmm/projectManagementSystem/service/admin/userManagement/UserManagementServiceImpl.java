@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.service.admin.userManagement;
 
+import com.dmm.projectManagementSystem.service.serviceUtils.FirebaseService;
 import com.dmm.projectManagementSystem.utils.StringUtils;
 import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     final private DepartmentRepo departmentRepo;
     final private MajorRepo majorRepo;
     final private CourseRepo courseRepo;
+    final private FirebaseService firebaseService;
 
     @Transactional
     @Override
@@ -102,10 +105,13 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Transactional
     @Override
-    public boolean updateUser(UpdateUserRequest updateUserRequest) {
+    public boolean updateUser(UpdateUserRequest updateUserRequest, MultipartFile[] avatarImg) {
         try {
             User exUser = userRepo.findByIdNum(updateUserRequest.getIdNum())
                     .orElseThrow(() -> new RuntimeException("Khong ton tai user voi idNum: " + updateUserRequest.getIdNum()));
+
+            List<String> avatarUrl = firebaseService.uploadFiles(avatarImg);
+
             User updateUser = new User();
             String encodePassword = passwordEncoder.encode(updateUserRequest.getPassword());
 
@@ -113,7 +119,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Department department = departmentRepo.findById(updateUserRequest.getDepartmentId())
                         .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + updateUserRequest.getDepartmentId()));
 
-                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword);
+                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword, avatarUrl.get(0));
                 updateUser.setId(exUser.getId());
                 updateUser.setDepartment(department);
             } else {
@@ -122,7 +128,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Course course = courseRepo.findById(updateUserRequest.getCourseId())
                         .orElseThrow(() -> new RuntimeException("Khong ton tai course voi idNum: " + updateUserRequest.getCourseId()));
 
-                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword);
+                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword, avatarUrl.get(0));
                 updateUser.setId(exUser.getId());
                 updateUser.setMajor(major);
                 updateUser.setCourse(course);

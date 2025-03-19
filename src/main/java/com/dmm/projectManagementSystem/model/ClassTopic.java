@@ -6,22 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "student_table")
+@Table(name = "class_topic")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class StudentTable {
+public class ClassTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "teacherID")
+    @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    @ManyToOne
-    @JoinColumn(name = "studentID")
-    private User student;
+    LocalDateTime startTime;
+    LocalDateTime endTime;
 }

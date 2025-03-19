@@ -38,6 +38,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     boolean existsByMajor(Major major);
     boolean existsByDepartment(Department department);
+    boolean existsByCourse(Course course);
 }
 
 
