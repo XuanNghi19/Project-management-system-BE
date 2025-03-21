@@ -30,11 +30,11 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     final private FilesUrlRepo filesUrlRepo;
     final private GradeRepo gradeRepo;
     final private EvaluationRepo evaluationRepo;
-    final private GroupRepo groupRepo;
+    final private TeamRepo teamRepo;
     final private MeetingRepo meetingRepo;
     final private DefenseScheduleRepo defenseScheduleRepo;
 
-    final private GroupStudentRepo groupStudentRepo;
+    final private TeamMemberRepo teamMemberRepo;
 
     @Transactional
     @Override
@@ -97,8 +97,8 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 }
             }
 
-            if(groupRepo.existsByTopic(topic)) {
-                if (!groupRepo.deleteAllByTopic(topic)) {
+            if(teamRepo.existsByTopic(topic)) {
+                if (!teamRepo.deleteAllByTopic(topic)) {
                     return Pair.of(String.format("cannot delete group by topic of idNum: %s", idNum), false);
                 }
             }
@@ -150,8 +150,8 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     public TopicDetailsResponse getDetailTopic(String idNum) {
         Topic exTopic = topicRepo.findByIdNum(idNum);
 
-        Group group = groupRepo.findByTopic(exTopic);
-        List<GroupStudent> groupStudentList = groupStudentRepo.findAllByGroup(group);
+        Team team = teamRepo.findByTopic(exTopic);
+        List<TeamMember> teamMemberList = teamMemberRepo.findAllByTeam(team);
 
         List<Task> taskList = taskRepo.findAllByTopic(exTopic);
         List<Announcement> announcementList = announcementRepo.findAllByTopic(exTopic);
@@ -162,8 +162,8 @@ public class TopicManagementServiceImpl implements TopicManagementService{
 
         return TopicDetailsResponse.fromTopicAllData(
                 exTopic,
-                group,
-                groupStudentList,
+                team,
+                teamMemberList,
                 taskList,
                 announcementList,
                 filesUrlList,

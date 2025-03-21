@@ -7,12 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "group")
+@Table(name = "team")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class Group {
+public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +26,6 @@ public class Group {
     private User teacher;
 
     private boolean status;
-    private String groupName;
+    private String teamName;
 }
 

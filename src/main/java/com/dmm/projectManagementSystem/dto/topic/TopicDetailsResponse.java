@@ -6,7 +6,7 @@ import com.dmm.projectManagementSystem.dto.defenseSchedule.DefenseScheduleRespon
 import com.dmm.projectManagementSystem.dto.evaluation.EvaluationResponse;
 import com.dmm.projectManagementSystem.dto.filesUrl.FilesUrlResponse;
 import com.dmm.projectManagementSystem.dto.grade.GradeResponse;
-import com.dmm.projectManagementSystem.dto.group.GroupResponse;
+import com.dmm.projectManagementSystem.dto.team.TeamResponse;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.meeting.MeetingResponse;
 import com.dmm.projectManagementSystem.dto.task.TaskResponse;
@@ -37,7 +37,7 @@ public class TopicDetailsResponse {
     CRUDCourse course;
     CRUDMajor major;
 
-    GroupResponse group;
+    TeamResponse group;
 
     List<TaskResponse> taskList;
     List<AnnouncementResponse> announcementList;
@@ -48,8 +48,8 @@ public class TopicDetailsResponse {
 
     static public TopicDetailsResponse fromTopicAllData(
             Topic topic,
-            Group group,
-            List<GroupStudent> groupStudentList,
+            Team team,
+            List<TeamMember> teamMemberList,
             List<Task> taskList,
             List<Announcement> announcementList,
             List<FilesUrl> filesUrlList,
@@ -68,9 +68,9 @@ public class TopicDetailsResponse {
                 .grade(GradeResponse.fromGrade(topic.getGrade()))
                 .course(CRUDCourse.fromCourse(topic.getCourse()))
                 .major(CRUDMajor.fromMajor(topic.getMajor()))
-                .group(GroupResponse.fromGroup(
-                        group,
-                        groupStudentList
+                .group(TeamResponse.fromGroup(
+                        team,
+                        teamMemberList
                 ))
                 .taskList(taskList.stream().map(TaskResponse::fromTask).toList())
                 .announcementList(announcementList.stream().map(AnnouncementResponse::fromAnnouncement).toList())
