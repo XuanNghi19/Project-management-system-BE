@@ -7,22 +7,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "project_user")
+@Table(name = "group")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class TopicUser {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "topicID")
+    @OneToOne
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     @ManyToOne
-    @JoinColumn(name = "userID")
-    private User user;
+    @JoinColumn(name = "teacher_id")
+    private User teacher;
+
+    private boolean status;
+    private String groupName;
 }
 

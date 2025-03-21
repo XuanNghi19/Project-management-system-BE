@@ -1,9 +1,8 @@
 package com.dmm.projectManagementSystem.service.admin.topicManagement;
 
+import com.dmm.projectManagementSystem.dto.topic.TopicDetailsResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
-import com.dmm.projectManagementSystem.dto.user.UserListByPageResponse;
-import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import com.dmm.projectManagementSystem.service.serviceUtils.FirebaseService;
@@ -31,10 +30,11 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     final private FilesUrlRepo filesUrlRepo;
     final private GradeRepo gradeRepo;
     final private EvaluationRepo evaluationRepo;
-    final private TopicUserRepo topicUserRepo;
+    final private GroupRepo groupRepo;
     final private MeetingRepo meetingRepo;
     final private DefenseScheduleRepo defenseScheduleRepo;
 
+    final private GroupStudentRepo groupStudentRepo;
 
     @Transactional
     @Override
@@ -78,7 +78,7 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 }
             }
 
-            List<FilesUrl> fileUrls = filesUrlRepo.getAllByTopic(topic);
+            List<FilesUrl> fileUrls = filesUrlRepo.findAllByTopic(topic);
             if(!fileUrls.isEmpty()) {
                 for(var x : fileUrls) {
                     if(!firebaseService.deleteFile(x.getUri())) {
@@ -97,21 +97,21 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 }
             }
 
-            if(topicUserRepo.existsByTopic(topic)) {
-                if (!topicUserRepo.deleteAllByTopic(topic)) {
-                    return Pair.of(String.format("cannot topicUser evaluation by topic of idNum: %s", idNum), false);
+            if(groupRepo.existsByTopic(topic)) {
+                if (!groupRepo.deleteAllByTopic(topic)) {
+                    return Pair.of(String.format("cannot delete group by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(meetingRepo.existsByTopic(topic)) {
                 if (!meetingRepo.deleteAllByTopic(topic)) {
-                    return Pair.of(String.format("cannot topicUser meeting by topic of idNum: %s", idNum), false);
+                    return Pair.of(String.format("cannot delete meeting by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(defenseScheduleRepo.existsByTopic(topic)) {
                 if (!defenseScheduleRepo.deleteAllByTopic(topic)) {
-                    return Pair.of(String.format("cannot topicUser defenseSchedule by topic of idNum: %s", idNum), false);
+                    return Pair.of(String.format("cannot delete defenseSchedule by topic of idNum: %s", idNum), false);
                 }
             }
 
@@ -144,5 +144,32 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 .map(TopicResponse::fromTopic);
 
         return TopicListByPageResponse.fromSplitPage(topicResponsePage.getContent(), topicResponsePage.getTotalPages(), page, limit);
+    }
+
+    @Override
+    public TopicDetailsResponse getDetailTopic(String idNum) {
+        Topic exTopic = topicRepo.findByIdNum(idNum);
+
+        Group group = groupRepo.findByTopic(exTopic);
+        List<GroupStudent> groupStudentList = groupStudentRepo.findAllByGroup(group);
+
+        List<Task> taskList = taskRepo.findAllByTopic(exTopic);
+        List<Announcement> announcementList = announcementRepo.findAllByTopic(exTopic);
+        List<FilesUrl> filesUrlList = filesUrlRepo.findAllByTopic(exTopic);
+        List<Evaluation> evaluationList = evaluationRepo.findAllByTopic(exTopic);
+        List<Meeting> meetingList = meetingRepo.findAllByTopic(exTopic);
+        DefenseSchedule defenseSchedule = defenseScheduleRepo.findByTopic(exTopic);
+
+        return TopicDetailsResponse.fromTopicAllData(
+                exTopic,
+                group,
+                groupStudentList,
+                taskList,
+                announcementList,
+                filesUrlList,
+                evaluationList,
+                meetingList,
+                defenseSchedule
+        );
     }
 }

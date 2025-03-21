@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface FilesUrlRepo extends JpaRepository<FilesUrl, Long> {
-    List<FilesUrl> getAllByTopic(Topic topic);
+    List<FilesUrl> findAllByTopic(Topic topic);
     boolean deleteAllByTopic(Topic topic);
 }

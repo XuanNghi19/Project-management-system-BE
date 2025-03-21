@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface DefenseScheduleRepo extends JpaRepository<DefenseSchedule, Long> {
     boolean existsByTopic(Topic topic);
     boolean deleteAllByTopic(Topic topic);
+
+    DefenseSchedule findByTopic(Topic topic);
 }
 

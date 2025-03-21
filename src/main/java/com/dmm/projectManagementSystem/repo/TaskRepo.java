@@ -5,8 +5,12 @@ import com.dmm.projectManagementSystem.model.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TaskRepo extends JpaRepository<Task, Long> {
     boolean existsByTopic(Topic topic);
     boolean deleteAllByTopic(Topic topic);
+
+    List<Task> findAllByTopic(Topic topic);
 }

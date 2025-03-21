@@ -22,7 +22,7 @@ public class Evaluation {
 
     private String comment;
     private LocalDateTime dateCommented;
-    private String grade;
+    private Double grade;
 
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
