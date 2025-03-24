@@ -8,7 +8,7 @@ public class CorsConfig implements WebMvcConfigurer {  // Implement WebMvcConfig
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // Áp dụng CORS cho tất cả các endpoint trong ứng dụng
                 .allowedOrigins("*") // Cho phép tất cả các domain (không giới hạn nguồn gốc)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH") // Cho phép các phương thức HTTP này
-                .allowedHeaders("Authorization"); // Chỉ cho phép gửi header "Authorization"
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH"); // Cho phép các phương thức HTTP này
+//                .allowedHeaders("Authorization"); // Chỉ cho phép gửi header "Authorization"
     }
 }

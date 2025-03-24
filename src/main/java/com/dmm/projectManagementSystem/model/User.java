@@ -41,6 +41,7 @@ public class User implements UserDetails {
     private String address;
     private boolean active;
 
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -108,4 +109,5 @@ public class User implements UserDetails {
                 .active(true)
                 .build();
     }
+
 }

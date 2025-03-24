@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "graduation_project")
+@Table(name = "topic")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,8 +31,20 @@ public class Topic {
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "gradeID")
     private Grade grade;
+
+
+    public Topic loadFromStudentTopicReq (StudentTopicReq studentTopicReq){
+        return Topic.builder()
+                .idNum(studentTopicReq.getIdNum())
+                .name(studentTopicReq.getName())
+                .build();
+    }
+
+    @OneToOne
+    private Team group;
+
 }
 
