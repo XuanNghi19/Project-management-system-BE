@@ -67,13 +67,13 @@ public class TopicManagementServiceImpl implements TopicManagementService{
             Topic topic = topicRepo.findByIdNum(idNum);
 
             if(taskRepo.existsByTopic(topic)) {
-                if(!taskRepo.deleteAllByTopic(topic)) {
+                if(taskRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete tasks by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(announcementRepo.existsByTopic(topic)) {
-                if (!announcementRepo.deleteAllByTopic(topic)) {
+                if (announcementRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete announcements by topic of idNum: %s", idNum), false);
                 }
             }
@@ -92,25 +92,25 @@ public class TopicManagementServiceImpl implements TopicManagementService{
             }
 
             if(evaluationRepo.existsByTopic(topic)) {
-                if (!evaluationRepo.deleteAllByTopic(topic)) {
+                if (evaluationRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete evaluation by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(teamRepo.existsByTopic(topic)) {
-                if (!teamRepo.deleteAllByTopic(topic)) {
+                if (teamRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete group by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(meetingRepo.existsByTopic(topic)) {
-                if (!meetingRepo.deleteAllByTopic(topic)) {
+                if (meetingRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete meeting by topic of idNum: %s", idNum), false);
                 }
             }
 
             if(defenseScheduleRepo.existsByTopic(topic)) {
-                if (!defenseScheduleRepo.deleteAllByTopic(topic)) {
+                if (defenseScheduleRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete defenseSchedule by topic of idNum: %s", idNum), false);
                 }
             }

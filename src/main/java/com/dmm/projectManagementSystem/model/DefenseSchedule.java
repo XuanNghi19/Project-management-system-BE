@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,5 +32,21 @@ public class DefenseSchedule {
     @ManyToOne
     @JoinColumn(name = "topic_Id")
     private Topic topic;
+
+    static public DefenseSchedule fromCRUDDefenseSchedule(
+            CRUDDefenseSchedule crudDefenseSchedule,
+            Council council,
+            Topic topic
+    ) {
+        return DefenseSchedule.builder()
+                .id(crudDefenseSchedule.getId())
+                .startTime(crudDefenseSchedule.getStartTime())
+                .endTime(crudDefenseSchedule.getEndTime())
+                .location(council.getLocation())
+                .note(crudDefenseSchedule.getNote())
+                .council(council)
+                .topic(topic)
+                .build();
+    }
 }
 

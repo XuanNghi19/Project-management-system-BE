@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeamRepo extends JpaRepository<Team, Long> {
     boolean existsByTopic(Topic topic);
-    boolean deleteAllByTopic(Topic topic);
+    Long deleteAllByTopic(Topic topic);
 
     Team findByTopic(Topic topic);
 }

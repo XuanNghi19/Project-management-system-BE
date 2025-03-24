@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface TaskRepo extends JpaRepository<Task, Long> {
     boolean existsByTopic(Topic topic);
-    boolean deleteAllByTopic(Topic topic);
+    Long deleteAllByTopic(Topic topic);
 
     List<Task> findAllByTopic(Topic topic);
 }

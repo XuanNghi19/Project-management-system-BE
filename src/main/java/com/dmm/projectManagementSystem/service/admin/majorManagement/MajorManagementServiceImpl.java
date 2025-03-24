@@ -23,6 +23,7 @@ public class MajorManagementServiceImpl implements MajorManagementService{
     final private MajorRepo majorRepo;
     final private UserRepo userRepo;
     final private TopicRepo topicRepo;
+    final private DepartmentRepo departmentRepo;
 
     @Transactional
     @Override
@@ -70,7 +71,12 @@ public class MajorManagementServiceImpl implements MajorManagementService{
     }
 
     @Override
-    public MajorListByPageResponse getAllMajor(String name, Department department, int page, int limit) {
+    public MajorListByPageResponse getAllMajor(String name, Long departmentID, int page, int limit) {
+        Department department = null;
+        if (departmentID != null) {
+            department = departmentRepo.findById(departmentID)
+                    .orElseThrow(() -> new RuntimeException("Khong tim thay department voi id: " + departmentID));
+        }
         Page<CRUDMajor> crudMajorPage = majorRepo.findAllMajor(name, department, PageRequest.of(page, limit))
                 .map(CRUDMajor::fromMajor);
 

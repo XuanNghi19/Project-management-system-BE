@@ -1,4 +1,6 @@
 package com.dmm.projectManagementSystem.model;
+import com.dmm.projectManagementSystem.dto.council.CreateCouncilRequest;
+import com.dmm.projectManagementSystem.dto.council.UpdateCouncilRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +33,37 @@ public class Council {
     @ManyToOne
     @JoinColumn(name = "departmentID")
     private Department department;
+
+    static public Council fromCreateCouncilRequest(
+            CreateCouncilRequest createCouncilRequest,
+            Course course,
+            Department department
+    ) {
+        return Council.builder()
+                .name(createCouncilRequest.getName())
+                .fileUrl(createCouncilRequest.getFileUrl())
+                .location(createCouncilRequest.getLocation())
+                .startTime(createCouncilRequest.getStartTime())
+                .endTime(createCouncilRequest.getEndTime())
+                .course(course)
+                .department(department)
+                .build();
+    }
+
+    static public Council fromUpdateCouncilRequest(
+            UpdateCouncilRequest updateCouncilRequest,
+            Course course,
+            Department department
+    ) {
+        return Council.builder()
+                .id(updateCouncilRequest.getId())
+                .name(updateCouncilRequest.getName())
+                .fileUrl(updateCouncilRequest.getFileUrl())
+                .location(updateCouncilRequest.getLocation())
+                .startTime(updateCouncilRequest.getStartTime())
+                .endTime(updateCouncilRequest.getEndTime())
+                .course(course)
+                .department(department)
+                .build();
+    }
 }

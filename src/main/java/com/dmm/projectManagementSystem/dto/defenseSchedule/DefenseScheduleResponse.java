@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class DefenseScheduleResponse {
-    private Long id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private String location;
-    private String note;
+    Long id;
+    LocalDateTime startTime;
+    LocalDateTime endTime;
+    String location;
+    String note;
 
     static public DefenseScheduleResponse fromDefenseSchedule(DefenseSchedule defenseSchedule) {
         return DefenseScheduleResponse.builder()

@@ -112,7 +112,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
             List<String> avatarUrl = firebaseService.uploadFiles(avatarImg);
 
-            User updateUser = new User();
+            User updateUser;
             String encodePassword = passwordEncoder.encode(updateUserRequest.getPassword());
 
             if (exUser.getRole() == Role.ADMIN || exUser.getRole() == Role.INSTRUCTORS) {

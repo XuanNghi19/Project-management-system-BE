@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface EvaluationRepo extends JpaRepository<Evaluation, Long> {
     boolean existsByTopic(Topic topic);
-    boolean deleteAllByTopic(Topic topic);
+    Long deleteAllByTopic(Topic topic);
 
     List<Evaluation> findAllByTopic(Topic topic);
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface MeetingRepo extends JpaRepository<Meeting, Long> {
     boolean existsByTopic(Topic topic);
-    boolean deleteAllByTopic(Topic topic);
+    Long deleteAllByTopic(Topic topic);
 
     List<Meeting> findAllByTopic(Topic topic);
 }

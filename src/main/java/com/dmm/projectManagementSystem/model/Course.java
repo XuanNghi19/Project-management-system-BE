@@ -30,6 +30,7 @@ public class Course {
 
     static public Course fromCRUDCourse(CRUDCourse crudCourse) {
         return Course.builder()
+                .id(crudCourse.getId())
                 .name(crudCourse.getName())
                 .startTime(crudCourse.getStartTime())
                 .endTime(crudCourse.getEndTime())

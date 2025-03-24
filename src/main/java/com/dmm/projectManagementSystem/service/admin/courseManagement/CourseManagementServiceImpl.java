@@ -2,10 +2,7 @@ package com.dmm.projectManagementSystem.service.admin.courseManagement;
 
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.course.CourseListByPageResponse;
-import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
-import com.dmm.projectManagementSystem.dto.department.DepartmentListByPageResponse;
 import com.dmm.projectManagementSystem.model.Course;
-import com.dmm.projectManagementSystem.model.Department;
 import com.dmm.projectManagementSystem.repo.CouncilRepo;
 import com.dmm.projectManagementSystem.repo.CourseRepo;
 import com.dmm.projectManagementSystem.repo.TopicRepo;
@@ -74,6 +71,6 @@ public class CourseManagementServiceImpl implements CourseManagementService{
         Page<CRUDCourse> crudCourses = courseRepo.findAllCourse(name, PageRequest.of(page, limit))
                 .map(CRUDCourse::fromCourse);
 
-        return CourseListByPageResponse.fromSplitPage(crudCourses.getContent(), crudCourses.getTotalPages(), page, limit);
+        return com.dmm.projectManagementSystem.dto.course.CourseListByPageResponse.fromSplitPage(crudCourses.getContent(), crudCourses.getTotalPages(), page, limit);
     }
 }

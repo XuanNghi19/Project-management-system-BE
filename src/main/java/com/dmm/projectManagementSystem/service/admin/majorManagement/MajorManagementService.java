@@ -14,5 +14,5 @@ public interface MajorManagementService {
     boolean updateMajor(CRUDMajor uMajor);
     Pair<String, Boolean> deleteMajor(Long id);
 
-    MajorListByPageResponse getAllMajor(String name, Department department, int page, int limit);
+    MajorListByPageResponse getAllMajor(String name, Long departmentID, int page, int limit);
 }
