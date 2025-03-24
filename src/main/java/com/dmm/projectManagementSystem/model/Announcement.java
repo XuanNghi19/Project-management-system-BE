@@ -24,5 +24,8 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "topicID")
     private Topic topic;
+    @ManyToOne
+    @JoinColumn(name="teacher_id")
+    private User teacher;
 }
 

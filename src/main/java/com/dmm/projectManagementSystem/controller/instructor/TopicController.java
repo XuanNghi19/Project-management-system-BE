@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controller.instructor;
 
 public class TopicController {
 }
