@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.classTopic.CreateClassTopicRequest;
+import com.dmm.projectManagementSystem.dto.classTopic.UpdateClassTopicRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +21,53 @@ public class ClassTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String className;
+
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    LocalDateTime startTime;
-    LocalDateTime endTime;
+    private LocalDateTime startRegistrationTime;
+    private LocalDateTime endRegistrationTime;
+
+    @ManyToOne
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
+
+    static public ClassTopic fromCreateClassTopicRequest(
+            CreateClassTopicRequest request,
+            User teacher,
+            TopicSemester topicSemester,
+            Major major
+    ) {
+        return ClassTopic.builder()
+                .className(request.getClassName())
+                .teacher(teacher)
+                .startRegistrationTime(request.getStartRegistrationTime())
+                .endRegistrationTime(request.getEndRegistrationTime())
+                .topicSemester(topicSemester)
+                .major(major)
+                .build();
+    }
+
+    static public ClassTopic fromUpdateClassTopicRequest(
+            UpdateClassTopicRequest request,
+            User teacher,
+            TopicSemester topicSemester,
+            Major major
+    ) {
+        return ClassTopic.builder()
+                .id(request.getId())
+                .className(request.getClassName())
+                .teacher(teacher)
+                .startRegistrationTime(request.getStartRegistrationTime())
+                .endRegistrationTime(request.getEndRegistrationTime())
+                .topicSemester(topicSemester)
+                .major(major)
+                .build();
+    }
 }

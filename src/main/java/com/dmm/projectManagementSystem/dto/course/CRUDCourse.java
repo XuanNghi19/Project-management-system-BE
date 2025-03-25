@@ -1,16 +1,11 @@
 package com.dmm.projectManagementSystem.dto.course;
 
-import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.model.Course;
-import com.dmm.projectManagementSystem.model.Department;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.dmm.projectManagementSystem.model.TopicSemester;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor

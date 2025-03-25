@@ -1,8 +1,9 @@
 package com.dmm.projectManagementSystem.dto.team;
 
-import com.dmm.projectManagementSystem.model.Team;
-import com.dmm.projectManagementSystem.model.TeamMember;
-import com.dmm.projectManagementSystem.model.User;
+import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
+import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
+import com.dmm.projectManagementSystem.model.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,16 +19,23 @@ public class TeamResponse {
     User teacher;
     String groupName;
 
+    CRUDTopicSemester topicSemester;
+    CRUDMajor major;
+
     List<TeamMemberResponse> teamMemberResponseList;
 
     static public TeamResponse fromGroup(
             Team team,
+            TopicSemester topicSemester,
+            Major major,
             List<TeamMember> teamMemberList
     ) {
         return TeamResponse.builder()
                 .id(team.getId())
                 .teacher(team.getTeacher())
                 .groupName(team.getTeamName())
+                .topicSemester(CRUDTopicSemester.fromTopicSemester(topicSemester))
+                .major(CRUDMajor.fromMajor(major))
                 .teamMemberResponseList(teamMemberList.stream().map(TeamMemberResponse::fromTeamMember).toList())
                 .build();
     }

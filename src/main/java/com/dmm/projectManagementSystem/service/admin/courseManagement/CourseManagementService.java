@@ -7,9 +7,9 @@ import org.springframework.data.util.Pair;
 import java.util.List;
 
 public interface CourseManagementService {
-    boolean addCourse(List<CRUDCourse> cCoursesList);
-    boolean updateCourse(CRUDCourse uCourse);
-    Pair<String, Boolean> deleteCourse(Long id);
+    boolean addCourse(List<CRUDCourse> cCoursesList) throws Exception;
+    boolean updateCourse(CRUDCourse uCourse) throws Exception;
+    Pair<String, Boolean> deleteCourse(Long id) throws Exception;
 
     CourseListByPageResponse getAllCourse(String name, int page, int limit);
 }

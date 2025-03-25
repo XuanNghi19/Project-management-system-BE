@@ -27,16 +27,16 @@ public class Council {
     private LocalDateTime endTime;
 
     @ManyToOne
-    @JoinColumn(name = "courseID")
-    private Course course;
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID")
+    @JoinColumn(name = "department_id")
     private Department department;
 
     static public Council fromCreateCouncilRequest(
             CreateCouncilRequest createCouncilRequest,
-            Course course,
+            TopicSemester topicSemester,
             Department department
     ) {
         return Council.builder()
@@ -45,14 +45,14 @@ public class Council {
                 .location(createCouncilRequest.getLocation())
                 .startTime(createCouncilRequest.getStartTime())
                 .endTime(createCouncilRequest.getEndTime())
-                .course(course)
+                .topicSemester(topicSemester)
                 .department(department)
                 .build();
     }
 
     static public Council fromUpdateCouncilRequest(
             UpdateCouncilRequest updateCouncilRequest,
-            Course course,
+            TopicSemester topicSemester,
             Department department
     ) {
         return Council.builder()
@@ -62,7 +62,7 @@ public class Council {
                 .location(updateCouncilRequest.getLocation())
                 .startTime(updateCouncilRequest.getStartTime())
                 .endTime(updateCouncilRequest.getEndTime())
-                .course(course)
+                .topicSemester(topicSemester)
                 .department(department)
                 .build();
     }

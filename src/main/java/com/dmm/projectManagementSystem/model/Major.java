@@ -36,7 +36,7 @@ public class Major {
                 .reportPercentage(crudMajor.getReportPercentage())
                 .defensePercentage(crudMajor.getDefensePercentage())
                 .reviewPercentage(crudMajor.getReviewPercentage())
-                .department(crudMajor.getDepartment())
+                .department(Department.fromCRUDDepartment(crudMajor.getDepartment()))
                 .build();
     }
 }

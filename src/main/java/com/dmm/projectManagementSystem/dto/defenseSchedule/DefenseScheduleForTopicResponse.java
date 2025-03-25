@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class DefenseScheduleResponse {
+public class DefenseScheduleForTopicResponse {
     Long id;
     LocalDateTime startTime;
     LocalDateTime endTime;
     String location;
     String note;
 
-    static public DefenseScheduleResponse fromDefenseSchedule(DefenseSchedule defenseSchedule) {
-        return DefenseScheduleResponse.builder()
+    static public DefenseScheduleForTopicResponse fromDefenseSchedule(DefenseSchedule defenseSchedule) {
+        return DefenseScheduleForTopicResponse.builder()
                 .id(defenseSchedule.getId())
                 .startTime(defenseSchedule.getStartTime())
                 .endTime(defenseSchedule.getEndTime())

@@ -3,10 +3,8 @@ package com.dmm.projectManagementSystem.service.admin.courseManagement;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.course.CourseListByPageResponse;
 import com.dmm.projectManagementSystem.model.Course;
-import com.dmm.projectManagementSystem.repo.CouncilRepo;
-import com.dmm.projectManagementSystem.repo.CourseRepo;
-import com.dmm.projectManagementSystem.repo.TopicRepo;
-import com.dmm.projectManagementSystem.repo.UserRepo;
+import com.dmm.projectManagementSystem.model.TopicSemester;
+import com.dmm.projectManagementSystem.repo.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,16 +16,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CourseManagementServiceImpl implements CourseManagementService{
+public class CourseManagementServiceImpl implements CourseManagementService {
 
     final private CourseRepo courseRepo;
     final private UserRepo userRepo;
-    final private TopicRepo topicRepo;
-    final private CouncilRepo councilRepo;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addCourse(List<CRUDCourse> cCoursesList) {
+    public boolean addCourse(List<CRUDCourse> cCoursesList) throws Exception {
         try {
             for (var x : cCoursesList) {
                 courseRepo.save(Course.fromCRUDCourse(x));
@@ -35,33 +31,38 @@ public class CourseManagementServiceImpl implements CourseManagementService{
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean updateCourse(CRUDCourse uCourse) {
+    public boolean updateCourse(CRUDCourse uCourse) throws Exception {
         try {
             courseRepo.save(Course.fromCRUDCourse(uCourse));
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public Pair<String, Boolean> deleteCourse(Long id) {
-        if(courseRepo.existsById(id)) {
+    public Pair<String, Boolean> deleteCourse(Long id) throws Exception {
+        if (courseRepo.existsById(id)) {
             Course exCourse = courseRepo.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Khong tim thay course voi id: " + id));
-            if(userRepo.existsByCourse(exCourse) || topicRepo.existsByCourse(exCourse) || councilRepo.existsByCourse(exCourse)) {
-                return Pair.of("still exists in the course!", false);
+                    .orElseThrow(() -> new RuntimeException("Khong tim thay course voi id: " + id));
+            if (userRepo.existsByCourse(exCourse)) {
+                return Pair.of("still had user exists in the course!", false);
             }
-            courseRepo.deleteById(id);
-            return Pair.of("Deleted!", true);
+            try {
+                courseRepo.deleteById(id);
+                return Pair.of("Deleted!", true);
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex);
+                throw new Exception(ex);
+            }
         }
         return Pair.of(String.format("ID doesn't exists: %d", id), false);
     }
@@ -71,6 +72,6 @@ public class CourseManagementServiceImpl implements CourseManagementService{
         Page<CRUDCourse> crudCourses = courseRepo.findAllCourse(name, PageRequest.of(page, limit))
                 .map(CRUDCourse::fromCourse);
 
-        return com.dmm.projectManagementSystem.dto.course.CourseListByPageResponse.fromSplitPage(crudCourses.getContent(), crudCourses.getTotalPages(), page, limit);
+        return CourseListByPageResponse.fromSplitPage(crudCourses.getContent(), crudCourses.getTotalPages(), page, limit);
     }
 }

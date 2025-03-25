@@ -1,6 +1,5 @@
 package com.dmm.projectManagementSystem.repo;
 
-import com.dmm.projectManagementSystem.model.Course;
 import com.dmm.projectManagementSystem.model.TopicSemester;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CourseRepo extends JpaRepository<Course, Long> {
+public interface TopicSemesterRepo extends JpaRepository<TopicSemester, Long> {
     @Query("""
-        select c from Course c where (:name is null or lower(c.name) like lower(concat( '%', :name, '%')))
-        order by c.id desc
+        select t from TopicSemester t where (:name is null or lower(t.name) like lower(concat( '%', :name, '%')))
+        order by t.id desc
     """)
-    Page<Course> findAllCourse(@Param("name") String name, Pageable pageable);
+    Page<TopicSemester> findAllTopicSemester(@Param("name") String name, Pageable pageable);
 }

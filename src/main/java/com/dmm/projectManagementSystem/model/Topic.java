@@ -35,8 +35,8 @@ public class Topic {
     private Grade grade;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
 
     @ManyToOne
     @JoinColumn(name = "major_id")

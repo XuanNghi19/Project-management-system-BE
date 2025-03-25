@@ -1,6 +1,10 @@
 package com.dmm.projectManagementSystem.dto.user;
 
-import com.dmm.projectManagementSystem.model.Course;
+import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
+import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
+import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
+import com.dmm.projectManagementSystem.model.TopicSemester;
 import com.dmm.projectManagementSystem.model.Department;
 import com.dmm.projectManagementSystem.model.Major;
 import com.dmm.projectManagementSystem.model.User;
@@ -24,9 +28,9 @@ public class UserResponse {
     String avatarUrl;
     String address;
 
-    Course course;
-    Department department;
-    Major major;
+    CRUDCourse course;
+    CRUDDepartment department;
+    CRUDMajor major;
 
     public static UserResponse fromUser(
             User user
@@ -42,9 +46,9 @@ public class UserResponse {
                 .sex(user.getSex())
                 .avatarUrl(user.getAvatarUrl())
                 .address(user.getAddress())
-                .course(user.getCourse())
-                .department(user.getDepartment())
-                .major(user.getMajor())
+                .course(CRUDCourse.fromCourse(user.getCourse()))
+                .department(CRUDDepartment.fromDepartment(user.getDepartment()))
+                .major(CRUDMajor.fromMajor(user.getMajor()))
                 .build();
     }
 }

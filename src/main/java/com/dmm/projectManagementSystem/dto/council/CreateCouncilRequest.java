@@ -19,7 +19,7 @@ public class CreateCouncilRequest {
     LocalDateTime startTime;
     LocalDateTime endTime;
 
-    Long courseID;
+    Long topicSemesterID;
     Long departmentID;
 
     List<CRUDDefenseSchedule> scheduleRequests;

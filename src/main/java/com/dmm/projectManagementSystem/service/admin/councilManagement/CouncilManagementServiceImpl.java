@@ -1,14 +1,14 @@
 package com.dmm.projectManagementSystem.service.admin.councilManagement;
 
-import com.dmm.projectManagementSystem.dto.council.CouncilDetailResponse;
-import com.dmm.projectManagementSystem.dto.council.CouncilListByPageResponse;
-import com.dmm.projectManagementSystem.dto.council.CreateCouncilRequest;
-import com.dmm.projectManagementSystem.dto.council.UpdateCouncilRequest;
+import com.dmm.projectManagementSystem.dto.council.*;
 import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
+import com.dmm.projectManagementSystem.enums.ActionTypes;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -20,112 +20,124 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
 
     final private CouncilRepo councilRepo;
     final private DefenseScheduleRepo defenseScheduleRepo;
-    final private CourseRepo courseRepo;
+    final private TopicSemesterRepo topicSemesterRepo;
     final private DepartmentRepo departmentRepo;
-    final private TopicRepo topicRepo;
+    final private DefenseScheduleService defenseScheduleService;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public Pair<String, Boolean> addCouncil(CreateCouncilRequest request) throws Exception {
-        Course exCourse = courseRepo.findById(request.getCourseID())
-                .orElseThrow(() -> new RuntimeException("Khong tim thay course voi id: " + request.getCourseID()));
+        TopicSemester exTopicSemester = topicSemesterRepo.findById(request.getTopicSemesterID())
+                .orElseThrow(() -> new Exception("Khong tim thay course voi id: " + request.getTopicSemesterID()));
         Department exDepartment = departmentRepo.findById(request.getDepartmentID())
-                .orElseThrow(() -> new RuntimeException("Khong tim thay department voi id: " + request.getDepartmentID()));
+                .orElseThrow(() -> new Exception("Khong tim thay department voi id: " + request.getDepartmentID()));
 
-        Council council = Council.fromCreateCouncilRequest(request, exCourse, exDepartment);
-        council = councilRepo.save(council);
+        Council council = Council.fromCreateCouncilRequest(request, exTopicSemester, exDepartment);
 
-        for(var x : request.getScheduleRequests()) {
+        // try cho rollback
+        try {
+            council = councilRepo.save(council);
 
-            Topic exTopic = topicRepo.findByIdNum(x.getTopicIdNum());
-
-            DefenseSchedule defenseSchedule = DefenseSchedule.fromCRUDDefenseSchedule(x, council, exTopic);
-            defenseScheduleRepo.save(defenseSchedule);
+            for(var x : request.getScheduleRequests()) {
+                defenseScheduleService.addDefenseSchedule(council, x);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
 
         return Pair.of("Add Council Successes!", true);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public Pair<String, Boolean> updateCouncil(UpdateCouncilRequest request) throws Exception {
 
-        Course exCourse = courseRepo.findById(request.getCourseID())
-                .orElseThrow(() -> new RuntimeException("Khong tim thay course voi id: " + request.getCourseID()));
+        TopicSemester exTopicSemester = topicSemesterRepo.findById(request.getCourseID())
+                .orElseThrow(() -> new Exception("Khong tim thay course voi id: " + request.getCourseID()));
         Department exDepartment = departmentRepo.findById(request.getDepartmentID())
-                .orElseThrow(() -> new RuntimeException("Khong tim thay department voi id: " + request.getDepartmentID()));
+                .orElseThrow(() -> new Exception("Khong tim thay department voi id: " + request.getDepartmentID()));
 
-        Council updateCouncil = councilRepo.save(Council.fromUpdateCouncilRequest(request, exCourse, exDepartment));
+        try {
+            Council updateCouncil = councilRepo.save(Council.fromUpdateCouncilRequest(request, exTopicSemester, exDepartment));
 
-        List<DefenseSchedule> defenseScheduleList = defenseScheduleRepo.findAllByCouncil(updateCouncil);
-
-        for (var x : defenseScheduleList) {
-            x.setLocation(updateCouncil.getLocation());
-            defenseScheduleRepo.save(x);
+            for (var x : request.getScheduleRequests()) {
+                if (x.getAction() == ActionTypes.DELETE) {
+                    defenseScheduleService.deleteDefenceSchedule(x.getId());
+                } else if (x.getAction() == ActionTypes.UPDATE) {
+                    defenseScheduleService.updateDefenseSchedule(x);
+                } else if (x.getAction() == ActionTypes.CREATE) {
+                    defenseScheduleService.addDefenseSchedule(updateCouncil, x);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         return Pair.of("Update Council Successes!", true);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public Pair<String, Boolean> deleteCouncil(Long councilID) throws Exception {
 
         if(councilRepo.existsById(councilID)) {
             Council council = councilRepo.findById(councilID)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay council voi id: " + councilID));
+                    .orElseThrow(() -> new Exception("Khong tim thay council voi id: " + councilID));
 
             if(defenseScheduleRepo.existsByCouncil(council)) {
-                if(defenseScheduleRepo.deleteAllByCouncil(council) <= 0) {
-                       return Pair.of("Delete Defense Schedule Fail!", false);
+                try {
+                    defenseScheduleRepo.deleteAllByCouncil(council);
+                    councilRepo.deleteById(councilID);
+                    return Pair.of("Delete Council Successes!", true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-
-            councilRepo.deleteById(councilID);
-            return Pair.of("Delete Council Successes!", true);
         }
 
         return Pair.of("Delete Council Fail!", false);
     }
 
-    @Transactional
     @Override
-    public Pair<String, Boolean> addDefenseSchedule(Long councilID, List<CRUDDefenseSchedule> requests) throws Exception {
-        Council council = councilRepo.findById(councilID)
-                .orElseThrow(() -> new RuntimeException("Khong tim thay council voi id: " + councilID));
+    public CouncilListByPageResponse getAllCouncil(String name, Long topicSemesterID, Long departmentID, int page, int limit) throws Exception {
+        TopicSemester topicSemester = null;
+        Department department = null;
 
-        for (var x : requests) {
-            Topic exTopic = topicRepo.findByIdNum(x.getTopicIdNum());
-            DefenseSchedule defenseSchedule = DefenseSchedule.fromCRUDDefenseSchedule(x, council, exTopic);
-            defenseScheduleRepo.save(defenseSchedule);
+        if(topicSemesterID != null) {
+            topicSemester = topicSemesterRepo.findById(topicSemesterID)
+                    .orElseThrow(() -> new Exception("Khong tim thay topic semester voi id: " + topicSemesterID));
         }
-        return Pair.of("Add Defense Schedule Successes!", true);
+        if(departmentID != null) {
+            department = departmentRepo.findById(departmentID)
+                    .orElseThrow(() -> new Exception("Khong tim thay department voi id: " + departmentID));
+        }
+
+        Page<CouncilResponse> councilPage = councilRepo.findAllCouncil(
+                        name,
+                        topicSemester,
+                        department,
+                        PageRequest.of(page, limit)
+                )
+                .map(CouncilResponse::fromCouncil);
+
+        return CouncilListByPageResponse.fromSplitPage(
+                councilPage.getContent(),
+                councilPage.getTotalPages(),
+                page,
+                limit
+        );
     }
 
-    @Transactional
     @Override
-    public Pair<String, Boolean> updateDefenseSchedule(Long councilID, CRUDDefenseSchedule request) throws Exception {
-        Council council = councilRepo.findById(councilID)
-                .orElseThrow(() -> new RuntimeException("Khong tim thay council voi id: " + councilID));
+    public CouncilDetailResponse getCouncilDetail(Long councilID) throws Exception {
+        Council exCouncil = councilRepo.findById(councilID)
+                .orElseThrow(() -> new Exception("Khong tim thay council voi id: " + councilID));
 
-        return null;
-    }
+        List<CRUDDefenseSchedule> defenseScheduleList = defenseScheduleRepo.findAllByCouncil(exCouncil).stream().map(
+                CRUDDefenseSchedule::fromDefenseSchedule
+        ).toList();
 
-    @Transactional
-    @Override
-    public Pair<String, Boolean> deleteDefenceSchedule(Long councilID, Long defenseScheduleID) throws Exception{
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public CouncilListByPageResponse getAllCouncil(String name, Long courseID, Long departmentID, int page, int limit) {
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public CouncilDetailResponse getCouncilDetail(Long councilID) {
-        return null;
+        return CouncilDetailResponse.fromCouncil(exCouncil, defenseScheduleList);
     }
 }

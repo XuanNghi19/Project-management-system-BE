@@ -1,11 +1,8 @@
 package com.dmm.projectManagementSystem.dto.topic;
 
 import com.dmm.projectManagementSystem.enums.ProjectStage;
-import com.dmm.projectManagementSystem.model.Course;
 import com.dmm.projectManagementSystem.model.Grade;
-import com.dmm.projectManagementSystem.model.Major;
 import com.dmm.projectManagementSystem.model.Topic;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -18,7 +18,7 @@ public class CRUDMajor {
     int reportPercentage;
     int defensePercentage;
     int reviewPercentage;
-    Department department;
+    CRUDDepartment department;
 
     static public CRUDMajor fromMajor(Major major) {
         return CRUDMajor.builder()
@@ -28,7 +28,7 @@ public class CRUDMajor {
                 .reportPercentage(major.getReportPercentage())
                 .defensePercentage(major.getDefensePercentage())
                 .reviewPercentage(major.getReviewPercentage())
-                .department(major.getDepartment())
+                .department(CRUDDepartment.fromDepartment(major.getDepartment()))
                 .build();
     }
 }

@@ -27,5 +27,13 @@ public class Team {
 
     private boolean status;
     private String teamName;
+
+    @ManyToOne
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
 }
 

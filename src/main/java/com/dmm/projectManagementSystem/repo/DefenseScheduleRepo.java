@@ -18,6 +18,6 @@ public interface DefenseScheduleRepo extends JpaRepository<DefenseSchedule, Long
     List<DefenseSchedule> findAllByCouncil(Council council);
 
     boolean existsByCouncil(Council council);
-    Long deleteAllByCouncil(Council council);
+    void deleteAllByCouncil(Council council);
 }
 

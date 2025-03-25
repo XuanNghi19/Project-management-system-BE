@@ -1,9 +1,11 @@
 package com.dmm.projectManagementSystem.dto.council;
 
+import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -20,4 +22,6 @@ public class UpdateCouncilRequest {
 
     Long courseID;
     Long departmentID;
+
+    List<CRUDDefenseSchedule> scheduleRequests;
 }

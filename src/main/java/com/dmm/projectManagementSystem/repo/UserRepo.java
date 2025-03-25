@@ -1,10 +1,7 @@
 package com.dmm.projectManagementSystem.repo;
 
 import com.dmm.projectManagementSystem.enums.Role;
-import com.dmm.projectManagementSystem.model.Course;
-import com.dmm.projectManagementSystem.model.Department;
-import com.dmm.projectManagementSystem.model.Major;
-import com.dmm.projectManagementSystem.model.User;
+import com.dmm.projectManagementSystem.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

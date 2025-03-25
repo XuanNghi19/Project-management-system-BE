@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.repo;
 
+import com.dmm.projectManagementSystem.model.TopicSemester;
+import com.dmm.projectManagementSystem.model.Major;
 import com.dmm.projectManagementSystem.model.Topic;
 import com.dmm.projectManagementSystem.model.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +13,7 @@ public interface TeamRepo extends JpaRepository<Team, Long> {
     Long deleteAllByTopic(Topic topic);
 
     Team findByTopic(Topic topic);
+
+    boolean existsByTopicSemester(TopicSemester topicSemester);
+    boolean existsByMajor(Major major);
 }

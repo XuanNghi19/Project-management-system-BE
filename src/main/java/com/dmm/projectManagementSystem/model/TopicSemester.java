@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
+import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "course")
+@Table(name = "topic_semester")
 @Entity
-public class Course {
+public class TopicSemester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +27,12 @@ public class Course {
 
     private LocalDateTime endTime;
 
-    static public Course fromCRUDCourse(CRUDCourse crudCourse) {
-        return Course.builder()
-                .id(crudCourse.getId())
-                .name(crudCourse.getName())
-                .startTime(crudCourse.getStartTime())
-                .endTime(crudCourse.getEndTime())
+    static public TopicSemester fromCRUDTopicSemester(CRUDTopicSemester crudTopicSemester) {
+        return TopicSemester.builder()
+                .id(crudTopicSemester.getId())
+                .name(crudTopicSemester.getName())
+                .startTime(crudTopicSemester.getStartTime())
+                .endTime(crudTopicSemester.getEndTime())
                 .build();
     }
 }

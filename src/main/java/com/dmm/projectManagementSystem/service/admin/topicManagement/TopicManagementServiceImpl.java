@@ -22,7 +22,7 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     final private FirebaseService firebaseService;
 
     final private TopicRepo topicRepo;
-    final private CourseRepo courseRepo;
+    final private TopicSemesterRepo topicSemesterRepo;
     final private MajorRepo majorRepo;
 
     final private TaskRepo taskRepo;
@@ -122,22 +122,22 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     }
 
     @Override
-    public TopicListByPageResponse getAllTopic(String name, Long courseID, Long majorID, int page, int limit) {
+    public TopicListByPageResponse getAllTopic(String name, Long topicSemesterID, Long majorID, int page, int limit) {
         Major major = null;
-        Course course = null;
+        TopicSemester topicSemester = null;
 
         if (majorID != null) {
             major = majorRepo.findById(majorID)
                     .orElseThrow(() -> new RuntimeException("Khong tim thay majorId: " + majorID));
         }
-        if (courseID != null) {
-            course = courseRepo.findById(courseID)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay courseId: " + courseID));
+        if (topicSemesterID != null) {
+            topicSemester = topicSemesterRepo.findById(topicSemesterID)
+                    .orElseThrow(() -> new RuntimeException("Khong tim thay courseId: " + topicSemesterID));
         }
 
         Page<TopicResponse> topicResponsePage = topicRepo.findAllTopic(
                         major,
-                        course,
+                        topicSemester,
                         name,
                         PageRequest.of(page, limit)
                 )

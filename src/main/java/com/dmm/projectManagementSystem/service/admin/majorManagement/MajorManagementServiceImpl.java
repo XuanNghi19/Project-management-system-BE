@@ -1,7 +1,5 @@
 package com.dmm.projectManagementSystem.service.admin.majorManagement;
 
-import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
-import com.dmm.projectManagementSystem.dto.department.DepartmentListByPageResponse;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.major.MajorListByPageResponse;
 import com.dmm.projectManagementSystem.model.Department;
@@ -24,6 +22,8 @@ public class MajorManagementServiceImpl implements MajorManagementService{
     final private UserRepo userRepo;
     final private TopicRepo topicRepo;
     final private DepartmentRepo departmentRepo;
+    final private TeamRepo teamRepo;
+    final private ClassTopicRepo classTopicRepo;
 
     @Transactional
     @Override
@@ -53,7 +53,7 @@ public class MajorManagementServiceImpl implements MajorManagementService{
 
     @Transactional
     @Override
-    public Pair<String, Boolean> deleteMajor(Long id) {
+    public Pair<String, Boolean> deleteMajor(Long id) throws Exception {
 
         if(majorRepo.existsById(id)) {
             Major major = majorRepo.findById(id)
@@ -64,7 +64,17 @@ public class MajorManagementServiceImpl implements MajorManagementService{
             if(topicRepo.existsByMajor(major)) {
                 return Pair.of("Still have topic in major!", false);
             }
-            majorRepo.deleteById(id);
+            if(teamRepo.existsByMajor(major)) {
+                return Pair.of("Still have team in major!", false);
+            }
+            if(classTopicRepo.existsByMajor(major)) {
+                return Pair.of("Still have class topic in major!", false);
+            }
+            try {
+                majorRepo.delete(major);
+            } catch (Exception ex) {
+                throw new Exception("Can't delete major!");
+            }
             return Pair.of("Deleted!", true);
         }
         return Pair.of("Still have students in major!", false);

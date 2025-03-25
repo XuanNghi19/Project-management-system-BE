@@ -1,13 +1,12 @@
 package com.dmm.projectManagementSystem.model;
 
-import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.dmm.projectManagementSystem.dto.studentTopic.CUDStudentTopicRequest;
+import com.dmm.projectManagementSystem.dto.studentTopic.StudentTopicResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -25,11 +24,21 @@ public class StudentTopic {
     private ClassTopic classTopic;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "student_id")
     private User student;
 
     boolean status = false;
 
-
-
+    static public StudentTopic fromCUDStudentTopic(
+            CUDStudentTopicRequest request,
+            ClassTopic classTopic,
+            User student
+    ){
+        return StudentTopic.builder()
+                .id(request.getId())
+                .classTopic(classTopic)
+                .student(student)
+                .status(request.isStatus())
+                .build();
+    }
 }
