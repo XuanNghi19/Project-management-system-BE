@@ -25,9 +25,9 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     final private UserRepo userRepo;
     final private CouncilRepo councilRepo;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addDepartment(List<CRUDDepartment> cDepartmentList) {
+    public boolean addDepartment(List<CRUDDepartment> cDepartmentList) throws Exception {
         try {
             for (var x : cDepartmentList) {
                 departmentRepo.save(Department.fromCRUDDepartment(x));
@@ -35,33 +35,38 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean updateDepartment(CRUDDepartment uDepartment) {
+    public boolean updateDepartment(CRUDDepartment uDepartment) throws Exception {
         try {
             departmentRepo.save(Department.fromCRUDDepartment(uDepartment));
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public Pair<String, Boolean> deleteDepartment(Long id) {
+    public Pair<String, Boolean> deleteDepartment(Long id) throws Exception {
         if(departmentRepo.existsById(id)) {
             Department department = departmentRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException());
             if(majorRepo.existsByDepartment(department) || userRepo.existsByDepartment(department) || councilRepo.existsByDepartment(department)) {
                return Pair.of("still exists in the department!", false);
             }
-            departmentRepo.deleteById(id);
-            return Pair.of("Deleted!", true);
+            try {
+                departmentRepo.deleteById(id);
+                return Pair.of("Deleted!", true);
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex);
+                throw new Exception(ex);
+            }
         }
         return Pair.of(String.format("department with id does not exist: %d", id), false);
     }

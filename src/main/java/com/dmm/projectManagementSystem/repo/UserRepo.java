@@ -15,20 +15,21 @@ import java.util.Optional;
 public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByIdNum(String idNum);
 
-    @Query("""
-            select u from User u
-            where u.role = :role
-            and (:department is null or u.department = :department)
-            and (:major is null or u.major = :major)
-            and (:course is null or u.course = :course)
-            and (:name is null or lower(u.name) like lower(concat('%', :name, '%')))
-            order by u.id desc
-    """)
+    @Query(value = """
+            select * from app_user
+            where role = :role
+            and active = true
+            and (:department_id is null or department_id = :department_id)
+            and (:major_id is null or major_id = :major_id)
+            and (:course_id is null or course_id = :course_id)
+            and (:name is null or lower(name) like lower(concat('%', :name, '%')))
+            order by id desc
+    """, nativeQuery = true)
     Page<User> findAllUser(
-            @Param("role") Role role,
-            @Param("department")  Department department,
-            @Param("major") Major major,
-            @Param("course") Course course,
+            @Param("role") String role,
+            @Param("department_id") Long departmentID,
+            @Param("major_id") Long majorID,
+            @Param("course_id") Long courseID,
             @Param("name") String name,
             Pageable pageable
     );
@@ -36,6 +37,8 @@ public interface UserRepo extends JpaRepository<User, Long> {
     boolean existsByMajor(Major major);
     boolean existsByDepartment(Department department);
     boolean existsByCourse(Course course);
+
+    boolean existsByRole(Role role);
 }
 
 

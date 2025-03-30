@@ -20,10 +20,16 @@ public class DefenseSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "start_time")
     private LocalDateTime startTime;
-    private String location;
-    private String note;
+
+    @Column(name = "end_time")
     private LocalDateTime endTime;
+
+    private String location;
+
+    @Column(columnDefinition = "TEXT")
+    private String note;
 
     @ManyToOne
     @JoinColumn(name = "council_id")

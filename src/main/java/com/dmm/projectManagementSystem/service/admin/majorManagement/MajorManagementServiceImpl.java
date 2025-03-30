@@ -25,9 +25,9 @@ public class MajorManagementServiceImpl implements MajorManagementService{
     final private TeamRepo teamRepo;
     final private ClassTopicRepo classTopicRepo;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addMajor(List<CRUDMajor> cMajorList) {
+    public boolean addMajor(List<CRUDMajor> cMajorList) throws Exception{
         try {
             for (var x : cMajorList) {
                 majorRepo.save(Major.fromCRUDMajor(x));
@@ -35,23 +35,23 @@ public class MajorManagementServiceImpl implements MajorManagementService{
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean updateMajor(CRUDMajor uMajor) {
+    public boolean updateMajor(CRUDMajor uMajor) throws Exception{
         try {
             majorRepo.save(Major.fromCRUDMajor(uMajor));
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public Pair<String, Boolean> deleteMajor(Long id) throws Exception {
 
@@ -73,6 +73,7 @@ public class MajorManagementServiceImpl implements MajorManagementService{
             try {
                 majorRepo.delete(major);
             } catch (Exception ex) {
+                System.out.println("Exception: " + ex);
                 throw new Exception("Can't delete major!");
             }
             return Pair.of("Deleted!", true);

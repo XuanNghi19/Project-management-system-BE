@@ -26,6 +26,8 @@ public class Team {
     private User teacher;
 
     private boolean status;
+
+    @Column(name = "team_name")
     private String teamName;
 
     @ManyToOne

@@ -21,10 +21,19 @@ public class Task {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String describe;
+
     private LocalDateTime deadline;
+
+    @Column(columnDefinition = "TEXT")
     private String comment;
+
     private boolean status;
+
+    @Column(name = "project_stage")
+    @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
     @ManyToOne

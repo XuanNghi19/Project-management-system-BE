@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService{
         String token = "";
         User exUser = userRepo.findByIdNum(authenticationRequest.getIdNum())
                 .orElseThrow(() -> new RuntimeException("Khong tim thay nguoi dung voi idNum: " + authenticationRequest.getIdNum()));
-        if(passwordEncoder.matches(authenticationRequest.getPassword(), exUser.getPassword())) {
+        if(passwordEncoder.matches(authenticationRequest.getPassword(), exUser.getPassword()) && exUser.isActive()) {
             token = jwtUtils.generateToken(exUser);
 
             return AuthenticationResponse.fromAuthenticationRequest(token, true);

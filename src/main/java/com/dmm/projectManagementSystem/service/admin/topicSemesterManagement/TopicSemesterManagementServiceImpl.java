@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -80,8 +81,8 @@ public class TopicSemesterManagementServiceImpl implements TopicSemesterManageme
     }
 
     @Override
-    public TopicSemesterListByPageResponse getAllTopicSemester(String name, int page, int limit) {
-        Page<CRUDTopicSemester> crudTopicSemesters = topicSemesterRepo.findAllTopicSemester(name, PageRequest.of(page, limit))
+    public TopicSemesterListByPageResponse getAllTopicSemester(String name, LocalDateTime start, LocalDateTime end, int page, int limit) {
+        Page<CRUDTopicSemester> crudTopicSemesters = topicSemesterRepo.findAllTopicSemester(name, start, end, PageRequest.of(page, limit))
                 .map(CRUDTopicSemester::fromTopicSemester);
 
         return TopicSemesterListByPageResponse.fromSplitPage(crudTopicSemesters.getContent(), crudTopicSemesters.getTotalPages(), page, limit);

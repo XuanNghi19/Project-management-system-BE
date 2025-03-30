@@ -20,9 +20,17 @@ public class Major {
     private Long id;
 
     private String name;
+
+    @Column(name = "progress_percentage")
     private int progressPercentage;
+
+    @Column(name = "report_percentage")
     private int reportPercentage;
+
+    @Column(name = "defense_percentage")
     private int defensePercentage;
+
+    @Column(name = "review_percentage")
     private int reviewPercentage;
 
     @ManyToOne

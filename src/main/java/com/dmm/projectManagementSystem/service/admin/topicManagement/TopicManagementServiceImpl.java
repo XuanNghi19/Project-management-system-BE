@@ -36,9 +36,9 @@ public class TopicManagementServiceImpl implements TopicManagementService{
 
     final private TeamMemberRepo teamMemberRepo;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public Pair<String, Boolean> approveGrade(String idNum) {
+    public Pair<String, Boolean> approveGrade(String idNum) throws Exception{
         Topic exTopic = topicRepo.findByIdNum(idNum);
         Grade exGrade = exTopic.getGrade();
         if(
@@ -48,21 +48,26 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 && exGrade.getDefenseScore() != null
         ) {
             Major major = exTopic.getMajor();
-            Double finalScore = exGrade.getProgressScore()*major.getProgressPercentage()
-                    + exGrade.getReportScore()*major.getReportPercentage()
-                    + exGrade.getReviewScore()*major.getReviewPercentage()
-                    + exGrade.getDefenseScore()*major.getDefensePercentage();
+            Double finalScore = exGrade.getProgressScore()*(major.getProgressPercentage()/100.0)
+                    + exGrade.getReportScore()*(major.getReportPercentage()/100.0)
+                    + exGrade.getReviewScore()*(major.getReviewPercentage()/100.0)
+                    + exGrade.getDefenseScore()*(major.getDefensePercentage()/100.0);
             exGrade.setFinalScore(finalScore);
-            gradeRepo.save(exGrade);
-            return Pair.of("Approve succeeded!", true);
+            try {
+                gradeRepo.save(exGrade);
+                return Pair.of("Approve succeeded!", true);
+            } catch (Exception e) {
+                throw new Exception(e);
+            }
+
         }
 
         return Pair.of("Not enough points to approve!", false);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public Pair<String, Boolean> deleteTopic(String idNum) {
+    public Pair<String, Boolean> deleteTopic(String idNum) throws Exception {
         if(topicRepo.existsByIdNum(idNum)) {
             Topic topic = topicRepo.findByIdNum(idNum);
 
@@ -115,8 +120,13 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 }
             }
 
-            topicRepo.deleteByIdNum(idNum);
-            return Pair.of("Deleted!", true);
+            try {
+                topicRepo.deleteByIdNum(idNum);
+                return Pair.of("Deleted!", true);
+            } catch (Exception e) {
+                System.out.println("Exception: " + e.getMessage());
+                throw new Exception(e);
+            }
         }
         return Pair.of(String.format("topic with idNum does not exist: %s", idNum), false);
     }

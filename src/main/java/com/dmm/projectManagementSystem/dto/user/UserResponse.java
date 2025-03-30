@@ -46,9 +46,9 @@ public class UserResponse {
                 .sex(user.getSex())
                 .avatarUrl(user.getAvatarUrl())
                 .address(user.getAddress())
-                .course(CRUDCourse.fromCourse(user.getCourse()))
-                .department(CRUDDepartment.fromDepartment(user.getDepartment()))
-                .major(CRUDMajor.fromMajor(user.getMajor()))
+                .course(user.getCourse() != null ? CRUDCourse.fromCourse(user.getCourse()) : null)
+                .department(user.getDepartment() != null ? CRUDDepartment.fromDepartment(user.getDepartment()) : null)
+                .major(user.getMajor() != null ? CRUDMajor.fromMajor(user.getMajor()) : null)
                 .build();
     }
 }

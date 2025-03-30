@@ -23,8 +23,10 @@ public class TopicSemester {
 
     private String name;
 
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
+    @Column(name = "end_time")
     private LocalDateTime endTime;
 
     static public TopicSemester fromCRUDTopicSemester(CRUDTopicSemester crudTopicSemester) {

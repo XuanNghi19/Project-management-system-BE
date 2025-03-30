@@ -20,8 +20,13 @@ public class Meeting {
     private Long id;
 
     private String title;
+
+    @Column(name = "start_time")
     private LocalDateTime startTime;
+
+    @Column(name = "end_time")
     private LocalDateTime endTime;
+
     private String location;
     private String note;
 

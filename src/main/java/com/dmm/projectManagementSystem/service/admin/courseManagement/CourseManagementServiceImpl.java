@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,8 +69,8 @@ public class CourseManagementServiceImpl implements CourseManagementService {
     }
 
     @Override
-    public CourseListByPageResponse getAllCourse(String name, int page, int limit) {
-        Page<CRUDCourse> crudCourses = courseRepo.findAllCourse(name, PageRequest.of(page, limit))
+    public CourseListByPageResponse getAllCourse(String name, LocalDateTime start, LocalDateTime end, int page, int limit) {
+        Page<CRUDCourse> crudCourses = courseRepo.findAllCourse(name, start, end, PageRequest.of(page, limit))
                 .map(CRUDCourse::fromCourse);
 
         return CourseListByPageResponse.fromSplitPage(crudCourses.getContent(), crudCourses.getTotalPages(), page, limit);

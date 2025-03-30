@@ -20,15 +20,20 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String comment;
+
+    @Column(name = "date_commented")
     private LocalDateTime dateCommented;
+
     private Double grade;
 
+    @Column(name = "project_stage")
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
     @ManyToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

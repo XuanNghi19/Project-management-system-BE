@@ -8,9 +8,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateStudentRequest {
+    String idNum;
+
     String name;
     int age;
-    String password;
     String dob;
     String cccd;
     String email;

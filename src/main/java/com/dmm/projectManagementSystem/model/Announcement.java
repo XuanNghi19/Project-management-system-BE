@@ -19,8 +19,15 @@ public class Announcement {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "date_posted")
     private String datePosted;
+
+    @Column(name = "project_stage")
+    @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
     @ManyToOne

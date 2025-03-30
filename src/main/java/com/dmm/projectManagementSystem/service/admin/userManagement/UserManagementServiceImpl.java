@@ -31,9 +31,9 @@ public class UserManagementServiceImpl implements UserManagementService {
     final private CourseRepo courseRepo;
     final private FirebaseService firebaseService;
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addTeachers(List<CreateUserRequest> createUserRequests) {
+    public boolean addTeachers(List<CreateUserRequest> createUserRequests) throws Exception {
         try {
             for (var x : createUserRequests) {
                 Department department = departmentRepo.findById(x.getDepartmentId())
@@ -51,13 +51,13 @@ public class UserManagementServiceImpl implements UserManagementService {
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addStudent(List<CreateUserRequest> createUserRequests) {
+    public boolean addStudent(List<CreateUserRequest> createUserRequests) throws Exception {
         try {
             for (var x : createUserRequests) {
                 Major major = majorRepo.findById(x.getMajorId())
@@ -77,13 +77,13 @@ public class UserManagementServiceImpl implements UserManagementService {
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean addAdmin(CreateUserRequest createUserRequest) {
+    public boolean addAdmin(CreateUserRequest createUserRequest) throws Exception {
         try {
             Department department = departmentRepo.findById(createUserRequest.getDepartmentId())
                     .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + createUserRequest.getDepartmentId()));
@@ -99,28 +99,28 @@ public class UserManagementServiceImpl implements UserManagementService {
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean updateUser(UpdateUserRequest updateUserRequest, MultipartFile[] avatarImg) {
+    public boolean updateUser(UpdateUserRequest updateUserRequest) throws Exception {
         try {
             User exUser = userRepo.findByIdNum(updateUserRequest.getIdNum())
                     .orElseThrow(() -> new RuntimeException("Khong ton tai user voi idNum: " + updateUserRequest.getIdNum()));
 
-            List<String> avatarUrl = firebaseService.uploadFiles(avatarImg);
-
             User updateUser;
-            String encodePassword = passwordEncoder.encode(updateUserRequest.getPassword());
 
             if (exUser.getRole() == Role.ADMIN || exUser.getRole() == Role.INSTRUCTORS) {
                 Department department = departmentRepo.findById(updateUserRequest.getDepartmentId())
                         .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + updateUserRequest.getDepartmentId()));
 
-                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword, avatarUrl.get(0));
+                updateUser = User.fromUpdateUserRequest(updateUserRequest);
                 updateUser.setId(exUser.getId());
+                updateUser.setIdNum(exUser.getIdNum());
+                updateUser.setPassword(exUser.getPassword());
+                updateUser.setRole(exUser.getRole());
                 updateUser.setDepartment(department);
             } else {
                 Major major = majorRepo.findById(updateUserRequest.getMajorId())
@@ -128,9 +128,12 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Course course = courseRepo.findById(updateUserRequest.getCourseId())
                         .orElseThrow(() -> new RuntimeException("Khong ton tai course voi idNum: " + updateUserRequest.getCourseId()));
 
-                updateUser = User.fromUpdateUserRequest(updateUserRequest, encodePassword, avatarUrl.get(0));
+                updateUser = User.fromUpdateUserRequest(updateUserRequest);
                 updateUser.setId(exUser.getId());
+                updateUser.setIdNum(exUser.getIdNum());
+                updateUser.setPassword(exUser.getPassword());
                 updateUser.setMajor(major);
+                updateUser.setRole(exUser.getRole());
                 updateUser.setCourse(course);
             }
 
@@ -139,13 +142,13 @@ public class UserManagementServiceImpl implements UserManagementService {
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean changePassword(String newPassword, String idNum) {
+    public boolean changePassword(String newPassword, String idNum) throws Exception {
         try {
             User exUser = userRepo.findByIdNum(idNum)
                     .orElseThrow(() -> new RuntimeException("khong tim thay user voi idNum: " + idNum));
@@ -157,13 +160,38 @@ public class UserManagementServiceImpl implements UserManagementService {
             return true;
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
+            throw new Exception(ex);
+        }
+
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    @Override
+    public boolean uploadAvatar(String idNum, MultipartFile[] avatar) throws Exception {
+        if(avatar.length == 0 || avatar[0].isEmpty() || avatar[0].getSize() == 0) {
             return false;
+        }
+        try {
+            User exUser = userRepo.findByIdNum(idNum)
+                    .orElseThrow(() -> new RuntimeException("khong tim thay user voi idNum: " + idNum));
+
+            if(exUser.getAvatarUrl() != null) {
+                firebaseService.deleteFile(exUser.getAvatarUrl());
+            }
+
+            exUser.setAvatarUrl(firebaseService.uploadFiles(avatar).get(0));
+            userRepo.save(exUser);
+
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex);
+            throw new Exception(ex);
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public boolean deleteUser(String idNum) {
+    public boolean deleteUser(String idNum) throws Exception {
         Optional<User> exUser = userRepo.findByIdNum(idNum);
         try {
             if (exUser.isPresent()) {
@@ -174,35 +202,18 @@ public class UserManagementServiceImpl implements UserManagementService {
             }
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
-            return false;
+            throw new Exception(ex);
         }
         return false;
     }
 
     @Override
     public UserListByPageResponse getAllUser(Role role, Long departmentId, Long majorId, Long courseId, String name, int page, int limit) {
-        Department department = null;
-        Major major = null;
-        Course course = null;
-
-        if (departmentId != null) {
-            department = departmentRepo.findById(departmentId)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + departmentId));
-        }
-        if (majorId != null) {
-            major = majorRepo.findById(majorId)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay majorId: " + majorId));
-        }
-        if (courseId != null) {
-            course = courseRepo.findById(courseId)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay courseId: " + courseId));
-        }
-
         Page<UserResponse> userResponsePage = userRepo.findAllUser(
-                        role,
-                        department,
-                        major,
-                        course,
+                        role.toString(),
+                        departmentId,
+                        majorId,
+                        courseId,
                         name,
                         PageRequest.of(page, limit)
                 )

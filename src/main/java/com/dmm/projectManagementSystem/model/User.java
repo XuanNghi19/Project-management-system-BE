@@ -3,6 +3,7 @@ import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "id_num", unique = true)
     private String idNum;
 
     private String name;
@@ -35,9 +36,15 @@ public class User implements UserDetails {
     private String dob;
     private String cccd;
     private String email;
+
+    @Column(name = "phone_number")
     private String phoneNumber;
+
     private String sex;
+
+    @Column(name = "avatar_url")
     private String avatarUrl;
+
     private String address;
     private boolean active;
 
@@ -49,7 +56,7 @@ public class User implements UserDetails {
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     @ManyToOne
@@ -89,13 +96,9 @@ public class User implements UserDetails {
     }
 
     static public User fromUpdateUserRequest(
-            UpdateUserRequest request,
-            String passwordEncode,
-            String avatarUrl
+            UpdateUserRequest request
     ) {
         return User.builder()
-                .password(passwordEncode)
-                .role(request.getRole())
                 .name(request.getName())
                 .age(request.getAge())
                 .dob(request.getDob())
@@ -103,7 +106,6 @@ public class User implements UserDetails {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
-                .avatarUrl(avatarUrl)
                 .address(request.getAddress())
                 .active(true)
                 .build();

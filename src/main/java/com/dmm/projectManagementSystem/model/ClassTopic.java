@@ -21,13 +21,17 @@ public class ClassTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "class_name")
     private String className;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
+    @Column(name = "start_registration_time")
     private LocalDateTime startRegistrationTime;
+
+    @Column(name = "end_registration_time")
     private LocalDateTime endRegistrationTime;
 
     @ManyToOne

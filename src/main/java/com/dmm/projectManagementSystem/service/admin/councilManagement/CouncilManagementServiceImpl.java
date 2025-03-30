@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -100,7 +101,16 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
     }
 
     @Override
-    public CouncilListByPageResponse getAllCouncil(String name, Long topicSemesterID, Long departmentID, int page, int limit) throws Exception {
+    public CouncilListByPageResponse getAllCouncil (
+            String name,
+            Long topicSemesterID,
+            Long departmentID,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            int page,
+            int limit
+    ) throws Exception
+    {
         TopicSemester topicSemester = null;
         Department department = null;
 
@@ -117,6 +127,8 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
                         name,
                         topicSemester,
                         department,
+                        startTime,
+                        endTime,
                         PageRequest.of(page, limit)
                 )
                 .map(CouncilResponse::fromCouncil);
