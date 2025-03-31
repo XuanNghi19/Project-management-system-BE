@@ -1,7 +1,10 @@
 package com.dmm.projectManagementSystem.service.student.teamService;
 
+import com.dmm.projectManagementSystem.dto.RestResponse;
+import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
+
 public interface TeamService {
-    public boolean handleCreateGroup(Long userID, String groupName);
+    public RestResponse<StudentTeamResDTO> handleCreateGroup(Long userID, String groupName);
 
     public boolean handleRemoveStudentFromGroup();
 

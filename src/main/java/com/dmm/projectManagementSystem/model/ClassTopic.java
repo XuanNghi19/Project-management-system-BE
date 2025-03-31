@@ -19,12 +19,22 @@ public class ClassTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String className;
+
+    private LocalDateTime startRegistrationimeTime;
+    private LocalDateTime endRegistrationimeTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "major_id")
+    private Major major;
 
     @OneToMany(mappedBy = "classTopic", cascade = CascadeType.ALL)
     private List<StudentTopic> listStudentTopic;

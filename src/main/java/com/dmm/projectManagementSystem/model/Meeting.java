@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,8 @@ public class Meeting {
     private String location;
     private String note;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "topicID")
     private Topic topic;
 }

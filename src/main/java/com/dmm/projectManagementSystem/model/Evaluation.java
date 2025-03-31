@@ -1,6 +1,8 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.enums.GradeType;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +26,12 @@ public class Evaluation {
     private LocalDateTime dateCommented;
     private String grade;
 
-    @Enumerated(EnumType.STRING)
-    private GradeType gradeType;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
+    private ProjectStage projectStage;
+
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "topicID")
     private Topic topic;
 }

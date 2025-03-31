@@ -1,11 +1,14 @@
 package com.dmm.projectManagementSystem.controllers.student;
 
+import com.dmm.projectManagementSystem.dto.RestResponse;
+import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
+import com.dmm.projectManagementSystem.model.TeamMember;
 import com.dmm.projectManagementSystem.service.student.teamService.TeamServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/invitations")
+@RequestMapping("/group")
 public class TeamController {
     private final TeamServiceImpl teamServiceImpl;
     private TeamController(TeamServiceImpl teamServiceImpl) {
@@ -13,17 +16,13 @@ public class TeamController {
     }
 
     @PostMapping("/create_group")
-    public ResponseEntity<String> createStudentGroup (@RequestParam Long studentId, String groupName) {
-        this.teamServiceImpl.handleCreateGroup(studentId, groupName);
-        return ResponseEntity.ok("Tạo nhóm thành công !");
+    public ResponseEntity<RestResponse<StudentTeamResDTO>> createStudentGroup (@RequestParam Long studentId, @RequestParam String groupName) {
+        return ResponseEntity.ok(this.teamServiceImpl.handleCreateGroup(studentId, groupName));
     }
 
-
-
     @GetMapping("/invite")
-    public ResponseEntity<String> inviteMember(@RequestParam Long leaderId, @RequestParam Long userId) {
-        this.teamServiceImpl.inviteMember(leaderId, userId);
-        return ResponseEntity.ok("Mời thành công");
+    public ResponseEntity<RestResponse<TeamMember>> inviteMember(@RequestParam Long leaderId, @RequestParam Long userId) {
+        return ResponseEntity.ok(this.teamServiceImpl.inviteMember(leaderId, userId));
     }
 
     @PutMapping("/{id}/accept")

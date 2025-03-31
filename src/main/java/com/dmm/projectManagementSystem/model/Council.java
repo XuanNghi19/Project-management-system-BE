@@ -24,9 +24,10 @@ public class Council {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    @ManyToOne
-    @JoinColumn(name = "courseID")
-    private Course course;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
 
     @ManyToOne
     @JoinColumn(name = "departmentID")

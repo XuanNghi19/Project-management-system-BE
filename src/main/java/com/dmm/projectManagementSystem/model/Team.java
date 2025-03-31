@@ -26,14 +26,20 @@ public class Team {
     @JoinColumn(name = "topicID")
     private Topic topic;
 
+    @Enumerated(EnumType.STRING)
+    private TeamStatus status;
+
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
 
-    @Enumerated(EnumType.STRING)
-    private TeamStatus status;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "major_id")
+    private Major major;
 
     @OneToMany (mappedBy = "team", cascade = CascadeType.ALL)
     List<TeamMember> listStudent;

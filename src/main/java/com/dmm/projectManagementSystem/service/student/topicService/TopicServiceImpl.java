@@ -1,6 +1,5 @@
-package com.dmm.projectManagementSystem.service.student.projectService;
+package com.dmm.projectManagementSystem.service.student.topicService;
 
-import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.Team;
@@ -38,7 +37,6 @@ public class TopicServiceImpl implements TopicService {
           Topic studentTopic = new Topic();
           studentTopic.setName(topicName);
           studentTopic.setProjectStage(ProjectStage.IDEATION);
-
             Optional<Team> team = this.teamRepo.findById(leaderTeam.get().getTeam().getId());
             team.orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm của bạn!"));
             team.get().setTopic(studentTopic);

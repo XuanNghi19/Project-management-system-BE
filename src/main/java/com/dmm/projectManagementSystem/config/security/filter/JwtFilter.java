@@ -101,8 +101,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/swagger-ui.html", "GET"),
                 Pair.of("/swagger-ui/index.html", "GET"),
                 Pair.of("/create_group", "POST"),
-                Pair.of("/invite", "GET")
-        );
+                Pair.of("/invite", "GET"),
+                Pair.of("/project/", "GET"),
+                Pair.of("/project/get_meeting", "GET"),
+                Pair.of("/project/get_council", "GET"),
+                Pair.of("/group/", "POST"),
+                Pair.of("/group/create_group/", "POST")
+                );
 
         for(Pair<String, String> bypassToken : bypassTokens) {
 //            System.out.println("Request:");

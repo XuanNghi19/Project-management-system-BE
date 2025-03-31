@@ -21,6 +21,14 @@ public class Major {
 
     private String name;
 
+    private float progressPercentage;
+
+    private float reportPercentage;
+
+    private float defensePercentage;
+
+    private float reviewPercentage;
+
     @ManyToOne
     @JoinColumn(name = "departmentID", nullable = false)
     private Department department;

@@ -1,7 +1,6 @@
 package com.dmm.projectManagementSystem.controllers.student;
 
-import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
-import com.dmm.projectManagementSystem.service.student.projectService.TopicServiceImpl;
+import com.dmm.projectManagementSystem.service.student.topicService.TopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

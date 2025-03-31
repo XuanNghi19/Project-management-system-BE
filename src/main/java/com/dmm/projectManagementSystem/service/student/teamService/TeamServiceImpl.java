@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.service.student.teamService;
 
+import com.dmm.projectManagementSystem.dto.RestResponse;
+import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
 import com.dmm.projectManagementSystem.enums.TeamStatus;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.model.*;
@@ -29,27 +31,33 @@ public class TeamServiceImpl implements TeamService {
     // Trưởng nhóm tạo nhóm
     @Transactional
     @Override
-    public boolean handleCreateGroup(Long leaderId, String teamName) {
+    public RestResponse<StudentTeamResDTO> handleCreateGroup(Long leaderId, String teamName) {
+        RestResponse<StudentTeamResDTO> restResponse = new RestResponse();
+
+
         Optional<User> leader = userRepo.findById(leaderId);
         leader.orElseThrow(() -> new NoSuchElementException("Không tìm thấy người dùng trong csdl !"));
         //Kiểm tra thời gian cho phép tạo nhóm
-        if (this.teamMemberRepo.findByStudentId(leader.get().getId()).isPresent()){
-            System.out.println("Bạn đã có nhóm rồi, không thể tạo được nhóm mới !");
-            return false;
+        if (teamMemberRepo.findByStudentId(leader.get().getId()).isPresent()) {
+            restResponse.setMessage(" Bạn đã có nhóm rồi, không thể tạo được nhóm mới !");
+            return restResponse;
+
         }
+
         Optional<StudentTopic> studentTopic = studentTopicRepo.findByStudentId(leader.get().getId());
-        if (!studentTopic.isPresent()){
-            System.out.println("Sinh viên chưa được phân vào lớp của giảng viên !");
-            return false;
+        if (!studentTopic.isPresent()) {
+            throw new IllegalStateException("Sinh viên chưa được phân vào lớp của giảng viên!");
         }
-        Optional<ClassTopic> classTopic = studentTopicRepo.findByClassTopicId(studentTopic.get().getId());
-        Optional<User> teacher = classTopicRepo.findByTeacherId(classTopic.get().getId());
+        ClassTopic classTopic = studentTopic.get().getClassTopic();
+        Optional<User> teacher = this.userRepo.findById(classTopic.getTeacher().getId());
         Team team  = new Team();
         team.setTeacher(teacher.get());
         team.setTopic(null);
         team.setStatus(TeamStatus.PENDING);
         team.setGroupName(teamName);
         Team teamSaved = groupRepo.save(team);
+        TopicSemester topicSemester = team.getTopicSemester();
+
 
        TeamMember teamStudent = TeamMember.builder()
                .student(leader.get())
@@ -57,11 +65,19 @@ public class TeamServiceImpl implements TeamService {
                .position(MembershipPosition.LEADER)
                .build();
         teamMemberRepo.save(teamStudent);
-    return true;
+        StudentTeamResDTO studentTeamResDTO = new StudentTeamResDTO();
+        studentTeamResDTO.setGroupName(team.getGroupName());
+        studentTeamResDTO.setTeacher(teacher.get());
+        studentTeamResDTO.setTopicSemester(topicSemester);
+        restResponse.setData(studentTeamResDTO);
+        restResponse.setData(studentTeamResDTO);
+        return restResponse;
     }
 
+
+
     @Transactional
-    public boolean inviteMember (Long leaderId, Long memberId) {
+    public RestResponse<TeamMember> inviteMember (Long leaderId, Long memberId) {
         User memberDB = this.userRepo.findById(memberId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy thành viên cần mời trong csdl !"));
         StudentTopic studentTopic = studentTopicRepo.findByStudentId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp chủ đề được phân"));
@@ -78,8 +94,10 @@ public class TeamServiceImpl implements TeamService {
                 .position(MembershipPosition.MEMBER)
                 .build();
         this.teamMemberRepo.save(teamMember);
-        return true;
-
+        RestResponse<TeamMember> restResponse = new RestResponse();
+        restResponse.setMessage("Nhóm của bạn đã được tạo thành công và chờ duyệt từ giảng viên");
+        restResponse.setData(teamMember);
+        return restResponse;
     }
 
     @Transactional
