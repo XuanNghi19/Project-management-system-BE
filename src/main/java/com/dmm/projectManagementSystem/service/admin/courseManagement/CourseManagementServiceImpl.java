@@ -27,7 +27,9 @@ public class CourseManagementServiceImpl implements CourseManagementService {
     public boolean addCourse(List<CRUDCourse> cCoursesList) throws Exception {
         try {
             for (var x : cCoursesList) {
-                courseRepo.save(Course.fromCRUDCourse(x));
+                Course newCourse = Course.fromCRUDCourse(x);
+                newCourse.setId(null);
+                courseRepo.save(newCourse);
             }
             return true;
         } catch (Exception ex) {

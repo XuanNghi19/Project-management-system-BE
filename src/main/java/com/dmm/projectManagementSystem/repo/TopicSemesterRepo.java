@@ -13,17 +13,17 @@ import java.util.List;
 
 @Repository
 public interface TopicSemesterRepo extends JpaRepository<TopicSemester, Long> {
-    @Query("""
-                select t from TopicSemester t where
-                (:name is null or lower(t.name) like lower(concat( '%', :name, '%')))
+    @Query(value = """
+                select * from topic_semester where
+                (:name is null or lower(name) like lower(concat( '%', :name, '%')))
                     and (
-                        (:start is null and :end is null)
-                        or (:start is not null and :end is not null and t.startTime >= :start and t.endTime <= :end)
-                        or (:start is not null and :end is null and t.startTime >= :start)
-                        or (:start is null and :end is not null and t.endTime <= :end)
+                        (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is null)
+                        or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is not null and start_time >= CAST(:start AS TIMESTAMP) and end_time <= CAST(:end AS TIMESTAMP))
+                        or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is null and start_time >= CAST(:start AS TIMESTAMP))
+                        or (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is not null and end_time <= CAST(:end AS TIMESTAMP))
                     )
-                order by t.id desc
-            """)
+                order by id desc
+            """, nativeQuery = true)
     Page<TopicSemester> findAllTopicSemester(
             @Param("name") String name,
             @Param("start") LocalDateTime start,
@@ -31,9 +31,9 @@ public interface TopicSemesterRepo extends JpaRepository<TopicSemester, Long> {
             Pageable pageable
     );
 
-    @Query("""
-                select t from TopicSemester t where (:name is null or lower(t.name) like lower(concat( '%', :name, '%')))
-                order by t.id desc
-            """)
+    @Query(value = """
+                select * from topic_semester where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+                order by id desc
+            """, nativeQuery = true)
     List<TopicSemester> findAllTopicByName(@Param("name") String name);
 }

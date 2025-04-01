@@ -30,7 +30,9 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     public boolean addDepartment(List<CRUDDepartment> cDepartmentList) throws Exception {
         try {
             for (var x : cDepartmentList) {
-                departmentRepo.save(Department.fromCRUDDepartment(x));
+                Department newDepartment = Department.fromCRUDDepartment(x);
+                newDepartment.setId(null);
+                departmentRepo.save(newDepartment);
             }
             return true;
         } catch (Exception ex) {

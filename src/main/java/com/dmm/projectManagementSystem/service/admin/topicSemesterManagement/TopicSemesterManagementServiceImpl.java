@@ -32,7 +32,9 @@ public class TopicSemesterManagementServiceImpl implements TopicSemesterManageme
     public boolean addTopicSemester(List<CRUDTopicSemester> cTopicSemesterList) throws Exception {
         try {
             for (var x : cTopicSemesterList) {
-                topicSemesterRepo.save(TopicSemester.fromCRUDTopicSemester(x));
+                TopicSemester newTopicSemester = TopicSemester.fromCRUDTopicSemester(x);
+                newTopicSemester.setId(null);
+                topicSemesterRepo.save(newTopicSemester);
             }
             return true;
         } catch (Exception ex) {

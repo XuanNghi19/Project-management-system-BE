@@ -39,6 +39,7 @@ public class Major {
 
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {
         return Major.builder()
+                .id(crudMajor.getId())
                 .name(crudMajor.getName())
                 .progressPercentage(crudMajor.getProgressPercentage())
                 .reportPercentage(crudMajor.getReportPercentage())

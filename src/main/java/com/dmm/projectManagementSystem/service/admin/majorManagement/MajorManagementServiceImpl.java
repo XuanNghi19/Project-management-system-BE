@@ -30,7 +30,9 @@ public class MajorManagementServiceImpl implements MajorManagementService{
     public boolean addMajor(List<CRUDMajor> cMajorList) throws Exception{
         try {
             for (var x : cMajorList) {
-                majorRepo.save(Major.fromCRUDMajor(x));
+                Major newMajor = Major.fromCRUDMajor(x);
+                newMajor.setId(null);
+                majorRepo.save(newMajor);
             }
             return true;
         } catch (Exception ex) {
@@ -88,7 +90,7 @@ public class MajorManagementServiceImpl implements MajorManagementService{
             department = departmentRepo.findById(departmentID)
                     .orElseThrow(() -> new RuntimeException("Khong tim thay department voi id: " + departmentID));
         }
-        Page<CRUDMajor> crudMajorPage = majorRepo.findAllMajor(name, department, PageRequest.of(page, limit))
+        Page<CRUDMajor> crudMajorPage = majorRepo.findAllMajor(name, departmentID, PageRequest.of(page, limit))
                 .map(CRUDMajor::fromMajor);
 
         return MajorListByPageResponse.fromSplitPage(crudMajorPage.getContent(), crudMajorPage.getTotalPages(), page, limit);
