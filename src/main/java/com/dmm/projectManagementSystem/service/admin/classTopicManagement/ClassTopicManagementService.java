@@ -4,8 +4,6 @@ import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicDetailResponse;
 import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicListByPageResponse;
 import com.dmm.projectManagementSystem.dto.classTopic.CreateClassTopicRequest;
 import com.dmm.projectManagementSystem.dto.classTopic.UpdateClassTopicRequest;
-import com.dmm.projectManagementSystem.dto.council.CouncilDetailResponse;
-import com.dmm.projectManagementSystem.dto.council.CouncilListByPageResponse;
 import org.springframework.data.util.Pair;
 
 public interface ClassTopicManagementService {

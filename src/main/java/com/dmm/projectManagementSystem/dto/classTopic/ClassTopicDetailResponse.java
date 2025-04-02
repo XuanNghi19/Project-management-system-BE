@@ -4,11 +4,12 @@ import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.studentTopic.CUDStudentTopicRequest;
 import com.dmm.projectManagementSystem.dto.studentTopic.StudentTopicResponse;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
+import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.model.ClassTopic;
 import com.dmm.projectManagementSystem.model.TopicSemester;
-import com.dmm.projectManagementSystem.model.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.catalina.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ClassTopicDetailResponse {
     Long id;
 
     String className;
-    User teacher;
+    UserResponse teacher;
 
     LocalDateTime startRegistrationTime;
     LocalDateTime endRegistrationTime;
@@ -39,7 +40,7 @@ public class ClassTopicDetailResponse {
         return ClassTopicDetailResponse.builder()
                 .id(classTopic.getId())
                 .className(classTopic.getClassName())
-                .teacher(classTopic.getTeacher())
+                .teacher(UserResponse.fromUser(classTopic.getTeacher()))
                 .startRegistrationTime(classTopic.getStartRegistrationTime())
                 .endRegistrationTime(classTopic.getEndRegistrationTime())
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(classTopic.getTopicSemester()))

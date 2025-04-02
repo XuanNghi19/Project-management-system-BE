@@ -37,7 +37,7 @@ public class TopicDetailsResponse {
     CRUDTopicSemester topicSemester;
     CRUDMajor major;
 
-    TeamResponse group;
+    TeamResponse team;
 
     List<TaskResponse> taskList;
     List<AnnouncementResponse> announcementList;
@@ -68,7 +68,7 @@ public class TopicDetailsResponse {
                 .grade(GradeResponse.fromGrade(topic.getGrade()))
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(topic.getTopicSemester()))
                 .major(CRUDMajor.fromMajor(topic.getMajor()))
-                .group(TeamResponse.fromGroup(
+                .team(TeamResponse.fromGroup(
                         team,
                         topic.getTopicSemester(),
                         topic.getMajor(),

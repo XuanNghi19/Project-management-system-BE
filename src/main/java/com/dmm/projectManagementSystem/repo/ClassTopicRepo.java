@@ -11,18 +11,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClassTopicRepo extends JpaRepository<ClassTopic, Long> {
     boolean existsByTopicSemester(TopicSemester topicSemester);
+
     boolean existsByMajor(Major major);
 
-    @Query("""
-    select c from ClassTopic c where (:name is null or lower(c.className) like lower(concat( '%', :name, '%')))
-    and (:topicSemester is null or c.topicSemester = :topicSemester)
-    and (:major is null or c.major = :major)
-    order by c.id desc
-    """)
+    @Query(value = """
+            select * from class_topic where (:name is null or lower(class_name) like lower(concat( '%', :name, '%')))
+            and (:topic_semester_id is null or topic_semester_id = :topic_semester_id)
+            and (:major_id is null or major_id = :major_id)
+            order by id desc
+            """, nativeQuery = true)
     Page<ClassTopic> findAllClassTopic(
             @Param("name") String name,
-            @Param("topicSemester") TopicSemester topicSemester,
-            @Param("major") Major major,
+            @Param("topic_semester_id") Long topicSemesterID,
+            @Param("major_id") Long majorID,
             Pageable pageable
     );
 }

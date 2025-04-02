@@ -14,18 +14,18 @@ public interface TopicRepo extends JpaRepository<Topic, Long> {
     boolean existsByMajor(Major major);
     boolean existsByTopicSemester(TopicSemester topicSemester);
     boolean existsByIdNum(String idNum);
-    boolean deleteByIdNum(String idNum);
+    Long deleteByIdNum(String idNum);
 
-    @Query("""
-            select t from Topic t
-            where (:major is null or t.major = :major)
-            and (:topicSemester is null or t.topicSemester = :topicSemester)
-            and (:name is null or lower(t.name) like lower(concat('%', :name, '%')))
-            order by t.id desc
-    """)
+    @Query(value = """
+            select * from topic
+            where (:major_id is null or major_id = :major_id)
+            and (:topic_semester_id is null or topic_semester_id = :topic_semester_id)
+            and (:name is null or lower(name) like lower(concat('%', :name, '%')))
+            order by id desc
+    """, nativeQuery = true)
     Page<Topic> findAllTopic(
-            @Param("major") Major major,
-            @Param("topicSemester") TopicSemester topicSemester,
+            @Param("major_id") Long majorID,
+            @Param("topic_semester_id") Long topicSemesterID,
             @Param("name") String name,
             Pageable pageable
     );

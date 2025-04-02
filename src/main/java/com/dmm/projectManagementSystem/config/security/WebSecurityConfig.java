@@ -38,7 +38,8 @@ public class WebSecurityConfig {
                                     String.format("%s/department_management/add_department", apiPrefix),
                                     String.format("%s/major_management/add_major", apiPrefix),
                                     String.format("%s/topic_semester_management/add_topic_semester", apiPrefix),
-                                    String.format("%s/course_management/add_course", apiPrefix)
+                                    String.format("%s/course_management/add_course", apiPrefix),
+                                    String.format("%s/class_topic_management/add_class_topic", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.PUT,
@@ -46,12 +47,14 @@ public class WebSecurityConfig {
                                     String.format("%s/department_management/update_department", apiPrefix),
                                     String.format("%s/major_management/update_major", apiPrefix),
                                     String.format("%s/topic_semester_management/update_topic_semester", apiPrefix),
-                                    String.format("%s/course_management/update_course", apiPrefix)
+                                    String.format("%s/course_management/update_course", apiPrefix),
+                                    String.format("%s/class_topic_management/update_class_topic", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.PATCH,
                                     String.format("%s/user_management/change_password", apiPrefix),
-                                    String.format("%s/user_management/upload_avatar", apiPrefix)
+                                    String.format("%s/user_management/upload_avatar", apiPrefix),
+                                    String.format("%s/topic_management/approve_grade", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.DELETE,
@@ -59,7 +62,9 @@ public class WebSecurityConfig {
                                     String.format("%s/department_management/delete_department", apiPrefix),
                                     String.format("%s/major_management/delete_major", apiPrefix),
                                     String.format("%s/topic_semester_management/delete_topic_semester", apiPrefix),
-                                    String.format("%s/course_management/delete_course", apiPrefix)
+                                    String.format("%s/course_management/delete_course", apiPrefix),
+                                    String.format("%s/topic_management/delete_topic", apiPrefix),
+                                    String.format("%s/class_topic_management/delete_class_topic", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.GET,
@@ -71,7 +76,11 @@ public class WebSecurityConfig {
                                     String.format("%s/department_management/get_all_department", apiPrefix),
                                     String.format("%s/major_management/get_all_major", apiPrefix),
                                     String.format("%s/topic_semester_management/get_all_topic_semester", apiPrefix),
-                                    String.format("%s/course_management/get_all_course", apiPrefix)
+                                    String.format("%s/course_management/get_all_course", apiPrefix),
+                                    String.format("%s/topic_management/get_all_topic", apiPrefix),
+                                    String.format("%s/topic_management/get_detail_topic", apiPrefix),
+                                    String.format("%s/class_topic_management/get_all_class_topic", apiPrefix),
+                                    String.format("%s/class_topic_management/get_detail_class_topic", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                 HttpMethod.POST,

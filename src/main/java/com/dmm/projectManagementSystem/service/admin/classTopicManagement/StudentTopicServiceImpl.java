@@ -39,7 +39,9 @@ public class StudentTopicServiceImpl implements StudentTopicService {
                     throw new Exception("Student already exists in this semester's topic class, student code: " + exStudent.getIdNum());
                 }
             }
-            studentTopicRepo.save(StudentTopic.fromCUDStudentTopic(requests, classTopic, exStudent));
+            StudentTopic newStudentTopic = StudentTopic.fromCUDStudentTopic(requests, classTopic, exStudent);
+            newStudentTopic.setId(null);
+            studentTopicRepo.save(newStudentTopic);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

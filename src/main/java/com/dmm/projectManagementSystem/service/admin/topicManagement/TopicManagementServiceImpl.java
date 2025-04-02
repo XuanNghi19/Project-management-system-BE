@@ -3,6 +3,7 @@ package com.dmm.projectManagementSystem.service.admin.topicManagement;
 import com.dmm.projectManagementSystem.dto.topic.TopicDetailsResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import com.dmm.projectManagementSystem.service.serviceUtils.FirebaseService;
@@ -38,11 +39,12 @@ public class TopicManagementServiceImpl implements TopicManagementService{
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public Pair<String, Boolean> approveGrade(String idNum) throws Exception{
+    public Pair<Pair<String, Boolean>, Double> approveGrade(String idNum) throws Exception{
         Topic exTopic = topicRepo.findByIdNum(idNum);
         Grade exGrade = exTopic.getGrade();
         if(
-                exGrade.getProgressScore() != null
+                exTopic.getProjectStage() == ProjectStage.DEFENSE
+                && exGrade.getProgressScore() != null
                 && exGrade.getReportScore() != null
                 && exGrade.getReviewScore() != null
                 && exGrade.getDefenseScore() != null
@@ -55,14 +57,14 @@ public class TopicManagementServiceImpl implements TopicManagementService{
             exGrade.setFinalScore(finalScore);
             try {
                 gradeRepo.save(exGrade);
-                return Pair.of("Approve succeeded!", true);
+                return Pair.of(Pair.of("Approve succeeded!", true), finalScore);
             } catch (Exception e) {
                 throw new Exception(e);
             }
 
         }
 
-        return Pair.of("Not enough points to approve!", false);
+        return Pair.of(Pair.of("Not enough points to approve!", false), 0D);
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -121,8 +123,11 @@ public class TopicManagementServiceImpl implements TopicManagementService{
             }
 
             try {
-                topicRepo.deleteByIdNum(idNum);
-                return Pair.of("Deleted!", true);
+                if(topicRepo.deleteByIdNum(idNum) > 0) {
+                    return Pair.of("Deleted!", true);
+                }
+
+                return Pair.of(String.format("Cannot delete this topic, idNum: " + idNum), true);
             } catch (Exception e) {
                 System.out.println("Exception: " + e.getMessage());
                 throw new Exception(e);
@@ -146,8 +151,8 @@ public class TopicManagementServiceImpl implements TopicManagementService{
         }
 
         Page<TopicResponse> topicResponsePage = topicRepo.findAllTopic(
-                        major,
-                        topicSemester,
+                        majorID,
+                        topicSemesterID,
                         name,
                         PageRequest.of(page, limit)
                 )
@@ -161,6 +166,8 @@ public class TopicManagementServiceImpl implements TopicManagementService{
         Topic exTopic = topicRepo.findByIdNum(idNum);
 
         Team team = teamRepo.findByTopic(exTopic);
+        if(team == null) team = new Team();
+
         List<TeamMember> teamMemberList = teamMemberRepo.findAllByTeam(team);
 
         List<Task> taskList = taskRepo.findAllByTopic(exTopic);
@@ -168,7 +175,9 @@ public class TopicManagementServiceImpl implements TopicManagementService{
         List<FilesUrl> filesUrlList = filesUrlRepo.findAllByTopic(exTopic);
         List<Evaluation> evaluationList = evaluationRepo.findAllByTopic(exTopic);
         List<Meeting> meetingList = meetingRepo.findAllByTopic(exTopic);
+
         DefenseSchedule defenseSchedule = defenseScheduleRepo.findByTopic(exTopic);
+        if(defenseSchedule == null) defenseSchedule = new DefenseSchedule();
 
         return TopicDetailsResponse.fromTopicAllData(
                 exTopic,

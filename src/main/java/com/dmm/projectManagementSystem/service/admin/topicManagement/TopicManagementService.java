@@ -5,7 +5,7 @@ import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
 import org.springframework.data.util.Pair;
 
 public interface TopicManagementService {
-    Pair<String, Boolean> approveGrade(String idNum) throws Exception;
+    Pair<Pair<String, Boolean>, Double> approveGrade(String idNum) throws Exception;
     Pair<String, Boolean> deleteTopic(String idNum) throws Exception;
     TopicListByPageResponse getAllTopic(String name, Long topicSemesterID, Long majorID, int page, int limit);
 

@@ -41,7 +41,7 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
         try {
             ClassTopic classTopic = classTopicRepo.save(ClassTopic.fromCreateClassTopicRequest(request, teacher, exTopicSemester, exMajor));
 
-            for(var x : request.getStudentTopicList()) {
+            for (var x : request.getStudentTopicList()) {
                 studentTopicService.addStudentTopic(classTopic, x);
             }
         } catch (Exception e) {
@@ -87,22 +87,23 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
     @Override
     public Pair<String, Boolean> deleteClassTopic(Long classTopicID) throws Exception {
 
-        if(classTopicRepo.existsById(classTopicID)) {
+        if (classTopicRepo.existsById(classTopicID)) {
             ClassTopic exClasTopic = classTopicRepo.findById(classTopicID)
                     .orElseThrow(() -> new Exception("Khong tim thay class topic voi id: " + classTopicID));
 
-            if(studentTopicRepo.existsByClassTopic(exClasTopic)) {
-                try {
+            try {
+                if (studentTopicRepo.existsByClassTopic(exClasTopic)) {
                     studentTopicRepo.deleteAllByClassTopic(exClasTopic);
-                    classTopicRepo.deleteById(classTopicID);
-                    return Pair.of("Delete Council Successes!", true);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
+                classTopicRepo.deleteById(classTopicID);
+                return Pair.of("Delete Class Topic Successes!", true);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+
         }
 
-        return Pair.of("Delete Council Fail!", false);
+        return Pair.of("Delete Class Topic Fail!", false);
     }
 
     @Override
@@ -110,19 +111,19 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
         TopicSemester topicSemester = null;
         Major major = null;
 
-        if(topicSemesterID != null) {
+        if (topicSemesterID != null) {
             topicSemester = topicSemesterRepo.findById(topicSemesterID)
                     .orElseThrow(() -> new Exception("Khong tim thay topic semester voi id: " + topicSemesterID));
         }
-        if(majorID != null) {
+        if (majorID != null) {
             major = majorRepo.findById(majorID)
                     .orElseThrow(() -> new Exception("Khong tim thay major voi id: " + majorID));
         }
 
         Page<ClassTopicResponse> classTopicResponsePage = classTopicRepo.findAllClassTopic(
                         name,
-                        topicSemester,
-                        major,
+                        topicSemesterID,
+                        majorID,
                         PageRequest.of(page, limit)
                 )
                 .map(ClassTopicResponse::fromClassTopic);
@@ -140,7 +141,9 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
         ClassTopic exClassTopic = classTopicRepo.findById(classTopicID)
                 .orElseThrow(() -> new Exception("Khong tim thay class topic voi id: " + classTopicID));
 
-        List<StudentTopicResponse> studentTopicResponseList = studentTopicRepo.findAllByClassTopic(exClassTopic).stream().map(
+        List<StudentTopic> test = studentTopicRepo.findAllByClassTopic(classTopicID);
+
+        List<StudentTopicResponse> studentTopicResponseList = studentTopicRepo.findAllByClassTopic(classTopicID).stream().map(
                 StudentTopicResponse::fromStudentTopic
         ).toList();
 
