@@ -105,8 +105,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/project/", "GET"),
                 Pair.of("/project/get_meeting", "GET"),
                 Pair.of("/project/get_council", "GET"),
-                Pair.of("/group/", "POST"),
-                Pair.of("/group/create_group/", "POST")
+                Pair.of("/group/**", "POST"),
+                Pair.of("/group/create_group", "POST"),
+                Pair.of("/group/invite", "POST"),
+                Pair.of("/group/accept", "PUT"),
+                Pair.of("/group/decline", "PUT"),
+                Pair.of("/group/delete_team", "DELETE"),
+                Pair.of("/topic/register_topic", "POST"),
+                Pair.of("/topic/update_topic", "PUT"),
+                Pair.of("/topic/get_topic", "GET")
                 );
 
         for(Pair<String, String> bypassToken : bypassTokens) {
@@ -117,7 +124,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     && request.getMethod().equals(bypassToken.getSecond()))
                 return true;
         }
-
         return false;
     }
 }

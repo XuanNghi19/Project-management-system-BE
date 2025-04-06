@@ -12,4 +12,6 @@ public class RestResponse <T>{
     private Metadata metadata;
     private String message;
     private Object error;
+    @Builder.Default
+    private int statusCode = 1000;
 }

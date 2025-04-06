@@ -37,7 +37,7 @@ public class Topic {
     @JoinColumn(name = "gradeID")
     private Grade grade;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 

@@ -1,11 +1,13 @@
 package com.dmm.projectManagementSystem.service.student.projectService;
 
+import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.Metadata;
 import com.dmm.projectManagementSystem.dto.RestResponse;
 import com.dmm.projectManagementSystem.dto.project.CouncilResDTO;
 import com.dmm.projectManagementSystem.dto.project.DefenseScheduleResDTO;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,27 +32,33 @@ public class ProjectDetailServiceImpl {
   @Autowired
   private EvaluationRepo evaluationRepo;
 
-  public DefenseScheduleResDTO handleGetDefenseSchedule (Long topicId) {
+  public ApiResponseStudent<DefenseScheduleResDTO> handleGetDefenseSchedule (Long topicId) {
     Optional<DefenseSchedule> defenseScheduleDB = this.defenseScheduleRepo.findByTopicId(topicId);
     defenseScheduleDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy topic trong DB !"));
     DefenseScheduleResDTO defenseScheduleResDTO = new DefenseScheduleResDTO();
-    return defenseScheduleResDTO.convertToDefenseScheduleDTO(defenseScheduleDB.get());
+    ApiResponseStudent<DefenseScheduleResDTO> apiResponseGetDefence  = new ApiResponseStudent<>();
+    apiResponseGetDefence.setData(defenseScheduleResDTO.convertToDefenseScheduleDTO(defenseScheduleDB.get()));
+    apiResponseGetDefence.setMessage("Lấy lịch bảo về đồ án thành công !");
+    return apiResponseGetDefence;
   }
 
-  public CouncilResDTO handleGetCouncil (Long topicId) {
+  public ApiResponseStudent<CouncilResDTO> handleGetCouncil (Long topicId) {
     Optional<DefenseSchedule> defenseScheduleDB = this.defenseScheduleRepo.findByTopicId(topicId);
     defenseScheduleDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy topic trong DB !"));
     Long councilId = defenseScheduleDB.get().getCouncil().getId();
     Optional<Council> councilDB = this.councilRepo.findById(councilId);
     councilDB.orElseThrow(() ->new NoSuchElementException("Không tìm thấy hội đồng trong csdl"));
     Council council = councilDB.get();
-    return CouncilResDTO.builder()
+    ApiResponseStudent<CouncilResDTO> apiResponseGetCouncil  = new ApiResponseStudent<>();
+    apiResponseGetCouncil.setData(CouncilResDTO.builder()
             .name(council.getName())
             .fileUrl(council.getFileUrl())
             .location(council.getLocation())
             .startTime(council.getStartTime())
             .endTime(council.getEndTime())
-            .build();
+            .build());
+    apiResponseGetCouncil.setMessage("Lấy hội đồng tham gia đánh giá đồ án thành công");
+    return apiResponseGetCouncil;
   }
 
   public RestResponse<List<Meeting>> handleGetMeeting (Long topicId, int page, int size, String sort) {
@@ -75,14 +83,12 @@ public class ProjectDetailServiceImpl {
     return restResponse;
   }
 
-  public RestResponse<List<Evaluation>> handleGetEvaluation (Long topicId) {
+  public ApiResponseStudent<List<Evaluation>> handleGetEvaluation (Long topicId) {
     List<Evaluation> evaluationDB = this.evaluationRepo.findByTopicId(topicId);
-    RestResponse<List<Evaluation>> restResponse = new RestResponse<>();
-    restResponse.setData(evaluationDB);
-    restResponse.setMessage("Lấy đánh giá đề tài thành công");
-    return restResponse;
+    ApiResponseStudent<List<Evaluation>> apiResponseGetEvaluation = new ApiResponseStudent<>();
+    apiResponseGetEvaluation.setData(evaluationDB);
+    apiResponseGetEvaluation.setMessage("Lấy đánh giá đề tài thành công");
+    return apiResponseGetEvaluation;
   }
-
-
 
 }

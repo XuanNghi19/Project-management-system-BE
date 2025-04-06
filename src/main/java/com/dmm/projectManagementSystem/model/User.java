@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,6 +55,7 @@ public class User implements UserDetails {
     private Department department;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "majorID")
     private Major major;
 

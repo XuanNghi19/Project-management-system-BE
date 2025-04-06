@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +23,8 @@ public class FilesUrl {
     @ManyToOne
     @JoinColumn(name = "topicID")
     private Topic topic;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStage projectStage;
 }
 

@@ -1,8 +1,11 @@
 package com.dmm.projectManagementSystem.service.student.teamService;
 
-import com.dmm.projectManagementSystem.dto.RestResponse;
+import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
+import com.dmm.projectManagementSystem.dto.group.res.AcceptInvitationResDTO;
 import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
-import com.dmm.projectManagementSystem.enums.TeamStatus;
+import com.dmm.projectManagementSystem.dto.group.res.TeacherTeamResDTO;
+import com.dmm.projectManagementSystem.dto.group.res.UserTeamResDTO;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
@@ -11,8 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class TeamServiceImpl implements TeamService {
     @Autowired
@@ -27,38 +34,39 @@ public class TeamServiceImpl implements TeamService {
     private StudentTopicRepo studentTopicRepo;
     @Autowired
     private ClassTopicRepo classTopicRepo;
-
+    @Autowired
+    private TeamRepo teamRepo;
     // Trưởng nhóm tạo nhóm
     @Transactional
     @Override
-    public RestResponse<StudentTeamResDTO> handleCreateGroup(Long leaderId, String teamName) {
-        RestResponse<StudentTeamResDTO> restResponse = new RestResponse();
-
-
-        Optional<User> leader = userRepo.findById(leaderId);
-        leader.orElseThrow(() -> new NoSuchElementException("Không tìm thấy người dùng trong csdl !"));
-        //Kiểm tra thời gian cho phép tạo nhóm
-        if (teamMemberRepo.findByStudentId(leader.get().getId()).isPresent()) {
-            restResponse.setMessage(" Bạn đã có nhóm rồi, không thể tạo được nhóm mới !");
-            return restResponse;
-
-        }
-
-        Optional<StudentTopic> studentTopic = studentTopicRepo.findByStudentId(leader.get().getId());
+    public ApiResponseStudent<StudentTeamResDTO> handleCreateGroup(Long leaderId, String teamName) {
+        Optional<StudentTopic> studentTopic = studentTopicRepo.findByStudentId(leaderId);
         if (!studentTopic.isPresent()) {
             throw new IllegalStateException("Sinh viên chưa được phân vào lớp của giảng viên!");
         }
+        ApiResponseStudent<StudentTeamResDTO> apiResponseStudent = new ApiResponseStudent<>();
+        Optional<User> leader = userRepo.findById(leaderId);
+        leader.orElseThrow(() -> new NoSuchElementException("Không tìm thấy người dùng trong csdl !"));
+        //Kiểm tra thời gian cho phép tạo nhóm
         ClassTopic classTopic = studentTopic.get().getClassTopic();
-        Optional<User> teacher = this.userRepo.findById(classTopic.getTeacher().getId());
+        Long teacherId = classTopic.getTeacher().getId();
+        Optional<User> teacher = this.userRepo.findById(teacherId);
+        Optional<List<TeamMember>> teamMember = teamMemberRepo.findByStudentId(leaderId);
         Team team  = new Team();
-        team.setTeacher(teacher.get());
-        team.setTopic(null);
-        team.setStatus(TeamStatus.PENDING);
-        team.setGroupName(teamName);
-        Team teamSaved = groupRepo.save(team);
+        User user = teacher.orElseThrow(() -> new NoSuchElementException("Không tìm thấy giảng viên!"));
+       if (!teamMember.isPresent() || checkJoinTeam(teamMember.get())){
+           team.setTeacher(teacher.get());
+           team.setTopic(null);
+           team.setTopicSemester(classTopic.getTopicSemester());
+           team.setStatus(ProjectStage.PENDING);
+           team.setGroupName(teamName);
+           Team teamSaved = groupRepo.save(team);
+       }else {
+           apiResponseStudent.setMessage("Bạn đã tham gia nhóm rồi, không được đăng ký thêm nhóm !");
+           return apiResponseStudent;
+       }
         TopicSemester topicSemester = team.getTopicSemester();
-
-
+        TeacherTeamResDTO teacherTeamResDTO = TeacherTeamResDTO.loadFromTeacherRes(user);
        TeamMember teamStudent = TeamMember.builder()
                .student(leader.get())
                .team(team)
@@ -67,72 +75,163 @@ public class TeamServiceImpl implements TeamService {
         teamMemberRepo.save(teamStudent);
         StudentTeamResDTO studentTeamResDTO = new StudentTeamResDTO();
         studentTeamResDTO.setGroupName(team.getGroupName());
-        studentTeamResDTO.setTeacher(teacher.get());
+        studentTeamResDTO.setTeacher(teacherTeamResDTO);
         studentTeamResDTO.setTopicSemester(topicSemester);
-        restResponse.setData(studentTeamResDTO);
-        restResponse.setData(studentTeamResDTO);
-        return restResponse;
+        apiResponseStudent.setData(studentTeamResDTO);
+        apiResponseStudent.setMessage("Tạo nhóm đồ án thành công");
+
+        return apiResponseStudent;
     }
 
-
-
+    // chưa tối ưu hóa
     @Transactional
-    public RestResponse<TeamMember> inviteMember (Long leaderId, Long memberId) {
+    public List<UserTeamResDTO> inviteMember (Long leaderId, Long memberId, Long teamId) {
         User memberDB = this.userRepo.findById(memberId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy thành viên cần mời trong csdl !"));
         StudentTopic studentTopic = studentTopicRepo.findByStudentId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp chủ đề được phân"));
-        // Có thể bỏ
         if (studentTopic.isStatus()){
             System.out.println("Người dùng đã tham gia nhóm !");
         }
-        Optional<TeamMember> teamMemberInvited = this.teamMemberRepo.findByStudentId(leaderId);
-        teamMemberInvited.orElseThrow(() -> new NoSuchElementException("Không tìm được nhóm được mời vào"));
-        Team team = teamMemberInvited.get().getTeam();
+        StudentTopic studentTopicLeader = studentTopicRepo.findByStudentId(leaderId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp chủ đề được phân"));
+        studentTopic.setStatus(true);
+        this.studentTopicRepo.save(studentTopicLeader);
+        Optional<Team> team = this.teamRepo.findById(teamId);
+        team.orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm sinh viên"));
+
         TeamMember teamMember = TeamMember.builder()
                 .student(memberDB)
-                .team(team)
+                .team(team.get())
                 .position(MembershipPosition.MEMBER)
                 .build();
+
         this.teamMemberRepo.save(teamMember);
-        RestResponse<TeamMember> restResponse = new RestResponse();
-        restResponse.setMessage("Nhóm của bạn đã được tạo thành công và chờ duyệt từ giảng viên");
-        restResponse.setData(teamMember);
-        return restResponse;
+        List<TeamMember> teamMembers = this.teamMemberRepo.findByTeamId(team.get().getId());
+
+        List<Long> listMembersId = teamMembers.stream().map(student -> student.getStudent().getId()).toList();
+        Map<Long, User> userMap = userRepo.findByIdIn(listMembersId)
+                .stream().collect(Collectors.toMap(User::getId, user -> user));
+        return UserTeamResDTO.fromUserTeamRes(teamMembers, userMap, false);
     }
 
     @Transactional
-    public boolean handleAcceptJoinTeam (Long idUser) {
-        Optional<StudentTopic> studentTopic = this.studentTopicRepo.findByStudentId(idUser);
-        studentTopic.orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp !"));
-        studentTopic.get().setStatus(true);
-        this.studentTopicRepo.save(studentTopic.get());
-        return true;
+    public ApiResponseStudent<AcceptInvitationResDTO> handleAcceptJoinTeam (Long leaderId, Long idUser, Long teamId) {
+        Optional<StudentTopic> studentTopicDB = this.studentTopicRepo.findByStudentId(idUser);
+        studentTopicDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp được phân công !"));
+        studentTopicDB.get().setStatus(true);
+        this.studentTopicRepo.save(studentTopicDB.get());
+        Optional<Team> team = this.teamRepo.findById(teamId);
+        team.orElseThrow(() -> new NoSuchElementException("Không tìm thấy thông tin về nhóm trong csdl !"));
+        List<TeamMember> teamMembers = team.get().getListStudent();
+
+        Optional<User> leader = this.userRepo.findById(leaderId);
+        leader.orElseThrow(() -> new NoSuchElementException("Không tìm thấy thông tin nhóm trưởng"));
+
+        List<Long> studentIds = teamMembers.stream().map(tm -> tm.getStudent().getId()).toList();
+        Map<Long, User> userMap = userRepo.findByIdIn(studentIds)
+                .stream().collect(Collectors.toMap(User::getId, user -> user));
+
+        List<UserTeamResDTO> userTeamResDTO = UserTeamResDTO.fromUserTeamRes(teamMembers, userMap, studentTopicDB.get().isStatus());
+        AcceptInvitationResDTO acceptInvitationResDTO = new AcceptInvitationResDTO();
+        acceptInvitationResDTO.setStatus(true);
+        acceptInvitationResDTO.setGroupName(team.get().getGroupName());
+        acceptInvitationResDTO.setListMember(userTeamResDTO);
+
+        ApiResponseStudent<AcceptInvitationResDTO> apiResponseAcceptTeam = new ApiResponseStudent<>();
+        apiResponseAcceptTeam.setData(acceptInvitationResDTO);
+
+        return apiResponseAcceptTeam;
     }
-    // được dùng cho cả trường hợp leader hủy mời hoặc là người được mời từ chối tham gia
+
     @Transactional
-    public boolean handleRejectJoinTeam (Long invitationId) {
-        Optional<TeamMember> teamMember = this.teamMemberRepo.findById(invitationId);
-        if (!teamMember.isPresent()){
-            System.out.println("Không tìm thấy lời  mời !");
-            return false;
+    public ApiResponseStudent<Void> handleRejectJoinTeam (Long leaderId, Long memberId, Long teamId) {
+        ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
+
+        Optional<TeamMember> teamMember = this.teamMemberRepo.findByStudentIdAndTeamId(memberId, teamId);
+        if (teamMember.isEmpty()) {
+            apiResponseStudent.setMessage("Không tìm thấy thành viên trong nhóm!");
+            return apiResponseStudent;
         }
-        this.teamMemberRepo.delete(teamMember.get());
-        return true;
+        String message = this.teamMemberRepo.deleteByStudentId(memberId) > 0
+                ? "Từ chối tham gia nhóm thành công"
+                : "Từ chối tham gia nhóm không thành công";
+        apiResponseStudent.setMessage(message);
+        return apiResponseStudent;
     }
-    @Override
-    public boolean handleRemoveStudentFromGroup() {
-        return false;
+    @Transactional
+    public ApiResponseStudent<Void> handleRemoveStudentFromGroup(Long leaderId, Long memberId, Long teamId) {
+        // thành viên rời nhóm thì cập nhật lại thông tin nhóm thành viên và thông báo rời nhóm thành công, cập nhật thông báo tới các thành viên khác
+        ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
+        Optional<Team> team = teamRepo.findById(teamId);
+        if (team.isEmpty()) {
+            apiResponseStudent.setMessage("Nhóm không tồn tại trong CSDL !");
+            return apiResponseStudent;
+        }
+        if (team.get().getStatus() != ProjectStage.PENDING) {
+            apiResponseStudent.setMessage("Nhóm đã được duyệt, không thể xóa thành viên!");
+            return apiResponseStudent;
+        }
+        Optional<TeamMember> teamMember = teamMemberRepo.findByStudentIdAndTeamId(memberId, teamId);
+        if (teamMember.isEmpty()) {
+            apiResponseStudent.setMessage("Không tìm thấy thành viên trong nhóm!");
+            return apiResponseStudent;
+        }
+        this.teamMemberRepo.deleteByStudentId(memberId);
+        apiResponseStudent.setMessage("Từ chối tham gia nhóm thành công!");
+        return apiResponseStudent;
     }
-
+    @Transactional
     @Override
-    public boolean handleDeleteGroup(Long teamId) {
+    public ApiResponseStudent<Void> handleDeleteGroup(Long leaderId, Long teamId) {
+        ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
+        Optional<Team> team = teamRepo.findById(teamId);
+        if (team.isEmpty()) {
+            apiResponseStudent.setMessage("Nhóm không tồn tại trong CSDL !");
+            return apiResponseStudent;
+        }
+        if (team.get().getStatus() != ProjectStage.PENDING) {
+            apiResponseStudent.setMessage("Nhóm đã được duyệt, không thể hủy nhóm!");
+            return apiResponseStudent;
+        }
+        TeamMember leaderTeam = this.teamMemberRepo.findByStudentIdAndTeamId(leaderId, teamId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy trưởng nhóm trong bảng thành viên !"));
+        if (leaderTeam.getPosition() != MembershipPosition.LEADER){
+            apiResponseStudent.setMessage("Bạn không phải trưởng nhóm, hủy nhóm không thành công !");
+            return apiResponseStudent;
+        }
 
-        return false;
+        List<TeamMember> listMember = this.teamMemberRepo.findByTeamId(teamId);
+        for (TeamMember member : listMember){
+            StudentTopic studentTopic = this.studentTopicRepo.findByStudentId(member.getStudent().getId()).orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp được giao !"));
+            if (studentTopic.isStatus()){
+                studentTopic.setStatus(false);
+                this.studentTopicRepo.save(studentTopic);
+            }
+        }
+
+        this.teamMemberRepo.deleteByTeamId(teamId);
+       this.teamRepo.deleteById(teamId);
+
+        if (listMember.isEmpty()) {
+            apiResponseStudent.setMessage("Không tìm thấy thành viên trong nhóm!");
+            return apiResponseStudent;
+        }
+        apiResponseStudent.setMessage("Hủy nhóm thành công !");
+        return apiResponseStudent;
     }
 
     public boolean canRegisterGroup(LocalDateTime startTime, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startTime) && now.isBefore(endTime);
+    }
+
+    private boolean checkJoinTeam (List<TeamMember> teamMembers) {
+        for(TeamMember teamStudent : teamMembers){
+           Topic topic = topicRepo.findById(teamStudent.getTeam().getId()).orElseThrow(() -> new NoSuchElementException("Lỗi tìm nhóm sinh viên đã tham gia !"));
+           if (topic.getProjectStage() != ProjectStage.DEFENSE){
+               return false;
+           }
+        }
+        return true;
     }
 
 }

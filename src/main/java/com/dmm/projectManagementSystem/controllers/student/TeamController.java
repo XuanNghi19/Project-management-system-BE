@@ -1,11 +1,15 @@
 package com.dmm.projectManagementSystem.controllers.student;
 
-import com.dmm.projectManagementSystem.dto.RestResponse;
+import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
+import com.dmm.projectManagementSystem.dto.group.res.AcceptInvitationResDTO;
 import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
-import com.dmm.projectManagementSystem.model.TeamMember;
+import com.dmm.projectManagementSystem.dto.group.res.UserTeamResDTO;
 import com.dmm.projectManagementSystem.service.student.teamService.TeamServiceImpl;
+import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/group")
@@ -14,33 +18,48 @@ public class TeamController {
     private TeamController(TeamServiceImpl teamServiceImpl) {
         this.teamServiceImpl = teamServiceImpl;
     }
-
+    @ApiMessageResponse(message = "Tạo nhóm làm đồ án")
     @PostMapping("/create_group")
-    public ResponseEntity<RestResponse<StudentTeamResDTO>> createStudentGroup (@RequestParam Long studentId, @RequestParam String groupName) {
-        return ResponseEntity.ok(this.teamServiceImpl.handleCreateGroup(studentId, groupName));
+    public ResponseEntity<ApiResponseStudent<StudentTeamResDTO>> createStudentGroup (@RequestParam Long studentId,
+                                                                                     @RequestParam String teamName) {
+
+        return ResponseEntity.ok(this.teamServiceImpl.handleCreateGroup(studentId, teamName));
+    }
+    @ApiMessageResponse(value = "Nhóm của bạn đã được tạo thành công và chờ duyệt từ giảng viên !")
+    @PostMapping("/invite")
+    public ResponseEntity<List<UserTeamResDTO>> inviteMember(@RequestParam Long leaderId,
+                                                             @RequestParam Long userId,
+                                                             @RequestParam Long teamId) {
+        return ResponseEntity.ok(this.teamServiceImpl.inviteMember(leaderId, userId, teamId));
+    }
+    @ApiMessageResponse("Bạn chấp nhận tham gia nhóm thành công !")
+    @PutMapping("/accept")
+    public ResponseEntity<ApiResponseStudent<AcceptInvitationResDTO>> acceptInvitation (@RequestParam Long leaderId,
+                                                                                        @RequestParam Long userId,
+                                                                                        @RequestParam Long teamId) {
+       return ResponseEntity.ok(this.teamServiceImpl.handleAcceptJoinTeam(leaderId, userId, teamId));
+    }
+    @ApiMessageResponse("Từ chối tham gia nhóm ")
+    @PutMapping("/decline")
+    public ResponseEntity<ApiResponseStudent<Void>> rejectInvitation(@RequestParam Long leaderId,
+                                                                     @RequestParam Long memberId,
+                                                                     @RequestParam Long teamId) {
+        return ResponseEntity.ok( this.teamServiceImpl.handleRejectJoinTeam(leaderId, memberId, teamId));
     }
 
-    @GetMapping("/invite")
-    public ResponseEntity<RestResponse<TeamMember>> inviteMember(@RequestParam Long leaderId, @RequestParam Long userId) {
-        return ResponseEntity.ok(this.teamServiceImpl.inviteMember(leaderId, userId));
+    @ApiMessageResponse("Rời khỏi nhóm")
+    @PutMapping("/remove")
+    public ResponseEntity<ApiResponseStudent<Void>> removeStudentFromTeam(@RequestParam Long leaderId,
+                                                                          @RequestParam Long memberId,
+                                                                          @RequestParam Long teamId) {
+        return ResponseEntity.ok( this.teamServiceImpl.handleRemoveStudentFromGroup(leaderId, memberId, teamId));
     }
-
-    @PutMapping("/{id}/accept")
-    public ResponseEntity<String> acceptInvitation (@PathVariable ("id") Long idUser) {
-        this.teamServiceImpl.handleAcceptJoinTeam(idUser);
-       return ResponseEntity.ok("Đã chấp nhận tham gia nhóm !");
+    @ApiMessageResponse(message = "Hủy nhóm sinh viên")
+    @DeleteMapping("/delete_team")
+    public ResponseEntity<ApiResponseStudent<Void>> deleteTeam (
+                                            @RequestParam Long leaderId,
+                                            @RequestParam Long teamId) {
+        return ResponseEntity.ok(this.teamServiceImpl.handleDeleteGroup(leaderId, teamId));
     }
-
-    @PutMapping("/{id}/decline")
-    public ResponseEntity<String> rejectInvitation(@PathVariable Long invitationId) {
-        return ResponseEntity.ok("Đã từ chối lời mời !");
-    }
-
-    @DeleteMapping("/delete_team/{id}")
-    public ResponseEntity<String> deleteTeam (@PathVariable ("id") Long teamId) {
-        return ResponseEntity.ok("Chờ duyệt từ giảng viên");
-    }
-
-
 
 }

@@ -1,11 +1,13 @@
 package com.dmm.projectManagementSystem.controllers.student;
 
+import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.RestResponse;
 import com.dmm.projectManagementSystem.dto.project.CouncilResDTO;
 import com.dmm.projectManagementSystem.dto.project.DefenseScheduleResDTO;
 import com.dmm.projectManagementSystem.model.Evaluation;
 import com.dmm.projectManagementSystem.model.Meeting;
 import com.dmm.projectManagementSystem.service.student.projectService.ProjectDetailServiceImpl;
+import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +19,17 @@ import java.util.List;
 public class ProjectController {
     @Autowired
     private ProjectDetailServiceImpl projectDetailServiceImpl;
+    @ApiMessageResponse("Lấy lịch bảo về đồ án")
     @GetMapping("/get_defense_schedule/{projectId}")
-    public ResponseEntity<DefenseScheduleResDTO> getDefenseSchedule (@PathVariable ("projectId") Long projectId) {
+    public ResponseEntity<ApiResponseStudent<DefenseScheduleResDTO>> getDefenseSchedule (@PathVariable ("projectId") Long projectId) {
         return ResponseEntity.ok(this.projectDetailServiceImpl.handleGetDefenseSchedule(projectId));
     }
-
+    @ApiMessageResponse("Lấy hội đồng tham gia đánh giá đề tài")
     @GetMapping ("/get_council/{projectId}")
-    public ResponseEntity<CouncilResDTO> getCouncil (@PathVariable Long projectId){
+    public ResponseEntity<ApiResponseStudent<CouncilResDTO>> getCouncil (@PathVariable Long projectId){
         return ResponseEntity.ok(this.projectDetailServiceImpl.handleGetCouncil(projectId));
     }
-
+    @ApiMessageResponse("Lấy cuộc họp của nhóm đề tài")
     @GetMapping("/get_meeting")
     public ResponseEntity<RestResponse<List<Meeting>>> getMeeting (@RequestParam Long topicId,
                                                                    @RequestParam(defaultValue = "0") int page,
@@ -34,10 +37,10 @@ public class ProjectController {
                                                                    @RequestParam (defaultValue = "asc") String sort) {
         return ResponseEntity.ok(this.projectDetailServiceImpl.handleGetMeeting(topicId, page, pageSize, sort));
     }
-
+    @ApiMessageResponse("Lấy đánh giá đề tài từ giảng viên và hội đồng")
     @GetMapping ("/get_evaluations/{projectId}")
-    public ResponseEntity<RestResponse<List<Evaluation>>> getEvaluation (@PathVariable Long projectId){
-        RestResponse<List<Evaluation>> evaluations = this.projectDetailServiceImpl.handleGetEvaluation(projectId);
+    public ResponseEntity<ApiResponseStudent<List<Evaluation>>> getEvaluation (@PathVariable Long projectId){
+        ApiResponseStudent<List<Evaluation>> evaluations = this.projectDetailServiceImpl.handleGetEvaluation(projectId);
         return ResponseEntity.ok(evaluations);
     }
 

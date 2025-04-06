@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,14 +29,16 @@ public class ClassTopic {
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "major_id")
     private Major major;
 
     @OneToMany(mappedBy = "classTopic", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<StudentTopic> listStudentTopic;
 }

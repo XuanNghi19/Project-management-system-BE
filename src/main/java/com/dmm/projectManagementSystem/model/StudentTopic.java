@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,12 +19,18 @@ public class StudentTopic {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
+    @JsonIgnore
     private User student;
 
     private boolean status;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "class_topic_id")
     private ClassTopic classTopic;
+
+    @Override
+    public String toString() {
+        return "StudentTopic{id=" + id + ", status=" + status + "}";
+    }
 }
