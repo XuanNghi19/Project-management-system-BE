@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.dto.council;
 
+import com.dmm.projectManagementSystem.dto.boardMember.CRUDBoardMember;
 import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
@@ -27,9 +28,12 @@ public class CouncilDetailResponse {
 
     List<CRUDDefenseSchedule> defenseScheduleList;
 
+    List<CRUDBoardMember> boardMemberList;
+
     static public CouncilDetailResponse fromCouncil(
             Council council,
-            List<CRUDDefenseSchedule> defenseScheduleList
+            List<CRUDDefenseSchedule> defenseScheduleList,
+            List<CRUDBoardMember> boardMemberList
     ) {
         return CouncilDetailResponse.builder()
                 .id(council.getId())
@@ -40,6 +44,7 @@ public class CouncilDetailResponse {
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(council.getTopicSemester()))
                 .department(CRUDDepartment.fromDepartment(council.getDepartment()))
                 .defenseScheduleList(defenseScheduleList)
+                .boardMemberList(boardMemberList)
                 .build();
     }
 }

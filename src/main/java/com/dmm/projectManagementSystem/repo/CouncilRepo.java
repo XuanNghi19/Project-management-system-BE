@@ -18,22 +18,22 @@ public interface CouncilRepo extends JpaRepository<Council, Long> {
 
     boolean existsByTopicSemester(TopicSemester topicSemester);
 
-    @Query("""
-            select c from Council c where (:name is null or lower(c.name) like lower(concat( '%', :name, '%')))
-            and (:topicSemester is null or c.topicSemester = :topicSemester)
-            and (:department is null or c.department = :department)
+    @Query(value = """
+            select * from council where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+            and (:topic_semester_id is null or topic_semester_id = :topic_semester_id)
+            and (:department_id is null or department_id = :department_id)
             and (
-                (:start is null and :end is null)
-                or (:start is not null and :end is not null and c.startTime >= :start and c.endTime <= :end)
-                or (:start is not null and :end is null and c.startTime >= :start)
-                or (:start is null and :end is not null and c.endTime <= :end)
+                (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is null)
+                or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is not null and start_time >= CAST(:start AS TIMESTAMP) and end_time <= CAST(:end AS TIMESTAMP))
+                or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is null and start_time >= CAST(:start AS TIMESTAMP))
+                or (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is not null and end_time <= CAST(:end AS TIMESTAMP))
             )
-            order by c.id desc
-            """)
+            order by id desc
+            """, nativeQuery = true)
     Page<Council> findAllCouncil(
             @Param("name") String name,
-            @Param("topicSemester") TopicSemester topicSemester,
-            @Param("department") Department department,
+            @Param("topic_semester_id") Long topicSemesterID,
+            @Param("department_id") Long departmentID,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             Pageable pageable

@@ -39,7 +39,8 @@ public class WebSecurityConfig {
                                     String.format("%s/major_management/add_major", apiPrefix),
                                     String.format("%s/topic_semester_management/add_topic_semester", apiPrefix),
                                     String.format("%s/course_management/add_course", apiPrefix),
-                                    String.format("%s/class_topic_management/add_class_topic", apiPrefix)
+                                    String.format("%s/class_topic_management/add_class_topic", apiPrefix),
+                                    String.format("%s/council_management/add_council", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.PUT,
@@ -48,7 +49,8 @@ public class WebSecurityConfig {
                                     String.format("%s/major_management/update_major", apiPrefix),
                                     String.format("%s/topic_semester_management/update_topic_semester", apiPrefix),
                                     String.format("%s/course_management/update_course", apiPrefix),
-                                    String.format("%s/class_topic_management/update_class_topic", apiPrefix)
+                                    String.format("%s/class_topic_management/update_class_topic", apiPrefix),
+                                    String.format("%s/council_management/update_council", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.PATCH,
@@ -64,7 +66,8 @@ public class WebSecurityConfig {
                                     String.format("%s/topic_semester_management/delete_topic_semester", apiPrefix),
                                     String.format("%s/course_management/delete_course", apiPrefix),
                                     String.format("%s/topic_management/delete_topic", apiPrefix),
-                                    String.format("%s/class_topic_management/delete_class_topic", apiPrefix)
+                                    String.format("%s/class_topic_management/delete_class_topic", apiPrefix),
+                                    String.format("%s/council_management/delete_council", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                     HttpMethod.GET,
@@ -80,7 +83,9 @@ public class WebSecurityConfig {
                                     String.format("%s/topic_management/get_all_topic", apiPrefix),
                                     String.format("%s/topic_management/get_detail_topic", apiPrefix),
                                     String.format("%s/class_topic_management/get_all_class_topic", apiPrefix),
-                                    String.format("%s/class_topic_management/get_detail_class_topic", apiPrefix)
+                                    String.format("%s/class_topic_management/get_detail_class_topic", apiPrefix),
+                                    String.format("%s/council_management/get_all_council", apiPrefix),
+                                    String.format("%s/council_management/get_council_detail", apiPrefix)
                             ).hasAnyRole(Role.ADMIN.toString())
                             .requestMatchers(
                                 HttpMethod.POST,

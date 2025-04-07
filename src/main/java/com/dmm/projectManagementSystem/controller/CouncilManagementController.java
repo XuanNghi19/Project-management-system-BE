@@ -1,37 +1,36 @@
 package com.dmm.projectManagementSystem.controller;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
-import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicDetailResponse;
-import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicListByPageResponse;
-import com.dmm.projectManagementSystem.dto.classTopic.CreateClassTopicRequest;
-import com.dmm.projectManagementSystem.dto.classTopic.UpdateClassTopicRequest;
-import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
-import com.dmm.projectManagementSystem.dto.topic.TopicDetailsResponse;
-import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
-import com.dmm.projectManagementSystem.service.admin.classTopicManagement.ClassTopicManagementService;
+import com.dmm.projectManagementSystem.dto.council.CouncilDetailResponse;
+import com.dmm.projectManagementSystem.dto.council.CouncilListByPageResponse;
+import com.dmm.projectManagementSystem.dto.council.CreateCouncilRequest;
+import com.dmm.projectManagementSystem.dto.council.UpdateCouncilRequest;
+import com.dmm.projectManagementSystem.service.admin.councilManagement.CouncilManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.prefix}/class_topic_management")
-public class ClassTopicManagementController {
+@RequestMapping("${api.prefix}/council_management")
+public class CouncilManagementController {
 
-    final private ClassTopicManagementService classTopicManagementService;
+    final private CouncilManagementService councilManagementService;
 
-    @Operation(summary = "them lop hoc do an")
-    @PostMapping("add_class_topic")
-    public ApiResponse<?> addClassTopic(
-            @RequestBody @Valid CreateClassTopicRequest request,
+    @Operation(summary = "them hoi dong")
+    @PostMapping("add_council")
+    public ApiResponse<?> addCouncil(
+            @RequestBody @Valid CreateCouncilRequest request,
             BindingResult result
     ) {
         if(result.hasErrors()) {
@@ -47,7 +46,7 @@ public class ClassTopicManagementController {
         }
 
         try {
-            Pair<String, Boolean> response = classTopicManagementService.addClassTopic(request);
+            Pair<String, Boolean> response = councilManagementService.addCouncil(request);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response.getSecond())
@@ -62,10 +61,10 @@ public class ClassTopicManagementController {
         }
     }
 
-    @Operation(summary = "Cập nhật lop hoc do an")
-    @PutMapping(value = "/update_class_topic")
-    public ApiResponse<?> updateClassTopic(
-            @RequestBody @Valid UpdateClassTopicRequest request,
+    @Operation(summary = "Cập nhat hoi dong")
+    @PutMapping(value = "/update_council")
+    public ApiResponse<?> updateCouncil(
+            @RequestBody @Valid UpdateCouncilRequest request,
             BindingResult result
     ) {
         if(result.hasErrors()) {
@@ -81,7 +80,7 @@ public class ClassTopicManagementController {
         }
 
         try {
-            Pair<String, Boolean> response = classTopicManagementService.updateClassTopic(request);
+            Pair<String, Boolean> response = councilManagementService.updateCouncil(request);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response.getSecond())
@@ -96,14 +95,14 @@ public class ClassTopicManagementController {
         }
     }
 
-    @Operation(summary = "Xóa lop hoc do an")
-    @DeleteMapping("/delete_class_topic")
-    public ApiResponse<?> deleteClassTopic(
-            @Parameter(description = "mã của lop hoc do an")
-            @RequestParam(value = "id class topic") Long id
+    @Operation(summary = "Xóa hoi dong")
+    @DeleteMapping("/delete_council")
+    public ApiResponse<?> deleteCouncil(
+            @Parameter(description = "mã hoi dong")
+            @RequestParam(value = "id council") Long id
     ) {
         try {
-            Pair<String, Boolean> response = classTopicManagementService.deleteClassTopic(id);
+            Pair<String, Boolean> response = councilManagementService.deleteCouncil(id);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response.getSecond())
@@ -118,17 +117,25 @@ public class ClassTopicManagementController {
         }
     }
 
-    @Operation(summary = "Lấy tất cả lop hoc do an theo trang - có phân trang")
-    @GetMapping("/get_all_class_topic")
-    public ApiResponse<?> getAllClassTopic(
-            @Parameter(description = "tên lop hoc do an")
+    @Operation(summary = "Lấy tất cả hoi dong theo trang - có phân trang")
+    @GetMapping("/get_all_council")
+    public ApiResponse<?> getAllCouncil(
+            @Parameter(description = "tên hoi dong")
             @RequestParam(value = "name", required = false) String name,
 
             @Parameter(description = "mã của kỳ học đồ án")
             @RequestParam(value = "topic semester id", required = false) Long topicSemesterID,
 
-            @Parameter(description = "mã của ngành học")
-            @RequestParam(value = "major id", required = false) Long majorID,
+            @Parameter(description = "mã của kho")
+            @RequestParam(value = "department id", required = false) Long departmentID,
+
+            @Parameter(description = "thoi gian bat dau phien lam viec cua hoi dong - định dạng: yyyy-MM-dd HH:mm:ss")
+            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @RequestParam(value = "start", required = false) LocalDateTime startTime,
+
+            @Parameter(description = "thoi gian ket thuc phien lam viec cua hoi dong - định dạng: yyyy-MM-dd HH:mm:ss")
+            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @RequestParam(value = "end", required = false) LocalDateTime endTime,
 
             @Parameter(description = "số trang muốn chọn")
             @RequestParam(value = "page") int page,
@@ -137,10 +144,12 @@ public class ClassTopicManagementController {
             @RequestParam(value = "limit") int limit
     ) {
         try {
-            ClassTopicListByPageResponse response = classTopicManagementService.getAllClassTopic(
+            CouncilListByPageResponse response = councilManagementService.getAllCouncil(
                     name,
                     topicSemesterID,
-                    majorID,
+                    departmentID,
+                    startTime,
+                    endTime,
                     page,
                     limit
             );
@@ -158,14 +167,15 @@ public class ClassTopicManagementController {
         }
     }
 
-    @Operation(summary = "xem chi tiet lop hoc do an")
-    @GetMapping("/get_detail_class_topic")
-    public ApiResponse<?> getClassTopicDetail(
-            @Parameter(description = "mã của lop hoc do an")
-            @RequestParam(value = "id class topic") Long idNum
+
+    @Operation(summary = "xem chi tiet hoi dong")
+    @GetMapping("/get_council_detail")
+    public ApiResponse<?> getCouncilDetail(
+            @Parameter(description = "mã của hoi dong")
+            @RequestParam(value = "id council") Long idNum
     ) {
         try {
-            ClassTopicDetailResponse response = classTopicManagementService.getClassTopicDetail(idNum);
+            CouncilDetailResponse response = councilManagementService.getCouncilDetail(idNum);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response)

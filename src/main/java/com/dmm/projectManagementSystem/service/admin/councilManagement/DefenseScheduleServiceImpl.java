@@ -22,7 +22,9 @@ public class DefenseScheduleServiceImpl implements DefenseScheduleService {
     public void addDefenseSchedule(Council council, CRUDDefenseSchedule request) throws Exception {
         try {
             Topic exTopic = topicRepo.findByIdNum(request.getTopic().getIdNum());
-            defenseScheduleRepo.save(DefenseSchedule.fromCRUDDefenseSchedule(request, council, exTopic));
+            DefenseSchedule defenseSchedule = DefenseSchedule.fromCRUDDefenseSchedule(request, council, exTopic);
+            defenseSchedule.setId(null);
+            defenseScheduleRepo.save(defenseSchedule);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

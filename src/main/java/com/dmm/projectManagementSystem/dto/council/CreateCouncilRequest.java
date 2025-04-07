@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.dto.council;
 
+import com.dmm.projectManagementSystem.dto.boardMember.CRUDBoardMember;
 import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -23,4 +24,6 @@ public class CreateCouncilRequest {
     Long departmentID;
 
     List<CRUDDefenseSchedule> scheduleRequests;
+
+    List<CRUDBoardMember> boardMemberList;
 }

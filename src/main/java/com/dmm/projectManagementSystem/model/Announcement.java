@@ -31,7 +31,7 @@ public class Announcement {
     private ProjectStage projectStage;
 
     @ManyToOne
-    @JoinColumn(name = "topic_id")
-    private Topic topic;
+    @JoinColumn(name = "team_id")
+    private Team team;
 }
 

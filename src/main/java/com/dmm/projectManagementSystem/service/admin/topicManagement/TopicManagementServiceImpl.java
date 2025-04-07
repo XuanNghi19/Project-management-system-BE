@@ -79,11 +79,6 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                 }
             }
 
-            if(announcementRepo.existsByTopic(topic)) {
-                if (announcementRepo.deleteAllByTopic(topic) <= 0) {
-                    return Pair.of(String.format("cannot delete announcements by topic of idNum: %s", idNum), false);
-                }
-            }
 
             List<FilesUrl> fileUrls = filesUrlRepo.findAllByTopic(topic);
             if(!fileUrls.isEmpty()) {
@@ -105,6 +100,12 @@ public class TopicManagementServiceImpl implements TopicManagementService{
             }
 
             if(teamRepo.existsByTopic(topic)) {
+                Team team = teamRepo.findByTopic(topic);
+                if(announcementRepo.existsByTeam(team)) {
+                    if (announcementRepo.deleteAllByTeam(team) <= 0) {
+                        return Pair.of(String.format("cannot delete announcements by topic of idNum: %s", idNum), false);
+                    }
+                }
                 if (teamRepo.deleteAllByTopic(topic) <= 0) {
                     return Pair.of(String.format("cannot delete group by topic of idNum: %s", idNum), false);
                 }
@@ -166,12 +167,11 @@ public class TopicManagementServiceImpl implements TopicManagementService{
         Topic exTopic = topicRepo.findByIdNum(idNum);
 
         Team team = teamRepo.findByTopic(exTopic);
-        if(team == null) team = new Team();
 
         List<TeamMember> teamMemberList = teamMemberRepo.findAllByTeam(team);
 
         List<Task> taskList = taskRepo.findAllByTopic(exTopic);
-        List<Announcement> announcementList = announcementRepo.findAllByTopic(exTopic);
+        List<Announcement> announcementList = announcementRepo.findAllByTeam(team);
         List<FilesUrl> filesUrlList = filesUrlRepo.findAllByTopic(exTopic);
         List<Evaluation> evaluationList = evaluationRepo.findAllByTopic(exTopic);
         List<Meeting> meetingList = meetingRepo.findAllByTopic(exTopic);

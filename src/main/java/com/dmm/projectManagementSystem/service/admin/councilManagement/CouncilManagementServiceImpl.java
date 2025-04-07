@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.service.admin.councilManagement;
 
+import com.dmm.projectManagementSystem.dto.boardMember.CRUDBoardMember;
 import com.dmm.projectManagementSystem.dto.council.*;
 import com.dmm.projectManagementSystem.dto.defenseSchedule.CRUDDefenseSchedule;
 import com.dmm.projectManagementSystem.enums.ActionTypes;
@@ -21,9 +22,11 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
 
     final private CouncilRepo councilRepo;
     final private DefenseScheduleRepo defenseScheduleRepo;
+    final private BoardMemberRepo boardMemberRepo;
     final private TopicSemesterRepo topicSemesterRepo;
     final private DepartmentRepo departmentRepo;
     final private DefenseScheduleService defenseScheduleService;
+    final private BoardMemberService boardMemberService;
 
     @Transactional(rollbackOn = Exception.class)
     @Override
@@ -42,6 +45,10 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
             for(var x : request.getScheduleRequests()) {
                 defenseScheduleService.addDefenseSchedule(council, x);
             }
+
+            for(var x : request.getBoardMemberList()) {
+                boardMemberService.addBoardMember(council, x);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -54,8 +61,8 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
     @Override
     public Pair<String, Boolean> updateCouncil(UpdateCouncilRequest request) throws Exception {
 
-        TopicSemester exTopicSemester = topicSemesterRepo.findById(request.getCourseID())
-                .orElseThrow(() -> new Exception("Khong tim thay course voi id: " + request.getCourseID()));
+        TopicSemester exTopicSemester = topicSemesterRepo.findById(request.getTopicSemesterID())
+                .orElseThrow(() -> new Exception("Khong tim thay kỳ hoc do an voi id: " + request.getTopicSemesterID()));
         Department exDepartment = departmentRepo.findById(request.getDepartmentID())
                 .orElseThrow(() -> new Exception("Khong tim thay department voi id: " + request.getDepartmentID()));
 
@@ -69,6 +76,16 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
                     defenseScheduleService.updateDefenseSchedule(x);
                 } else if (x.getAction() == ActionTypes.CREATE) {
                     defenseScheduleService.addDefenseSchedule(updateCouncil, x);
+                }
+            }
+
+            for (var x : request.getBoardMemberList()) {
+                if (x.getAction() == ActionTypes.DELETE) {
+                    boardMemberService.deleteBoardMember(x.getId());
+                } else if (x.getAction() == ActionTypes.UPDATE) {
+                    boardMemberService.updateBoardMember(x);
+                } else if (x.getAction() == ActionTypes.CREATE) {
+                    boardMemberService.addBoardMember(updateCouncil, x);
                 }
             }
         } catch (Exception e) {
@@ -89,6 +106,7 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
             if(defenseScheduleRepo.existsByCouncil(council)) {
                 try {
                     defenseScheduleRepo.deleteAllByCouncil(council);
+                    boardMemberRepo.deleteAllByCouncil(council);
                     councilRepo.deleteById(councilID);
                     return Pair.of("Delete Council Successes!", true);
                 } catch (Exception e) {
@@ -125,8 +143,8 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
 
         Page<CouncilResponse> councilPage = councilRepo.findAllCouncil(
                         name,
-                        topicSemester,
-                        department,
+                        topicSemesterID,
+                        departmentID,
                         startTime,
                         endTime,
                         PageRequest.of(page, limit)
@@ -150,6 +168,10 @@ public class CouncilManagementServiceImpl implements CouncilManagementService{
                 CRUDDefenseSchedule::fromDefenseSchedule
         ).toList();
 
-        return CouncilDetailResponse.fromCouncil(exCouncil, defenseScheduleList);
+        List<CRUDBoardMember> boardMemberList = boardMemberRepo.findAllByCouncil(exCouncil).stream().map(
+                CRUDBoardMember::fromBoardMember
+        ).toList();
+
+        return CouncilDetailResponse.fromCouncil(exCouncil, defenseScheduleList, boardMemberList);
     }
 }
