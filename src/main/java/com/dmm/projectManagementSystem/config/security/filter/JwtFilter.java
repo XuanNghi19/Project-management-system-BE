@@ -1,7 +1,9 @@
 package com.dmm.projectManagementSystem.config.security.filter;
 
 import com.dmm.projectManagementSystem.config.security.JwtUtils;
+import com.dmm.projectManagementSystem.dto.IntrospectResponse;
 import com.dmm.projectManagementSystem.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.SignedJWT;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
@@ -52,17 +54,30 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // Lấy ra chuỗi token
             final String token = authorizationHeader.substring(7);
-            // Lấy ra phoneNumber từ token
-            final String idNum = SignedJWT.parse(token).getJWTClaimsSet().getSubject();
 
-            if(idNum != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Lấy ra user bằng idNum từ token
-                User user = (User) userDetailsService.loadUserByUsername(idNum);
+            // kiem tra xem token da het han chua
+            IntrospectResponse introspect = jwtUtils.introspect(token);
+            if(introspect.getValid()) {
+                // Lấy ra phoneNumber từ token
+                final String idNum = SignedJWT.parse(token).getJWTClaimsSet().getSubject();
 
-                createSessionForUser(user, idNum, request);
+                if(idNum != null
+                        && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Lấy ra user bằng idNum từ token
+                    User user = (User) userDetailsService.loadUserByUsername(idNum);
+
+                    createSessionForUser(user, idNum, request);
+                }
+                filterChain.doFilter(request, response);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                String json = objectMapper.writeValueAsString(introspect);
+
+                response.getWriter().write(json);
             }
-            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");

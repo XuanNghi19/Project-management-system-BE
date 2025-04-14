@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.dto;
 
+import com.dmm.projectManagementSystem.enums.ErrorCode;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,4 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class IntrospectResponse {
     Boolean valid;
+    String errorMessage;
+    ErrorCode errorCode;
 }

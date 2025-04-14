@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.dto.classTopic;
 
+import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.model.ClassTopic;
@@ -23,7 +24,7 @@ public class ClassTopicResponse {
     LocalDateTime endRegistrationTime;
 
     CRUDTopicSemester topicSemester;
-    Major major;
+    CRUDMajor major;
 
     static public ClassTopicResponse fromClassTopic(ClassTopic classTopic){
         return ClassTopicResponse.builder()
@@ -33,7 +34,7 @@ public class ClassTopicResponse {
                 .startRegistrationTime(classTopic.getStartRegistrationTime())
                 .endRegistrationTime(classTopic.getEndRegistrationTime())
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(classTopic.getTopicSemester()))
-                .major(classTopic.getMajor())
+                .major(CRUDMajor.fromMajor(classTopic.getMajor()))
                 .build();
     }
 }
