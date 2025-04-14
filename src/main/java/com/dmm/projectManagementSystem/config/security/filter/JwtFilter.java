@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.config.security.filter;
 
 import com.dmm.projectManagementSystem.config.security.JwtUtils;
+import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.IntrospectResponse;
 import com.dmm.projectManagementSystem.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,7 +75,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setContentType("application/json");
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                String json = objectMapper.writeValueAsString(introspect);
+
+                String json = objectMapper.writeValueAsString(
+                        ApiResponse.<IntrospectResponse>builder()
+                                .code(HttpServletResponse.SC_UNAUTHORIZED)
+                                .message(String.valueOf(HttpServletResponse.SC_UNAUTHORIZED))
+                                .result(introspect)
+                                .build()
+                );
 
                 response.getWriter().write(json);
             }

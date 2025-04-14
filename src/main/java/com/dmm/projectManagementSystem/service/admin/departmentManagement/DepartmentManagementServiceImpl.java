@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
+import org.springframework.expression.ExpressionException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     public Pair<String, Boolean> deleteDepartment(Long id) throws Exception {
         if(departmentRepo.existsById(id)) {
             Department department = departmentRepo.findById(id)
-                    .orElseThrow(() -> new RuntimeException());
+                    .orElseThrow(Exception::new);
             if(majorRepo.existsByDepartment(department) || userRepo.existsByDepartment(department) || councilRepo.existsByDepartment(department)) {
                return Pair.of("still exists in the department!", false);
             }
