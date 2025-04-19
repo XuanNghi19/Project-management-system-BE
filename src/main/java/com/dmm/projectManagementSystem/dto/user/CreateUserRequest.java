@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateUserRequest {
     String name;
     int age;
-    String password;
     String dob;
     String cccd;
     String email;

@@ -39,11 +39,11 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Department department = departmentRepo.findById(x.getDepartmentId())
                         .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + x.getDepartmentId()));
 
-                String encodePassword = passwordEncoder.encode(x.getPassword());
-
-                User newTeacher = userRepo.save(User.fromCreateUserRequest(x, encodePassword, Role.INSTRUCTORS));
+                User newTeacher = userRepo.save(User.fromCreateUserRequest(x, Role.INSTRUCTORS));
                 newTeacher.setDepartment(department);
                 newTeacher.setIdNum("GV" + StringUtils.getInitials(department.getName()) + newTeacher.getId());
+                String encodePassword = passwordEncoder.encode(newTeacher.getIdNum());
+                newTeacher.setPassword(encodePassword);
 
                 userRepo.save(newTeacher);
             }
@@ -65,12 +65,14 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Course course = courseRepo.findById(x.getCourseId())
                         .orElseThrow(() -> new RuntimeException("Khong ton tai course voi idNum: " + x.getCourseId()));
 
-                String encodePassword = passwordEncoder.encode(x.getPassword());
 
-                User newStudent = userRepo.save(User.fromCreateUserRequest(x, encodePassword, Role.STUDENT));
+
+                User newStudent = userRepo.save(User.fromCreateUserRequest(x, Role.STUDENT));
                 newStudent.setMajor(major);
                 newStudent.setCourse(course);
                 newStudent.setIdNum("SV" + StringUtils.getInitials(major.getName()) + newStudent.getId());
+                String encodePassword = passwordEncoder.encode(newStudent.getIdNum());
+                newStudent.setPassword(encodePassword);
 
                 userRepo.save(newStudent);
             }
@@ -88,11 +90,14 @@ public class UserManagementServiceImpl implements UserManagementService {
             Department department = departmentRepo.findById(createUserRequest.getDepartmentId())
                     .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + createUserRequest.getDepartmentId()));
 
-            String encodePassword = passwordEncoder.encode(createUserRequest.getPassword());
 
-            User newAdmin = userRepo.save(User.fromCreateUserRequest(createUserRequest, encodePassword, Role.ADMIN));
+
+            User newAdmin = userRepo.save(User.fromCreateUserRequest(createUserRequest, Role.ADMIN));
             newAdmin.setDepartment(department);
             newAdmin.setIdNum("AM" + StringUtils.getInitials(department.getName()) + newAdmin.getId());
+
+            String encodePassword = passwordEncoder.encode(newAdmin.getIdNum());
+            newAdmin.setPassword(encodePassword);
 
             userRepo.save(newAdmin);
 

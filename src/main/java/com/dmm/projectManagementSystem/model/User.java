@@ -77,11 +77,9 @@ public class User implements UserDetails {
 
     static public User fromCreateUserRequest(
             CreateUserRequest request,
-            String passwordEncode,
             Role role
     ) {
         return User.builder()
-                .password(passwordEncode)
                 .role(role)
                 .name(request.getName())
                 .age(request.getAge())

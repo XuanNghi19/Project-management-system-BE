@@ -45,7 +45,6 @@ public class Initializer implements CommandLineRunner {
         CreateUserRequest request = CreateUserRequest.builder()
                 .name("Admin")
                 .departmentId(1L)
-                .password("123")
                 .build();
 
         userManagementService.addAdmin(request);
