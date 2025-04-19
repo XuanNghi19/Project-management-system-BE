@@ -1,11 +1,11 @@
 package com.dmm.projectManagementSystem.controllers.student;
 
 import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
-import com.dmm.projectManagementSystem.dto.RestResponse;
 import com.dmm.projectManagementSystem.dto.project.CouncilResDTO;
 import com.dmm.projectManagementSystem.dto.project.DefenseScheduleResDTO;
 import com.dmm.projectManagementSystem.model.Evaluation;
 import com.dmm.projectManagementSystem.model.Meeting;
+import com.dmm.projectManagementSystem.model.Task;
 import com.dmm.projectManagementSystem.service.student.projectService.ProjectDetailServiceImpl;
 import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class ProjectController {
     }
     @ApiMessageResponse("Lấy cuộc họp của nhóm đề tài")
     @GetMapping("/get_meeting")
-    public ResponseEntity<RestResponse<List<Meeting>>> getMeeting (@RequestParam Long topicId,
+    public ResponseEntity<ApiResponseStudent<List<Meeting>>> getMeeting (@RequestParam Long topicId,
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam (defaultValue = "5") int pageSize,
                                                                    @RequestParam (defaultValue = "asc") String sort) {
@@ -42,6 +42,15 @@ public class ProjectController {
     public ResponseEntity<ApiResponseStudent<List<Evaluation>>> getEvaluation (@PathVariable Long projectId){
         ApiResponseStudent<List<Evaluation>> evaluations = this.projectDetailServiceImpl.handleGetEvaluation(projectId);
         return ResponseEntity.ok(evaluations);
+    }
+
+    @ApiMessageResponse("Lấy nhiệm vụ được giao của đề tài !")
+    @GetMapping("/get_task")
+    public ResponseEntity<ApiResponseStudent<List<Task>>> getTask (@RequestParam Long topicId,
+                                                             @RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam (defaultValue = "5") int pageSize,
+                                                             @RequestParam (defaultValue = "asc") String sort) {
+        return ResponseEntity.ok(this.projectDetailServiceImpl.handleGetTask(topicId, page, pageSize, sort));
     }
 
 

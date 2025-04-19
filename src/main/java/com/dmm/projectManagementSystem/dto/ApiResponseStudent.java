@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 public class ApiResponseStudent <T>{
     private T data;
     String message;
+    private Metadata metadata;
+    private Object error;
 }
 
 

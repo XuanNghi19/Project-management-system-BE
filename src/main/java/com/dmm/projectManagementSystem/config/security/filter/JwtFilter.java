@@ -105,6 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/project/", "GET"),
                 Pair.of("/project/get_meeting", "GET"),
                 Pair.of("/project/get_council", "GET"),
+                Pair.of("/project/get_task", "GET"),
                 Pair.of("/group/**", "POST"),
                 Pair.of("/group/create_group", "POST"),
                 Pair.of("/group/invite", "POST"),

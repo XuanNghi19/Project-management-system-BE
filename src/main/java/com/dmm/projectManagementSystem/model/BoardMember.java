@@ -17,12 +17,27 @@ public class BoardMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String position;
+
     @ManyToOne
-    @JoinColumn(name = "userID")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "councilID")
+    @JoinColumn(name = "council_id")
     private Council council;
+
+    static public BoardMember fromCRUDBoardMember(
+            CRUDBoardMember crudBoardMember,
+            Council council,
+            User user
+    ) {
+        return BoardMember.builder()
+                .id(crudBoardMember.getId())
+                .position(crudBoardMember.getPosition())
+                .user(user)
+                .council(council)
+                .build();
+    }
 }
 

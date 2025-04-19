@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 public class RestResponse <T>{
     private T data;
-    private Metadata metadata;
+
     private String message;
     private Object error;
     @Builder.Default

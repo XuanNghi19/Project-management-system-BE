@@ -4,6 +4,7 @@ import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.group.res.AcceptInvitationResDTO;
 import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
 import com.dmm.projectManagementSystem.dto.group.res.UserTeamResDTO;
+//import com.dmm.projectManagementSystem.service.student.teamService.EmailService;
 import com.dmm.projectManagementSystem.service.student.teamService.TeamServiceImpl;
 import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,10 @@ import java.util.List;
 @RequestMapping("/group")
 public class TeamController {
     private final TeamServiceImpl teamServiceImpl;
+//    private final EmailService emailService;
     private TeamController(TeamServiceImpl teamServiceImpl) {
         this.teamServiceImpl = teamServiceImpl;
+
     }
     @ApiMessageResponse(message = "Tạo nhóm làm đồ án")
     @PostMapping("/create_group")
@@ -27,9 +30,10 @@ public class TeamController {
     }
     @ApiMessageResponse(value = "Nhóm của bạn đã được tạo thành công và chờ duyệt từ giảng viên !")
     @PostMapping("/invite")
-    public ResponseEntity<List<UserTeamResDTO>> inviteMember(@RequestParam Long leaderId,
+    public ResponseEntity<ApiResponseStudent<List<UserTeamResDTO>>> inviteMember(@RequestParam Long leaderId,
                                                              @RequestParam Long userId,
                                                              @RequestParam Long teamId) {
+//        this.emailService.sendInvitationEmail("tungnguyen04082003tnnm@gmail.com", "Innovation Tech", "nguyentung0408@gmail.com");
         return ResponseEntity.ok(this.teamServiceImpl.inviteMember(leaderId, userId, teamId));
     }
     @ApiMessageResponse("Bạn chấp nhận tham gia nhóm thành công !")

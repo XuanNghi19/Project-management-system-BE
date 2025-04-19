@@ -9,9 +9,9 @@ import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,24 +21,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
-    @Autowired
-    private UserRepo userRepo;
-    @Autowired
-    private TeamRepo groupRepo;
-    @Autowired
-    private TopicRepo topicRepo;
-    @Autowired
-    private TeamMemberRepo teamMemberRepo;
-    @Autowired
-    private StudentTopicRepo studentTopicRepo;
-    @Autowired
-    private ClassTopicRepo classTopicRepo;
-    @Autowired
-    private TeamRepo teamRepo;
+     private final UserRepo userRepo;
+     private final TeamRepo groupRepo;
+     private final TopicRepo topicRepo;
+     private final TeamMemberRepo teamMemberRepo;
+     private final StudentTopicRepo studentTopicRepo;
+     private final ClassTopicRepo classTopicRepo;
+     private final TeamRepo teamRepo;
+
+
     // Trưởng nhóm tạo nhóm
-    @Transactional
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<StudentTeamResDTO> handleCreateGroup(Long leaderId, String teamName) {
         Optional<StudentTopic> studentTopic = studentTopicRepo.findByStudentId(leaderId);
         if (!studentTopic.isPresent()) {
@@ -84,8 +80,9 @@ public class TeamServiceImpl implements TeamService {
     }
 
     // chưa tối ưu hóa
-    @Transactional
-    public List<UserTeamResDTO> inviteMember (Long leaderId, Long memberId, Long teamId) {
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public ApiResponseStudent<List<UserTeamResDTO>> inviteMember (Long leaderId, Long memberId, Long teamId) {
         User memberDB = this.userRepo.findById(memberId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy thành viên cần mời trong csdl !"));
         StudentTopic studentTopic = studentTopicRepo.findByStudentId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp chủ đề được phân"));
@@ -111,10 +108,14 @@ public class TeamServiceImpl implements TeamService {
         List<Long> listMembersId = teamMembers.stream().map(student -> student.getStudent().getId()).toList();
         Map<Long, User> userMap = userRepo.findByIdIn(listMembersId)
                 .stream().collect(Collectors.toMap(User::getId, user -> user));
-        return UserTeamResDTO.fromUserTeamRes(teamMembers, userMap, false);
+        ApiResponseStudent<List<UserTeamResDTO>> apiResponseInvite = new ApiResponseStudent<>();
+        apiResponseInvite.setMessage("Mời tham gia nhóm thánh công !");
+        apiResponseInvite.setData(UserTeamResDTO.fromUserTeamRes(teamMembers, userMap, false));
+        return apiResponseInvite;
     }
 
-    @Transactional
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<AcceptInvitationResDTO> handleAcceptJoinTeam (Long leaderId, Long idUser, Long teamId) {
         Optional<StudentTopic> studentTopicDB = this.studentTopicRepo.findByStudentId(idUser);
         studentTopicDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên trong lớp được phân công !"));
@@ -143,7 +144,8 @@ public class TeamServiceImpl implements TeamService {
         return apiResponseAcceptTeam;
     }
 
-    @Transactional
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<Void> handleRejectJoinTeam (Long leaderId, Long memberId, Long teamId) {
         ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
 
@@ -158,7 +160,9 @@ public class TeamServiceImpl implements TeamService {
         apiResponseStudent.setMessage(message);
         return apiResponseStudent;
     }
-    @Transactional
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<Void> handleRemoveStudentFromGroup(Long leaderId, Long memberId, Long teamId) {
         // thành viên rời nhóm thì cập nhật lại thông tin nhóm thành viên và thông báo rời nhóm thành công, cập nhật thông báo tới các thành viên khác
         ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
@@ -180,8 +184,10 @@ public class TeamServiceImpl implements TeamService {
         apiResponseStudent.setMessage("Từ chối tham gia nhóm thành công!");
         return apiResponseStudent;
     }
-    @Transactional
+
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<Void> handleDeleteGroup(Long leaderId, Long teamId) {
         ApiResponseStudent<Void> apiResponseStudent = new ApiResponseStudent<>();
         Optional<Team> team = teamRepo.findById(teamId);

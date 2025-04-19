@@ -8,10 +8,9 @@ import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -20,20 +19,19 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TopicServiceImpl implements TopicService {
-    @Autowired
-    private TopicRepo topicRepo;
-    @Autowired
-    private TeamRepo teamRepo;
-    @Autowired
-    private TeamMemberRepo teamMemberRepo;
-    @Autowired
-    private FilesUrlRepo filesUrlRepo;
-    @Autowired
-    private ClassTopicRepo classTopicRepo;
-    @Autowired
-    private UserRepo userRepo;
+    private final TopicRepo topicRepo;
 
-    @Transactional
+    private final TeamRepo teamRepo;
+
+    private TeamMemberRepo teamMemberRepo;
+
+    private final FilesUrlRepo filesUrlRepo;
+
+    private final ClassTopicRepo classTopicRepo;
+
+    private final UserRepo userRepo;
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, Long teamId, String topicName, String uri) {
         // bổ sung thêm phần tìm theo nhiều điều kiện vd teamId, chứ không phải là có mỗi leaderId
         Optional<Team> team = teamRepo.findById(teamId);
@@ -66,7 +64,9 @@ public class TopicServiceImpl implements TopicService {
             apiResponseStudent.setData(topicRegisterResDTO);
             return apiResponseStudent;
     }
-    @Transactional
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long leaderId, Long topicId, String topicNameChange, String uri) {
         Team teamStudent = teamRepo.findByTopicId(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm sinh viên đăng ký"));
         Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, teamStudent.getId());
@@ -94,7 +94,10 @@ public class TopicServiceImpl implements TopicService {
         apiResponseStudent.setMessage("Cập nhật đề tài thành công !");
         return apiResponseStudent;
     }
+
     // có cần phải thêm người nộp cho phần này
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<ReportResDTO> handleAddFilesUrl (Long topicId, String uri) {
         Topic topicDB = topicRepo.findById(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm được đề tài nhóm đăng ký !"));
         FilesUrl filesUrl = FilesUrl.builder()
@@ -108,7 +111,9 @@ public class TopicServiceImpl implements TopicService {
         reportResponse.setData(reportResDTO);
         return reportResponse;
     }
-    
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicResDTO> handleGetTopic(Long topicId) {
        Topic topicFound = topicRepo.findById(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy chủ đề trong CSDL !"));
        Team teamStudent = teamRepo.findByTopicId(topicId).orElseThrow(()-> new NoSuchElementException("Không tìm thấy nhóm sinh viên!"));

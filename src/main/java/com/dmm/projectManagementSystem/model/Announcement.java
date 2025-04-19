@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +19,20 @@ public class Announcement {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "datePosted")
     private String datePosted;
+
+    @Column(name = "project_stage")
+    @Enumerated(EnumType.STRING)
+    private ProjectStage projectStage;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @ManyToOne
     @JoinColumn(name = "topicID")
