@@ -21,13 +21,17 @@ public class Major {
 
     private String name;
 
-    private float progressPercentage;
+    @Column(name = "progress_percentage")
+    private int progressPercentage;
 
-    private float reportPercentage;
+    @Column(name = "report_percentage")
+    private int reportPercentage;
 
-    private float defensePercentage;
+    @Column(name = "defense_percentage")
+    private int defensePercentage;
 
-    private float reviewPercentage;
+    @Column(name = "review_percentage")
+    private int reviewPercentage;
 
     @ManyToOne
     @JoinColumn(name = "departmentID", nullable = false)
@@ -35,8 +39,13 @@ public class Major {
 
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {
         return Major.builder()
+                .id(crudMajor.getId())
                 .name(crudMajor.getName())
-                .department(crudMajor.getDepartment())
+                .progressPercentage(crudMajor.getProgressPercentage())
+                .reportPercentage(crudMajor.getReportPercentage())
+                .defensePercentage(crudMajor.getDefensePercentage())
+                .reviewPercentage(crudMajor.getReviewPercentage())
+                .department(Department.fromCRUDDepartment(crudMajor.getDepartment()))
                 .build();
     }
 }

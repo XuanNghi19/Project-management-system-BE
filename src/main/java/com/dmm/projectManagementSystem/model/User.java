@@ -36,27 +36,32 @@ public class User implements UserDetails {
     private String dob;
     private String cccd;
     private String email;
+
+    @Column(name = "phone_number")
     private String phoneNumber;
+
     private String sex;
+
+    @Column(name = "avatar_url")
     private String avatarUrl;
+
     private String address;
     private boolean active;
-
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "courseID")
+    @JoinColumn(name = "course_id")
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID")
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "majorID")
+    @JoinColumn(name = "major_id")
     private Major major;
 
     @Override
@@ -111,5 +116,4 @@ public class User implements UserDetails {
                 .active(true)
                 .build();
     }
-
 }

@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.classTopic.CreateClassTopicRequest;
+import com.dmm.projectManagementSystem.dto.classTopic.UpdateClassTopicRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,14 +22,18 @@ public class ClassTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "class_name")
     private String className;
-
-    private LocalDateTime startRegistrationimeTime;
-    private LocalDateTime endRegistrationimeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private User teacher;
+
+    @Column(name = "start_registration_time")
+    private LocalDateTime startRegistrationTime;
+
+    @Column(name = "end_registration_time")
+    private LocalDateTime endRegistrationTime;
 
     @ManyToOne
     @JoinColumn(name = "topic_semester_id")
@@ -38,7 +44,38 @@ public class ClassTopic {
     @JoinColumn(name = "major_id")
     private Major major;
 
-    @OneToMany(mappedBy = "classTopic", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<StudentTopic> listStudentTopic;
+    static public ClassTopic fromCreateClassTopicRequest(
+            CreateClassTopicRequest request,
+            User teacher,
+            TopicSemester topicSemester,
+            Major major
+    ) {
+        return ClassTopic.builder()
+                .className(request.getClassName())
+                .teacher(teacher)
+                .startRegistrationTime(request.getStartRegistrationTime())
+                .endRegistrationTime(request.getEndRegistrationTime())
+                .topicSemester(topicSemester)
+                .major(major)
+                .build();
+    }
+
+    static public ClassTopic fromUpdateClassTopicRequest(
+            UpdateClassTopicRequest request,
+            User teacher,
+            TopicSemester topicSemester,
+            Major major
+    ) {
+        return ClassTopic.builder()
+                .id(request.getId())
+                .className(request.getClassName())
+                .teacher(teacher)
+                .startRegistrationTime(request.getStartRegistrationTime())
+                .endRegistrationTime(request.getEndRegistrationTime())
+                .topicSemester(topicSemester)
+                .major(major)
+                .build();
+    }
+
+
 }

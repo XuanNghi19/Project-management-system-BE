@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.boardMember.CRUDBoardMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

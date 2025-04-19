@@ -21,14 +21,19 @@ public class Meeting {
     private Long id;
 
     private String title;
+
+    @Column(name = "start_time")
     private LocalDateTime startTime;
+
+    @Column(name = "end_time")
     private LocalDateTime endTime;
+
     private String location;
     private String note;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

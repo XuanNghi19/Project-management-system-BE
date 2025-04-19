@@ -9,7 +9,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-//@Table(name = "project_user")
 @Table(name = "team")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,17 +21,18 @@ public class Team {
     private Long id;
 
     private String groupName;
+
     @OneToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     @JsonIgnore
     private Topic topic;
-
-    @Enumerated(EnumType.STRING)
-    private ProjectStage status;
 
     @ManyToOne (cascade = CascadeType.PERSIST)
     @JoinColumn(name = "teacher_id")
     private User teacher;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStage status;
 
     @ManyToOne
     @JoinColumn(name = "topic_semester_id")
@@ -46,7 +46,5 @@ public class Team {
     @OneToMany (mappedBy = "team", cascade = CascadeType.ALL)
     @JsonIgnore
     List<TeamMember> listStudent;
-
-
 }
 

@@ -17,10 +17,19 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "progress_score")
     private Double progressScore;
+
+    @Column(name = "report_score")
     private Double reportScore;
-    private Double defenseScore;
+
+    @Column(name = "defense_score")
     private Double reviewScore;
+
+    @Column(name = "review_score")
+    private Double defenseScore;
+
+    @Column(name = "final_score")
     private Double finalScore;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "grade")

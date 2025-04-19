@@ -11,10 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface TeamRepo extends JpaRepository<Team, Long> {
-//    boolean existsByUser (User user);
-//    List<Team> findBySubmitted (boolean status);
-//    List<Team> findByStatus(TeamStatus teamStatus);
-//    Optional<Team> findByTeamId(Long teamId);
 
     Optional<Team> findByTopicId(Long topicId);
 }

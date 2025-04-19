@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,14 +22,24 @@ public class Task {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String describe;
+
     private LocalDateTime deadline;
+
+    @Column(columnDefinition = "TEXT")
     private String comment;
+
     private boolean status;
+
+    @Column(name = "project_stage")
+    @Enumerated(EnumType.STRING)
+    private ProjectStage projectStage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

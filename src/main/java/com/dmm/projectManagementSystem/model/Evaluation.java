@@ -22,17 +22,21 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String comment;
+
+    @Column(name = "date_commented")
     private LocalDateTime dateCommented;
-    private String grade;
 
+    private Double grade;
 
+    @Column(name = "project_stage")
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

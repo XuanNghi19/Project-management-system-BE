@@ -18,13 +18,15 @@ public class FilesUrl {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String uri;
 
-    @ManyToOne
-    @JoinColumn(name = "topicID")
-    private Topic topic;
-
+    @Column(name = "project_stage")
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
+
+    @ManyToOne
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
 }
 

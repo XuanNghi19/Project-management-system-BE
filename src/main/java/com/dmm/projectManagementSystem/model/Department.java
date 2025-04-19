@@ -20,6 +20,7 @@ public class Department {
 
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     static public Department fromCRUDDepartment(CRUDDepartment crudDepartment) {
