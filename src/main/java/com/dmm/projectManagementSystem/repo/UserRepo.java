@@ -1,7 +1,10 @@
 package com.dmm.projectManagementSystem.repo;
 
 import com.dmm.projectManagementSystem.enums.Role;
-import com.dmm.projectManagementSystem.model.*;
+import com.dmm.projectManagementSystem.model.Course;
+import com.dmm.projectManagementSystem.model.Department;
+import com.dmm.projectManagementSystem.model.Major;
+import com.dmm.projectManagementSystem.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,6 +43,8 @@ public interface UserRepo extends JpaRepository<User, Long> {
     boolean existsByCourse(Course course);
 
     boolean existsByRole(Role role);
+
+    List<User> findByIdIn(List<Long> listStudentIds);
 }
 
 

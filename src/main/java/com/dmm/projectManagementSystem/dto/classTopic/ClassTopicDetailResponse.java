@@ -23,12 +23,15 @@ public class ClassTopicDetailResponse {
     Long id;
 
     String className;
+
     UserResponse teacher;
 
     LocalDateTime startRegistrationTime;
+
     LocalDateTime endRegistrationTime;
 
     CRUDTopicSemester topicSemester;
+
     CRUDMajor major;
 
     List<StudentTopicResponse> studentTopicList;

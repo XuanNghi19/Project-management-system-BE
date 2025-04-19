@@ -19,7 +19,6 @@ public class CreateClassTopicRequest {
     String className;
     LocalDateTime startRegistrationTime;
     LocalDateTime endRegistrationTime;
-
     Long topicSemesterID;
     Long majorID;
 

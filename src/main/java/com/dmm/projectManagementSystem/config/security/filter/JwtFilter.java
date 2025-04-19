@@ -42,11 +42,11 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            if(isBypassToken(request)) {
+            System.out.println("Processing request: " + request.getServletPath() + " with method: " + request.getMethod());
+            if (isBypassToken(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
-
             final String authorizationHeader = request.getHeader("Authorization");
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
@@ -58,11 +58,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // kiem tra xem token da het han chua
             IntrospectResponse introspect = jwtUtils.introspect(token);
-            if(introspect.getValid()) {
+            if (introspect.getValid()) {
                 // Lấy ra phoneNumber từ token
                 final String idNum = SignedJWT.parse(token).getJWTClaimsSet().getSubject();
 
-                if(idNum != null
+                if (idNum != null
                         && SecurityContextHolder.getContext().getAuthentication() == null) {
                     // Lấy ra user bằng idNum từ token
                     User user = (User) userDetailsService.loadUserByUsername(idNum);
@@ -116,6 +116,8 @@ public class JwtFilter extends OncePerRequestFilter {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of(String.format("%s/user/login", apiPrefix), "POST"),
                 Pair.of(String.format("%s/user/introspect", apiPrefix), "POST"),
+                Pair.of("/v3/api-docs", "GET"),
+                Pair.of("/v3/api-docs/**", "GET"),
                 Pair.of("/api-docs", "GET"),
                 Pair.of("/api-docs/**", "GET"),
                 Pair.of("/swagger-resources", "GET"),
@@ -127,11 +129,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/swagger-ui/index.html", "GET")
         );
 
-        for(Pair<String, String> bypassToken : bypassTokens) {
+        for (Pair<String, String> bypassToken : bypassTokens) {
 //            System.out.println("Request:");
 //            System.out.println(request.getServletPath());
 //            System.out.println(request.getMethod());
-            if(request.getServletPath().contains(bypassToken.getFirst())
+            if (request.getServletPath().contains(bypassToken.getFirst())
                     && request.getMethod().equals(bypassToken.getSecond()))
                 return true;
         }

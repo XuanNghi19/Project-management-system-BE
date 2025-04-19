@@ -49,9 +49,23 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> {
                     request
+//                            .requestMatchers(
+//                                    "/api-docs",
+//                                    "/api-docs/**",
+//                                    "/swagger-resources",
+//                                    "/swagger-resources/**",
+//                                    "/configuration/ui",
+//                                    "/configuration/security",
+//                                    "/swagger-ui/**",
+//                                    "/swagger-ui.html",
+//                                    "/webjars/swagger-ui/**",
+//                                    "/swagger-ui/index.html")
+//                            .permitAll()
                             .requestMatchers(
                                     "/api-docs",
                                     "/api-docs/**",
+                                    "/v3/api-docs",
+                                    "/v3/api-docs/**",
                                     "/swagger-resources",
                                     "/swagger-resources/**",
                                     "/configuration/ui",
@@ -121,7 +135,34 @@ public class WebSecurityConfig {
                                     String.format("%s/class_topic_management/get_detail_class_topic", apiPrefix),
                                     String.format("%s/council_management/get_all_council", apiPrefix),
                                     String.format("%s/council_management/get_council_detail", apiPrefix)
-                            ).hasAnyRole(Role.ADMIN.toString());
+                            ).hasAnyRole(Role.ADMIN.toString())
+                            .requestMatchers(
+                                    HttpMethod.POST,
+                                    String.format("%s/topic/register_topic", apiPrefix),
+                                    String.format("%s/group/create_group", apiPrefix),
+                                    String.format("%s/group/invite", apiPrefix)
+                            ).hasAnyRole(Role.STUDENT.toString())
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    String.format("%s/manage_topic/get_defense_schedule/{projectId}", apiPrefix),
+                                    String.format("%s/manage_topic/get_meeting", apiPrefix),
+                                    String.format("%s/manage_topic/get_evaluations/{projectId}", apiPrefix),
+                                    String.format("%s/manage_topic/get_council/{projectId}", apiPrefix),
+                                    String.format("%s/manage_topic/get_task", apiPrefix),
+                                    String.format("%s/topic/get_topic", apiPrefix)
+                            ).hasAnyRole(Role.STUDENT.toString())
+                            .requestMatchers(
+                                    HttpMethod.PUT,
+                                    String.format("%s/topic/update_topic", apiPrefix),
+                                    String.format("%s/topic/report", apiPrefix),
+                                    String.format("%s/group/accept", apiPrefix),
+                                    String.format("%s/group/decline", apiPrefix),
+                                    String.format("%s/group/remove", apiPrefix)
+                            ).hasAnyRole(Role.STUDENT.toString())
+                            .requestMatchers(
+                                    HttpMethod.DELETE,
+                                    String.format("%s/group/delete_team", apiPrefix)
+                            ).hasAnyRole(Role.STUDENT.toString());
                 });
         return httpSecurity.build();
     }

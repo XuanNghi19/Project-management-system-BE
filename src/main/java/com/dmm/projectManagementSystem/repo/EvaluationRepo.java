@@ -13,4 +13,6 @@ public interface EvaluationRepo extends JpaRepository<Evaluation, Long> {
     Long deleteAllByTopic(Topic topic);
 
     List<Evaluation> findAllByTopic(Topic topic);
+    List<Evaluation> findByTopicId(Long topicId);
+
 }

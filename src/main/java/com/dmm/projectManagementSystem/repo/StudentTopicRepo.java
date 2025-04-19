@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudentTopicRepo extends JpaRepository<StudentTopic, Long> {
     List<StudentTopic> findAllByStudent(User student);
@@ -23,4 +24,8 @@ public interface StudentTopicRepo extends JpaRepository<StudentTopic, Long> {
     List<StudentTopic> findAllByClassTopic(@Param("class_topic_id") Long classTopicID);
 
     StudentTopic findByClassTopic(ClassTopic classTopic);
+
+    Optional<StudentTopic> findByStudentId(Long id);
+
+    Optional<ClassTopic> findByClassTopicId(Long studentTopicId);
 }

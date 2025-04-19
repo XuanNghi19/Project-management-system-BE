@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

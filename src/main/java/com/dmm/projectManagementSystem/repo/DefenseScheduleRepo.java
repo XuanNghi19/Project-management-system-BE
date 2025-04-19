@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DefenseScheduleRepo extends JpaRepository<DefenseSchedule, Long> {
@@ -19,5 +20,7 @@ public interface DefenseScheduleRepo extends JpaRepository<DefenseSchedule, Long
 
     boolean existsByCouncil(Council council);
     void deleteAllByCouncil(Council council);
+
+    Optional<DefenseSchedule> findByTopicId(Long topicId);
 }
 

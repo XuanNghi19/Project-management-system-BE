@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ClassTopicRepo extends JpaRepository<ClassTopic, Long> {
+    Optional<User> findByTeacherId(Long classTopicId);
     boolean existsByTopicSemester(TopicSemester topicSemester);
 
     boolean existsByMajor(Major major);

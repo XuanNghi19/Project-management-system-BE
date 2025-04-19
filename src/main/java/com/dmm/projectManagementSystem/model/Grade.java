@@ -31,4 +31,7 @@ public class Grade {
 
     @Column(name = "final_score")
     private Double finalScore;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "grade")
+    private Topic topic;
 }

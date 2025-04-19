@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -77,6 +78,7 @@ public class User implements UserDetails {
 
     static public User fromCreateUserRequest(
             CreateUserRequest request,
+            Department department,
             Role role
     ) {
         return User.builder()
@@ -89,6 +91,7 @@ public class User implements UserDetails {
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
                 .address(request.getAddress())
+                .department(department)
                 .active(true)
                 .build();
     }
