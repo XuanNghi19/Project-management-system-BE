@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping("${api.prefix}/group")
 public class TeamController {
     private final TeamServiceImpl teamServiceImpl;
 //    private final EmailService emailService;

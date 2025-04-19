@@ -1,7 +1,10 @@
 package com.dmm.projectManagementSystem.config.security.filter;
 
 import com.dmm.projectManagementSystem.config.security.JwtUtils;
+import com.dmm.projectManagementSystem.dto.ApiResponse;
+import com.dmm.projectManagementSystem.dto.IntrospectResponse;
 import com.dmm.projectManagementSystem.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.SignedJWT;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
@@ -52,17 +55,37 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // Lấy ra chuỗi token
             final String token = authorizationHeader.substring(7);
-            // Lấy ra phoneNumber từ token
-            final String idNum = SignedJWT.parse(token).getJWTClaimsSet().getSubject();
 
-            if(idNum != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Lấy ra user bằng idNum từ token
-                User user = (User) userDetailsService.loadUserByUsername(idNum);
+            // kiem tra xem token da het han chua
+            IntrospectResponse introspect = jwtUtils.introspect(token);
+            if(introspect.getValid()) {
+                // Lấy ra phoneNumber từ token
+                final String idNum = SignedJWT.parse(token).getJWTClaimsSet().getSubject();
 
-                createSessionForUser(user, idNum, request);
+                if(idNum != null
+                        && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Lấy ra user bằng idNum từ token
+                    User user = (User) userDetailsService.loadUserByUsername(idNum);
+
+                    createSessionForUser(user, idNum, request);
+                }
+                filterChain.doFilter(request, response);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                String json = objectMapper.writeValueAsString(
+                        ApiResponse.<IntrospectResponse>builder()
+                                .code(HttpServletResponse.SC_UNAUTHORIZED)
+                                .message(String.valueOf(HttpServletResponse.SC_UNAUTHORIZED))
+                                .result(introspect)
+                                .build()
+                );
+
+                response.getWriter().write(json);
             }
-            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
@@ -91,6 +114,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private boolean isBypassToken(@NonNull HttpServletRequest request) {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
+                Pair.of(String.format("%s/user/login", apiPrefix), "POST") ,
                 Pair.of("/api-docs", "GET"),
                 Pair.of("/api-docs/**", "GET"),
                 Pair.of("/swagger-resources", "GET"),
@@ -99,23 +123,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/configuration/security", "GET"),
                 Pair.of("/swagger-ui", "GET"),
                 Pair.of("/swagger-ui.html", "GET"),
-                Pair.of("/swagger-ui/index.html", "GET"),
-                Pair.of("/create_group", "POST"),
-                Pair.of("/invite", "GET"),
-                Pair.of("/project/", "GET"),
-                Pair.of("/project/get_meeting", "GET"),
-                Pair.of("/project/get_council", "GET"),
-                Pair.of("/project/get_task", "GET"),
-                Pair.of("/group/**", "POST"),
-                Pair.of("/group/create_group", "POST"),
-                Pair.of("/group/invite", "POST"),
-                Pair.of("/group/accept", "PUT"),
-                Pair.of("/group/decline", "PUT"),
-                Pair.of("/group/delete_team", "DELETE"),
-                Pair.of("/topic/register_topic", "POST"),
-                Pair.of("/topic/update_topic", "PUT"),
-                Pair.of("/topic/get_topic", "GET")
-                );
+                Pair.of("/swagger-ui/index.html", "GET")
+        );
 
         for(Pair<String, String> bypassToken : bypassTokens) {
 //            System.out.println("Request:");
@@ -125,6 +134,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     && request.getMethod().equals(bypassToken.getSecond()))
                 return true;
         }
+
         return false;
     }
 }

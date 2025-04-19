@@ -1,14 +1,13 @@
 package com.dmm.projectManagementSystem.config.security;
 
 import com.dmm.projectManagementSystem.dto.IntrospectResponse;
+import com.dmm.projectManagementSystem.enums.ErrorCode;
 import com.dmm.projectManagementSystem.model.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,6 +35,7 @@ public class JwtUtils {
                 .issueTime(new Date(System.currentTimeMillis()))
                 .expirationTime(new Date(System.currentTimeMillis() + expiration))
                 .claim("id", user.getId())
+                .claim("role", user.getRole())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -55,19 +55,45 @@ public class JwtUtils {
         // Tạo một bộ xác thực chữ ký (JWSVerifier) sử dụng secretKey
         JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
 
-        // Parse token từ chuỗi JWT thành một đối tượng SignedJWT
-        SignedJWT signedJWT = SignedJWT.parse(token);
+        try {
+            // Parse token từ chuỗi JWT thành một đối tượng SignedJWT
+            SignedJWT signedJWT = SignedJWT.parse(token);
 
-        // Lấy thời gian hết hạn của token từ phần payload (claims)
-        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+            // Lấy thời gian hết hạn của token từ phần payload (claims)
+            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        // Kiểm tra xem chữ ký của token có hợp lệ không
-        boolean verified = signedJWT.verify(verifier);
+            // Kiểm tra xem chữ ký của token có hợp lệ không
+            boolean verified = signedJWT.verify(verifier);
 
-        // Xây dựng và trả về kết quả kiểm tra token
-        return IntrospectResponse.builder()
-                .valid(verified && expirationTime.after(new Date())) // Token hợp lệ nếu chữ ký đúng và chưa hết hạn
-                .build();
+            // Xây dựng và trả về kết quả kiểm tra token
+            if(expirationTime.after(new Date())) {
+                if(verified) {
+                    return IntrospectResponse.builder()
+                            .valid(true)
+                            .build();
+                } else {
+                    return IntrospectResponse.builder()
+                            .valid(false)
+                            .errorCode(ErrorCode.TOKEN_INVALID)
+                            .errorMessage(ErrorCode.TOKEN_INVALID.name())
+                            .build();
+                }
+            } else {
+                return IntrospectResponse.builder()
+                        .valid(false)
+                        .errorCode(ErrorCode.TOKEN_EXPIRED)
+                        .errorMessage(ErrorCode.TOKEN_EXPIRED.name())
+                        .build();
+            }
+
+        } catch (ParseException ex) {
+            return IntrospectResponse.builder()
+                    .valid(false)
+                    .errorCode(ErrorCode.TOKEN_INVALID)
+                    .errorMessage(ErrorCode.TOKEN_INVALID.name())
+                    .build();
+        }
+
     }
 
 }

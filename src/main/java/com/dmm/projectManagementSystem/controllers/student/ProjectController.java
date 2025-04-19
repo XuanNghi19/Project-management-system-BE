@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/project")
+@RequestMapping("${api.prefix}/manage_topic")
 public class ProjectController {
     @Autowired
     private ProjectDetailServiceImpl projectDetailServiceImpl;
