@@ -39,9 +39,10 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Department department = departmentRepo.findById(x.getDepartmentId())
                         .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + x.getDepartmentId()));
 
-                User newTeacher = userRepo.save(User.fromCreateUserRequest(x, Role.INSTRUCTORS));
-                newTeacher.setDepartment(department);
+                User newTeacher = userRepo.save(User.fromCreateUserRequest(x, department, Role.INSTRUCTORS));
+
                 newTeacher.setIdNum("GV" + StringUtils.getInitials(department.getName()) + newTeacher.getId());
+
                 String encodePassword = passwordEncoder.encode(newTeacher.getIdNum());
                 newTeacher.setPassword(encodePassword);
 
@@ -65,12 +66,13 @@ public class UserManagementServiceImpl implements UserManagementService {
                 Course course = courseRepo.findById(x.getCourseId())
                         .orElseThrow(() -> new RuntimeException("Khong ton tai course voi idNum: " + x.getCourseId()));
 
+                User newStudent = userRepo.save(User.fromCreateUserRequest(x, major.getDepartment(), Role.STUDENT));
 
-
-                User newStudent = userRepo.save(User.fromCreateUserRequest(x, Role.STUDENT));
                 newStudent.setMajor(major);
                 newStudent.setCourse(course);
+
                 newStudent.setIdNum("SV" + StringUtils.getInitials(major.getName()) + newStudent.getId());
+
                 String encodePassword = passwordEncoder.encode(newStudent.getIdNum());
                 newStudent.setPassword(encodePassword);
 
@@ -91,9 +93,8 @@ public class UserManagementServiceImpl implements UserManagementService {
                     .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + createUserRequest.getDepartmentId()));
 
 
+            User newAdmin = userRepo.save(User.fromCreateUserRequest(createUserRequest, department, Role.ADMIN));
 
-            User newAdmin = userRepo.save(User.fromCreateUserRequest(createUserRequest, Role.ADMIN));
-            newAdmin.setDepartment(department);
             newAdmin.setIdNum("AM" + StringUtils.getInitials(department.getName()) + newAdmin.getId());
 
             String encodePassword = passwordEncoder.encode(newAdmin.getIdNum());

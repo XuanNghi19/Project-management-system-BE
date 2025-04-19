@@ -77,6 +77,7 @@ public class User implements UserDetails {
 
     static public User fromCreateUserRequest(
             CreateUserRequest request,
+            Department department,
             Role role
     ) {
         return User.builder()
@@ -89,6 +90,7 @@ public class User implements UserDetails {
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
                 .address(request.getAddress())
+                .department(department)
                 .active(true)
                 .build();
     }
