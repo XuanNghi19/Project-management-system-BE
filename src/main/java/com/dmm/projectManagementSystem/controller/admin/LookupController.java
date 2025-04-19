@@ -1,11 +1,10 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controller.admin;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
-import com.dmm.projectManagementSystem.dto.user.UserListByPageResponse;
 import com.dmm.projectManagementSystem.service.serviceUtils.LookupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

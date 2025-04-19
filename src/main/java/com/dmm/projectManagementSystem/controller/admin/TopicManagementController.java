@@ -1,20 +1,15 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controller.admin;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicDetailsResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
-import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
-import com.dmm.projectManagementSystem.dto.user.UserListByPageResponse;
-import com.dmm.projectManagementSystem.enums.Role;
 import com.dmm.projectManagementSystem.service.admin.topicManagement.TopicManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,7 +1,6 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controller.admin;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
-import com.dmm.projectManagementSystem.dto.user.AuthenticationResponse;
 import com.dmm.projectManagementSystem.dto.user.CreateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.dto.user.UserListByPageResponse;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;

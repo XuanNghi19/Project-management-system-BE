@@ -1,36 +1,32 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controller.admin;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
-import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
-import com.dmm.projectManagementSystem.dto.course.CourseListByPageResponse;
-import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
-import com.dmm.projectManagementSystem.dto.topicSemester.TopicSemesterListByPageResponse;
-import com.dmm.projectManagementSystem.service.admin.courseManagement.CourseManagementService;
+import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.major.MajorListByPageResponse;
+import com.dmm.projectManagementSystem.service.admin.majorManagement.MajorManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.prefix}/course_management")
-public class CourseManagementController {
+@RequestMapping("${api.prefix}/major_management")
+public class MajorManagementController {
 
-    final private CourseManagementService courseManagementService;
+    final private MajorManagementService majorManagementService;
 
-    @Operation(summary = "them nien khoa, , id mặc định của viêc tạo niên khóa là null - id: null")
-    @PostMapping("add_course")
-    public ApiResponse<?> addCourse(
-            @RequestBody @Valid List<CRUDCourse> requests,
+    @Operation(summary = "them nganh hoc, id mặc định của viêc tạo ngành học là null - id: null")
+    @PostMapping("add_major")
+    public ApiResponse<?> addMajor(
+            @RequestBody @Valid List<CRUDMajor> requests,
             BindingResult result
     ) {
         if(result.hasErrors()) {
@@ -46,7 +42,7 @@ public class CourseManagementController {
         }
 
         try {
-            boolean response = courseManagementService.addCourse(requests);
+            boolean response = majorManagementService.addMajor(requests);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response)
@@ -61,10 +57,10 @@ public class CourseManagementController {
         }
     }
 
-    @Operation(summary = "Cập nhật nien khoa")
-    @PutMapping(value = "/update_course")
-    public ApiResponse<?> updateCourse(
-            @RequestBody @Valid CRUDCourse request,
+    @Operation(summary = "Cập nhật nganh hoc")
+    @PutMapping(value = "/update_major")
+    public ApiResponse<?> updateMajor(
+            @RequestBody @Valid CRUDMajor request,
             BindingResult result
     ) {
         if(result.hasErrors()) {
@@ -80,7 +76,7 @@ public class CourseManagementController {
         }
 
         try {
-            boolean response = courseManagementService.updateCourse(request);
+            boolean response = majorManagementService.updateMajor(request);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response)
@@ -96,14 +92,14 @@ public class CourseManagementController {
     }
 
 
-    @Operation(summary = "Xóa nien khoa")
-    @DeleteMapping("/delete_course")
-    public ApiResponse<?> deleteCourse(
-            @Parameter(description = "id cua nien khoa")
-            @RequestParam(value = "id course") Long id
+    @Operation(summary = "Xóa nganh hoc")
+    @DeleteMapping("/delete_major")
+    public ApiResponse<?> deleteMajor(
+            @Parameter(description = "id cua nganh hoc")
+            @RequestParam(value = "id major") Long id
     ) {
         try {
-            Pair<String, Boolean> response = courseManagementService.deleteCourse(id);
+            Pair<String, Boolean> response = majorManagementService.deleteMajor(id);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response.getSecond())
@@ -118,19 +114,14 @@ public class CourseManagementController {
         }
     }
 
-    @Operation(summary = "Lấy tất cả nien khoa theo trang - có phân trang")
-    @GetMapping("/get_all_course")
-    public ApiResponse<?> getAllCourse(
-            @Parameter(description = "ten nien khoa")
+    @Operation(summary = "Lấy tất cả nganh hoc theo trang - có phân trang")
+    @GetMapping("/get_all_major")
+    public ApiResponse<?> getAllMajor(
+            @Parameter(description = "ten nganh hoc")
             @RequestParam(value = "name", required = false) String name,
 
-            @Parameter(description = "ngay bat dau nien khoa - định dạng: yyyy-MM-dd HH:mm:ss")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            @RequestParam(value = "start", required = false) LocalDateTime start,
-
-            @Parameter(description = "ngay ket thuc nien khoa - định dạng: yyyy-MM-dd HH:mm:ss")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            @RequestParam(value = "end", required = false) LocalDateTime end,
+            @Parameter(description = "id khoa")
+            @RequestParam(value = "id department", required = false) Long departmentID,
 
             @Parameter(description = "số trang muốn chọn")
             @RequestParam(value = "page") int page,
@@ -139,10 +130,9 @@ public class CourseManagementController {
             @RequestParam(value = "limit") int limit
     ) {
         try {
-            CourseListByPageResponse response = courseManagementService.getAllCourse(
+            MajorListByPageResponse response = majorManagementService.getAllMajor(
                     name,
-                    start,
-                    end,
+                    departmentID,
                     page,
                     limit
             );
