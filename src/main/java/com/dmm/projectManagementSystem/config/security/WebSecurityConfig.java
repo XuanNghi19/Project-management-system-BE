@@ -63,6 +63,11 @@ public class WebSecurityConfig {
                             .permitAll()
                             .requestMatchers(
                                     HttpMethod.POST,
+                                    String.format("%s/user/login", apiPrefix),
+                                    String.format("%s/user/introspect", apiPrefix)
+                            ).permitAll()
+                            .requestMatchers(
+                                    HttpMethod.POST,
                                     String.format("%s/user_management/add_teacher", apiPrefix),
                                     String.format("%s/user_management/add_student", apiPrefix),
                                     String.format("%s/department_management/add_department", apiPrefix),
@@ -116,11 +121,7 @@ public class WebSecurityConfig {
                                     String.format("%s/class_topic_management/get_detail_class_topic", apiPrefix),
                                     String.format("%s/council_management/get_all_council", apiPrefix),
                                     String.format("%s/council_management/get_council_detail", apiPrefix)
-                            ).hasAnyRole(Role.ADMIN.toString())
-                            .requestMatchers(
-                                HttpMethod.POST,
-                                String.format("%s/user/login", apiPrefix)
-                            ).permitAll();
+                            ).hasAnyRole(Role.ADMIN.toString());
                 });
         return httpSecurity.build();
     }
