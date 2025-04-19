@@ -18,11 +18,11 @@ public class BoardMember {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userID")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "councilID")
+    @JoinColumn(name = "council_id")
     private Council council;
 }
 

@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.controller.instructor;
 
+import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.task.CreateTaskDTO;
 import com.dmm.projectManagementSystem.model.Task;
 import com.dmm.projectManagementSystem.service.instructor.taskManagement.TaskServiceImpl;
@@ -16,7 +17,7 @@ public class TaskController {
     private TaskServiceImpl taskService;
 
     @PostMapping("/task")
-    public ResponseEntity<Task> createTask(@RequestBody CreateTaskDTO task){
+    public ResponseEntity<ApiResponse<String>> createTask(@RequestBody CreateTaskDTO task){
         return ResponseEntity.ok(taskService.createTask(task));
     }
 }

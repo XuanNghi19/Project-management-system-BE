@@ -104,7 +104,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/swagger-ui.html", "GET"),
                 Pair.of("/swagger-ui/index.html", "GET"),
                 Pair.of("/meeting", "POST"),
-                Pair.of("/class_topic/{teacherId}", "GET")
+                Pair.of("/task", "POST"),
+                Pair.of("/class_topic/5", "GET"),
+                Pair.of("/student_topic/1", "GET"),
+                Pair.of("/team/5", "GET"),
+                Pair.of("/topic/approval", "PATCH"),
+                Pair.of("/files/1", "GET"),
+                Pair.of("/team/approval", "PATCH"),
+                Pair.of("/board_member/1", "GET")
 
         );
 

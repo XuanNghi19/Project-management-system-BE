@@ -1,6 +1,8 @@
 package com.dmm.projectManagementSystem.service.instructor.taskManagement;
 
+import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.task.CreateTaskDTO;
+import com.dmm.projectManagementSystem.exception.InvalidException;
 import com.dmm.projectManagementSystem.model.Task;
 import com.dmm.projectManagementSystem.model.Topic;
 import com.dmm.projectManagementSystem.repo.TaskRepo;
@@ -17,7 +19,8 @@ public class TaskServiceImpl implements TaskService{
     @Autowired
     private TopicRepo topicRepo;
     @Override
-    public Task createTask(CreateTaskDTO task) {
+    public ApiResponse<String> createTask(CreateTaskDTO task) {
+        if(!topicRepo.existsById(task.getTopicID())) throw new InvalidException("khong ton tai topic");
         Optional<Topic> topic=topicRepo.findById(task.getTopicID());
         Task res=Task.builder()
                 .title(task.getTitle())
@@ -27,6 +30,7 @@ public class TaskServiceImpl implements TaskService{
                 .status(task.isStatus())
                 .topic(topic.get())
                 .build();
-        return taskRepo.save(res);
+        taskRepo.save(res);
+        return new ApiResponse<>(1000,"Tạo thành công","");
     }
 }

@@ -25,11 +25,11 @@ public class DefenseSchedule {
     private LocalDateTime endTime;
 
     @ManyToOne
-    @JoinColumn(name = "councilID")
+    @JoinColumn(name = "council_id")
     private Council council;
 
     @ManyToOne
-    @JoinColumn(name = "topicId")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

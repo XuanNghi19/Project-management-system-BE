@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TeamRepo extends JpaRepository<Team,Long> {
-    List<Team> findByTeacherId(Long id);
+    List<Team> findByTeacher_Id(Long id);
 }

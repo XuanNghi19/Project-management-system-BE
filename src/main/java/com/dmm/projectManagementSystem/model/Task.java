@@ -26,7 +26,7 @@ public class Task {
     private boolean status;
 
     @ManyToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

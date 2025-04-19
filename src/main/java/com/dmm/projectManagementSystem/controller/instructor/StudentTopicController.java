@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.controller.instructor;
 
+import com.dmm.projectManagementSystem.dto.ApiResponse;
+import com.dmm.projectManagementSystem.dto.StudentTopicDTO;
 import com.dmm.projectManagementSystem.model.StudentTopic;
 import com.dmm.projectManagementSystem.service.instructor.studentTopicManagement.StudentTopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,7 @@ public class StudentTopicController {
     private StudentTopicServiceImpl studentTopicService;
 
     @GetMapping("/student_topic/{classTopicId}")
-    public ResponseEntity<List<StudentTopic>> getListStudentTopic(@PathVariable("classTopicId") Long id){
+    public ResponseEntity<ApiResponse<List<StudentTopicDTO>>> getListStudentTopic(@PathVariable("classTopicId") Long id){
         return ResponseEntity.ok(studentTopicService.getListStudentTopic(id));
     }
 }

@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,8 @@ public class Major {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID", nullable = false)
+    @JsonIgnore
+    @JoinColumn(name = "department_id", nullable = true)
     private Department department;
 
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {

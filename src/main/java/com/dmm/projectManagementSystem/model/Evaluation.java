@@ -28,7 +28,7 @@ public class Evaluation {
     private GradeType gradeType;
 
     @ManyToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }
 

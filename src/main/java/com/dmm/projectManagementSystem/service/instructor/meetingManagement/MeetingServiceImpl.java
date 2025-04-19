@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.service.instructor.meetingManagement;
 
 import com.dmm.projectManagementSystem.dto.meeting.CreateMeetingDTO;
+import com.dmm.projectManagementSystem.exception.InvalidException;
 import com.dmm.projectManagementSystem.model.Meeting;
 import com.dmm.projectManagementSystem.model.Topic;
 import com.dmm.projectManagementSystem.repo.MeetingRepo;
@@ -18,7 +19,7 @@ public class MeetingServiceImpl implements MeetingService{
     private MeetingRepo meetingRepo;
     @Override
     public Meeting createMeeting(CreateMeetingDTO meeting) {
-
+        if(!topicRepo.existsById(meeting.getTopicId())) throw new InvalidException("khong ton tai topic");
         Optional<Topic> topic=topicRepo.findById(meeting.getTopicId());
         Meeting res=Meeting.builder()
                 .title(meeting.getTitle())

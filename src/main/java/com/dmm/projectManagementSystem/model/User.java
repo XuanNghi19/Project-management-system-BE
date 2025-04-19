@@ -45,15 +45,15 @@ public class User implements UserDetails {
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "courseID")
+    @JoinColumn(name = "course_id")
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID")
+    @JoinColumn(name = "department_id")
     private Department department;
 
     @ManyToOne
-    @JoinColumn(name = "majorID")
+    @JoinColumn(name = "major_id")
     private Major major;
 
     @Override

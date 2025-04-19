@@ -1,4 +1,5 @@
 package com.dmm.projectManagementSystem.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +25,12 @@ public class Council {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    @ManyToOne
-    @JoinColumn(name = "courseID")
-    private Course course;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID")
+    @JoinColumn(name = "department_id")
     private Department department;
 }

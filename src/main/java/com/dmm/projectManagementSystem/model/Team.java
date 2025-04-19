@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.enums.TeamStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class Team {
 
     private String groupName;
     @OneToOne
-    @JoinColumn(name = "topicID")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -33,7 +34,16 @@ public class Team {
     @Enumerated(EnumType.STRING)
     private TeamStatus status;
 
-
     @OneToMany (mappedBy = "team", cascade = CascadeType.ALL)
     List<TeamMember> listStudent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "topic_semester_id")
+    private TopicSemester topicSemester;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
 }
+

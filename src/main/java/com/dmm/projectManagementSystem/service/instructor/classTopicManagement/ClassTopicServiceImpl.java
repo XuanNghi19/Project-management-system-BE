@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.service.instructor.classTopicManagement;
 
+import com.dmm.projectManagementSystem.dto.ApiResponse;
+import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicDTO;
 import com.dmm.projectManagementSystem.model.ClassTopic;
 import com.dmm.projectManagementSystem.repo.ClassTopicRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,9 @@ public class ClassTopicServiceImpl implements ClassTopicService {
     @Autowired
     private ClassTopicRepo classTopicRepo;
     @Override
-    public List<ClassTopic> getListClassTopic(Long id) {
-
-        return classTopicRepo.findByTeacherId(id);
+    public ApiResponse<List<ClassTopicDTO>> getListClassTopic(Long id) {
+        List<ClassTopic> list=classTopicRepo.findByTeacher_Id(id);
+        List<ClassTopicDTO> res=list.stream().map(x->new ClassTopicDTO(x.getId(),x.getClassName(),x.getStartRegistrationimeTime(),x.getEndRegistrationimeTime(),x.getTopicSemester(),x.getMajor())).toList();
+        return new ApiResponse<>(1000,"thanh cong",res);
     }
 }
