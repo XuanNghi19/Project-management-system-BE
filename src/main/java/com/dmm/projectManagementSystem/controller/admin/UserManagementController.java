@@ -165,7 +165,7 @@ public class UserManagementController {
     @Operation(summary = "Xóa người dùng")
     @DeleteMapping("/delete_user")
     public ApiResponse<?> deleteUser(
-            @RequestParam(value = "idNum user") String idNum
+            @RequestParam(value = "idNum_user") String idNum
     ) {
         try {
             boolean response = userManagementService.deleteUser(idNum);
@@ -186,8 +186,8 @@ public class UserManagementController {
     @Operation(summary = "Thay đổi mật khẩu người dùng")
     @PatchMapping("/change_password")
     public ApiResponse<?> changePassword(
-            @RequestParam(value = "idNum user") String idNum,
-            @RequestParam(value = "new password") String newPassword
+            @RequestParam(value = "idNum_user") String idNum,
+            @RequestParam(value = "new_password") String newPassword
     ) {
         try {
             boolean response = userManagementService.changePassword(newPassword, idNum);
@@ -208,8 +208,8 @@ public class UserManagementController {
     @Operation(summary = "Cập nhật ảnh người dùng")
     @PatchMapping(value = "/upload_avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<?> uploadAvatar(
-            @RequestParam(value = "idNum user") String idNum,
-            @RequestPart(value = "avatar img") MultipartFile[] avatars
+            @RequestParam(value = "idNum_user") String idNum,
+            @RequestPart(value = "avatar_img") MultipartFile[] avatars
     ) {
         try {
             boolean response = userManagementService.uploadAvatar(idNum, avatars);
@@ -234,13 +234,13 @@ public class UserManagementController {
             @RequestParam(value = "role") Role role,
 
             @Parameter(description = "id của khoa")
-            @RequestParam(value = "department id", required = false) Long departmentId,
+            @RequestParam(value = "department_id", required = false) Long departmentId,
 
             @Parameter(description = "id của ngành học")
-            @RequestParam(value = "major id", required = false) Long majorId,
+            @RequestParam(value = "major_id", required = false) Long majorId,
 
             @Parameter(description = "id của khóa học")
-            @RequestParam(value = "course id", required = false) Long courseId,
+            @RequestParam(value = "course_id", required = false) Long courseId,
 
             @Parameter(description = "tên người dùng")
             @RequestParam(value = "name", required = false) String name,

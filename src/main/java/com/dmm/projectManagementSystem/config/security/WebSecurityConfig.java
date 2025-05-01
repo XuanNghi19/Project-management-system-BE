@@ -69,6 +69,7 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     HttpMethod.POST,
                                     String.format("%s/user_management/add_teacher", apiPrefix),
+                                    String.format("%s/user_management/add_admin", apiPrefix),
                                     String.format("%s/user_management/add_student", apiPrefix),
                                     String.format("%s/department_management/add_department", apiPrefix),
                                     String.format("%s/major_management/add_major", apiPrefix),

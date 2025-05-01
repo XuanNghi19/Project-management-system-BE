@@ -92,7 +92,6 @@ public class UserManagementServiceImpl implements UserManagementService {
             Department department = departmentRepo.findById(createUserRequest.getDepartmentId())
                     .orElseThrow(() -> new RuntimeException("Khong tim thay departmentId: " + createUserRequest.getDepartmentId()));
 
-
             User newAdmin = userRepo.save(User.fromCreateUserRequest(createUserRequest, department, Role.ADMIN));
 
             newAdmin.setIdNum("AM" + StringUtils.getInitials(department.getName()) + newAdmin.getId());
