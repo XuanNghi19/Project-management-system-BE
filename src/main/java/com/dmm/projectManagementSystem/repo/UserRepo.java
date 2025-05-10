@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,6 +40,11 @@ public interface UserRepo extends JpaRepository<User, Long> {
     boolean existsByCourse(Course course);
 
     boolean existsByRole(Role role);
+
+    @Query(value = "select * from app_user where role = :role " +
+            "and (:name is null or lower(name) like lower(concat('%', :name, '%')))" +
+            "order by id desc", nativeQuery = true)
+    List<User> findByNameAndRole(@Param("name") String name, @Param("role") String role);
 }
 
 

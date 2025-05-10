@@ -23,7 +23,7 @@ public class StudentTopic {
     @JoinColumn(name = "class_topic_id")
     private ClassTopic classTopic;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id")
     private User student;
 

@@ -49,10 +49,12 @@ public class StudentTopicServiceImpl implements StudentTopicService {
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public void deleteStudentTopic(Long studentTopicID) throws Exception {
-        if (studentTopicRepo.existsById(studentTopicID)) {
+    public void deleteStudentTopic(String studentIdNum) throws Exception {
+        User exStudent = userRepo.findByIdNum(studentIdNum)
+                .orElseThrow(() -> new Exception("Khong tim thay nguoi dung voi idNum: " + studentIdNum));
+        if (studentTopicRepo.existsByStudent(exStudent)) {
             try {
-                studentTopicRepo.deleteById(studentTopicID);
+                studentTopicRepo.deleteByStudent(exStudent);
             } catch (Exception e) {
                 throw new Exception(e);
             }

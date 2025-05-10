@@ -19,6 +19,7 @@ public class StudentTopicResponse {
     boolean status;
 
     static public StudentTopicResponse fromStudentTopic(StudentTopic studentTopic) {
+        System.out.println("studentTopic" + studentTopic.getStudent());
         return StudentTopicResponse.builder()
                 .id(studentTopic.getId())
                 .student(UserResponse.fromUser(studentTopic.getStudent()))

@@ -54,7 +54,7 @@ public class ClassTopicManagementController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -88,7 +88,7 @@ public class ClassTopicManagementController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -110,7 +110,7 @@ public class ClassTopicManagementController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -122,10 +122,10 @@ public class ClassTopicManagementController {
             @RequestParam(value = "name", required = false) String name,
 
             @Parameter(description = "mã của kỳ học đồ án")
-            @RequestParam(value = "topic semester id", required = false) Long topicSemesterID,
+            @RequestParam(value = "topic_semester_id", required = false) Long topicSemesterID,
 
             @Parameter(description = "mã của ngành học")
-            @RequestParam(value = "major id", required = false) Long majorID,
+            @RequestParam(value = "major_id", required = false) Long majorID,
 
             @Parameter(description = "số trang muốn chọn")
             @RequestParam(value = "page") int page,
@@ -150,7 +150,7 @@ public class ClassTopicManagementController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -159,7 +159,7 @@ public class ClassTopicManagementController {
     @GetMapping("/get_detail_class_topic")
     public ApiResponse<?> getClassTopicDetail(
             @Parameter(description = "mã của lop hoc do an")
-            @RequestParam(value = "id class topic") Long idNum
+            @RequestParam(value = "id_class_topic") Long idNum
     ) {
         try {
             ClassTopicDetailResponse response = classTopicManagementService.getClassTopicDetail(idNum);
@@ -172,7 +172,7 @@ public class ClassTopicManagementController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }

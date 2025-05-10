@@ -16,6 +16,9 @@ public interface StudentTopicRepo extends JpaRepository<StudentTopic, Long> {
 
     void deleteAllByClassTopic(ClassTopic classTopic);
 
+    boolean existsByStudent(User student);
+    void deleteByStudent(User student);
+
     @Query(value = """
             select * from student_topic where class_topic_id = :class_topic_id
             order by id desc

@@ -5,6 +5,7 @@ import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
+import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.service.serviceUtils.LookupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +42,7 @@ public class LookupController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -63,7 +64,7 @@ public class LookupController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -85,7 +86,7 @@ public class LookupController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
@@ -107,9 +108,74 @@ public class LookupController {
             return ApiResponse.<String>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message(HttpStatus.BAD_REQUEST.toString())
-                    .result(ex.toString())
+                    .result(ex.getMessage())
                     .build();
         }
     }
 
+    @Operation(summary = "search giảng viên hướng dẫn, theo name")
+    @GetMapping("search_instructor")
+    public ApiResponse<?> searchInstructor(
+            @Parameter(description = "search_value")
+            @RequestParam(value = "name", required = false) String name
+    ) {
+        try {
+            List<UserResponse> response = lookupService.searchInstructor(name);
+            return ApiResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .result(response)
+                    .message(HttpStatus.OK.toString())
+                    .build();
+        } catch (Exception ex) {
+            return ApiResponse.<String>builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .message(HttpStatus.BAD_REQUEST.toString())
+                    .result(ex.getMessage())
+                    .build();
+        }
+    }
+
+    @Operation(summary = "search học sinh, theo name")
+    @GetMapping("search_student")
+    public ApiResponse<?> searchStudent(
+            @Parameter(description = "search_value")
+            @RequestParam(value = "name", required = false) String name
+    ) {
+        try {
+            List<UserResponse> response = lookupService.searchStudent(name);
+            return ApiResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .result(response)
+                    .message(HttpStatus.OK.toString())
+                    .build();
+        } catch (Exception ex) {
+            return ApiResponse.<String>builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .message(HttpStatus.BAD_REQUEST.toString())
+                    .result(ex.getMessage())
+                    .build();
+        }
+    }
+
+    @Operation(summary = "search 1 học sinh, theo mã sinh viên")
+    @GetMapping("search_single_student")
+    public ApiResponse<?> searchSingleStudent(
+            @Parameter(description = "search_value")
+            @RequestParam(value = "idNum", required = false) String idNum
+    ) {
+        try {
+            UserResponse response = lookupService.searchSingleStudent(idNum);
+            return ApiResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .result(response)
+                    .message(HttpStatus.OK.toString())
+                    .build();
+        } catch (Exception ex) {
+            return ApiResponse.<String>builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .message(HttpStatus.BAD_REQUEST.toString())
+                    .result(ex.getMessage())
+                    .build();
+        }
+    }
 }

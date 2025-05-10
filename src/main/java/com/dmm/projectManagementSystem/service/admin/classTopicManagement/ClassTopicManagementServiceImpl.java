@@ -45,7 +45,7 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
                 studentTopicService.addStudentTopic(classTopic, x);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         }
 
         return Pair.of("Add classTopic Successes!", true);
@@ -71,13 +71,13 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
 
             for (var x : request.getStudentTopicList()) {
                 if (x.getAction() == ActionTypes.DELETE) {
-                    studentTopicService.deleteStudentTopic(x.getId());
+                    studentTopicService.deleteStudentTopic(x.getStudentIdNum());
                 } else if (x.getAction() == ActionTypes.CREATE) {
                     studentTopicService.addStudentTopic(updateClassTopic, x);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         }
 
         return Pair.of("Update classTopic Successes!", true);
@@ -98,7 +98,7 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
                 classTopicRepo.deleteById(classTopicID);
                 return Pair.of("Delete Class Topic Successes!", true);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new Exception(e.getMessage());
             }
 
         }
@@ -140,8 +140,6 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
     public ClassTopicDetailResponse getClassTopicDetail(Long classTopicID) throws Exception {
         ClassTopic exClassTopic = classTopicRepo.findById(classTopicID)
                 .orElseThrow(() -> new Exception("Khong tim thay class topic voi id: " + classTopicID));
-
-        List<StudentTopic> test = studentTopicRepo.findAllByClassTopic(classTopicID);
 
         List<StudentTopicResponse> studentTopicResponseList = studentTopicRepo.findAllByClassTopic(classTopicID).stream().map(
                 StudentTopicResponse::fromStudentTopic
