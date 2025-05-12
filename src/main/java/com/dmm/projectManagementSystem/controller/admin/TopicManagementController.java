@@ -3,6 +3,7 @@ package com.dmm.projectManagementSystem.controller.admin;
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicDetailsResponse;
 import com.dmm.projectManagementSystem.dto.topic.TopicListByPageResponse;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.service.admin.topicManagement.TopicManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,10 +71,13 @@ public class TopicManagementController {
             @RequestParam(value = "name", required = false) String name,
 
             @Parameter(description = "mã của kỳ học đồ án")
-            @RequestParam(value = "topic semester id", required = false) Long topicSemesterID,
+            @RequestParam(value = "topic_semester_id", required = false) Long topicSemesterID,
 
             @Parameter(description = "mã của ngành học")
-            @RequestParam(value = "major id", required = false) Long majorID,
+            @RequestParam(value = "major_id", required = false) Long majorID,
+
+            @Parameter(description = "Giai đoạn đồ án")
+            @RequestParam(value = "project_stage", required = false) ProjectStage projectStage,
 
             @Parameter(description = "số trang muốn chọn")
             @RequestParam(value = "page") int page,
@@ -86,6 +90,7 @@ public class TopicManagementController {
                     name,
                     topicSemesterID,
                     majorID,
+                    projectStage,
                     page,
                     limit
             );

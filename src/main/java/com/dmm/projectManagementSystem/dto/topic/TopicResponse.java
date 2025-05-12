@@ -1,5 +1,7 @@
 package com.dmm.projectManagementSystem.dto.topic;
 
+import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.Grade;
 import com.dmm.projectManagementSystem.model.Topic;
@@ -15,11 +17,9 @@ import java.time.LocalDateTime;
 @Builder
 public class TopicResponse {
     private String idNum;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
     private String name;
-    private LocalDateTime startSubmissionDate;
-    private LocalDateTime endSubmissionDate;
+    private CRUDMajor major;
+    private CRUDTopicSemester topicSemester;
 
     private ProjectStage projectStage;
     private Grade grade;
@@ -27,11 +27,9 @@ public class TopicResponse {
     static public TopicResponse fromTopic(Topic topic) {
         return TopicResponse.builder()
                 .idNum(topic.getIdNum())
-                .startTime(topic.getStartTime())
-                .endTime(topic.getEndTime())
                 .name(topic.getName())
-                .startSubmissionDate(topic.getStartSubmissionDate())
-                .endSubmissionDate(topic.getEndSubmissionDate())
+                .major(CRUDMajor.fromMajor(topic.getMajor()))
+                .topicSemester(CRUDTopicSemester.fromTopicSemester(topic.getTopicSemester()))
                 .projectStage(topic.getProjectStage())
                 .grade(topic.getGrade())
                 .build();

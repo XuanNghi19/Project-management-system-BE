@@ -138,7 +138,7 @@ public class TopicManagementServiceImpl implements TopicManagementService{
     }
 
     @Override
-    public TopicListByPageResponse getAllTopic(String name, Long topicSemesterID, Long majorID, int page, int limit) {
+    public TopicListByPageResponse getAllTopic(String name, Long topicSemesterID, Long majorID, ProjectStage projectStage, int page, int limit) {
         Major major = null;
         TopicSemester topicSemester = null;
 
@@ -155,6 +155,7 @@ public class TopicManagementServiceImpl implements TopicManagementService{
                         majorID,
                         topicSemesterID,
                         name,
+                        projectStage != null ? projectStage.name() : null,
                         PageRequest.of(page, limit)
                 )
                 .map(TopicResponse::fromTopic);

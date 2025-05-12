@@ -21,12 +21,14 @@ public interface TopicRepo extends JpaRepository<Topic, Long> {
             where (:major_id is null or major_id = :major_id)
             and (:topic_semester_id is null or topic_semester_id = :topic_semester_id)
             and (:name is null or lower(name) like lower(concat('%', :name, '%')))
+            and (:project_stage is null or project_stage = :project_stage)
             order by id desc
     """, nativeQuery = true)
     Page<Topic> findAllTopic(
             @Param("major_id") Long majorID,
             @Param("topic_semester_id") Long topicSemesterID,
             @Param("name") String name,
+            @Param("project_stage") String projectStage,
             Pageable pageable
     );
 }
