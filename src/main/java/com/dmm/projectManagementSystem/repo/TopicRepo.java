@@ -3,6 +3,8 @@ package com.dmm.projectManagementSystem.repo;
 import com.dmm.projectManagementSystem.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.dmm.projectManagementSystem.model.Topic;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,6 @@ public interface TopicRepo extends JpaRepository<Topic, Long> {
             @Param("name") String name,
             Pageable pageable
     );
+
+    boolean existsById( Long id);
 }

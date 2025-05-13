@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

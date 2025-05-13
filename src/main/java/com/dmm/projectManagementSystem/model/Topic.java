@@ -2,7 +2,6 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,7 +66,6 @@ public class Topic {
     private List<Meeting> meeting;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Evaluation> evaluation;
 }
 

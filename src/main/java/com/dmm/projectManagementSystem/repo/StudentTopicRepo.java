@@ -27,5 +27,5 @@ public interface StudentTopicRepo extends JpaRepository<StudentTopic, Long> {
 
     Optional<StudentTopic> findByStudentId(Long id);
 
-    Optional<ClassTopic> findByClassTopicId(Long studentTopicId);
+    List<StudentTopic> findByClassTopicId(Long id);
 }

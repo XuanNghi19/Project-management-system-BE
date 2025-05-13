@@ -49,18 +49,6 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> {
                     request
-//                            .requestMatchers(
-//                                    "/api-docs",
-//                                    "/api-docs/**",
-//                                    "/swagger-resources",
-//                                    "/swagger-resources/**",
-//                                    "/configuration/ui",
-//                                    "/configuration/security",
-//                                    "/swagger-ui/**",
-//                                    "/swagger-ui.html",
-//                                    "/webjars/swagger-ui/**",
-//                                    "/swagger-ui/index.html")
-//                            .permitAll()
                             .requestMatchers(
                                     "/api-docs",
                                     "/api-docs/**",
@@ -162,7 +150,26 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     HttpMethod.DELETE,
                                     String.format("%s/group/delete_team", apiPrefix)
-                            ).hasAnyRole(Role.STUDENT.toString());
+                            ).hasAnyRole(Role.STUDENT.toString())
+                            .requestMatchers(
+                                    HttpMethod.POST,
+                                    String.format("%s/meeting", apiPrefix),
+                                    String.format("%s/task", apiPrefix),
+                                    String.format("%s/evaluation", apiPrefix)
+                             ).hasAnyRole(Role.INSTRUCTORS.toString())
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    String.format("%s/class_topic/{teacherId}", apiPrefix),
+                                    String.format("%s/team/{teacherId}", apiPrefix),
+                                    String.format("%s/files/{id}", apiPrefix),
+                                    String.format("%s/board_member/{id}", apiPrefix),
+                                    String.format("%s/instructor_student_topic/{classTopicId}", apiPrefix)
+                            ).hasAnyRole(Role.INSTRUCTORS.toString())
+                            .requestMatchers(
+                                    HttpMethod.PATCH,
+                                    String.format("%s/team/approval", apiPrefix),
+                                    String.format("%s/topic/approval", apiPrefix)
+                            ).hasAnyRole(Role.INSTRUCTORS.toString());
                 });
         return httpSecurity.build();
     }

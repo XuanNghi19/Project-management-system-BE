@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 import com.dmm.projectManagementSystem.dto.council.CreateCouncilRequest;
 import com.dmm.projectManagementSystem.dto.council.UpdateCouncilRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

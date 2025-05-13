@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +29,10 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
+
+    final private JwtUtils jwtUtils;
+
+     final private UserDetailsService userDetailsService;
 
     @Value("${api.prefix}")
     private String apiPrefix;
@@ -126,7 +129,17 @@ public class JwtFilter extends OncePerRequestFilter {
                 Pair.of("/configuration/security", "GET"),
                 Pair.of("/swagger-ui", "GET"),
                 Pair.of("/swagger-ui.html", "GET"),
-                Pair.of("/swagger-ui/index.html", "GET")
+                Pair.of("/swagger-ui/index.html", "GET"),
+                Pair.of("/meeting", "POST"),
+                Pair.of("/task", "POST"),
+                Pair.of("/class_topic/5", "GET"),
+                Pair.of("/student_topic/1", "GET"),
+                Pair.of("/team/5", "GET"),
+                Pair.of("/topic/approval", "PATCH"),
+                Pair.of("/files/1", "GET"),
+                Pair.of("/team/approval", "PATCH"),
+                Pair.of("/board_member/1", "GET")
+
         );
 
         for (Pair<String, String> bypassToken : bypassTokens) {

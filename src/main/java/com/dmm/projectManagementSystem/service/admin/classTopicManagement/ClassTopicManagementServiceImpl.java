@@ -24,7 +24,7 @@ public class ClassTopicManagementServiceImpl implements ClassTopicManagementServ
     final private MajorRepo majorRepo;
 
     final private StudentTopicRepo studentTopicRepo;
-    final private StudentTopicService studentTopicService;
+    final private StudentTopicManagementService studentTopicService;
 
     @Transactional(rollbackOn = Exception.class)
     @Override

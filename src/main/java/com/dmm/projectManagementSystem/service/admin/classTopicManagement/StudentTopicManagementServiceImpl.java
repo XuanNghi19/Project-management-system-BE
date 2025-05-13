@@ -1,8 +1,10 @@
 package com.dmm.projectManagementSystem.service.admin.classTopicManagement;
 
 import com.dmm.projectManagementSystem.dto.studentTopic.CUDStudentTopicRequest;
-import com.dmm.projectManagementSystem.dto.studentTopic.StudentTopicResponse;
-import com.dmm.projectManagementSystem.model.*;
+import com.dmm.projectManagementSystem.model.ClassTopic;
+import com.dmm.projectManagementSystem.model.StudentTopic;
+import com.dmm.projectManagementSystem.model.TopicSemester;
+import com.dmm.projectManagementSystem.model.User;
 import com.dmm.projectManagementSystem.repo.StudentTopicRepo;
 import com.dmm.projectManagementSystem.repo.UserRepo;
 import jakarta.transaction.Transactional;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StudentTopicServiceImpl implements StudentTopicService {
+public class StudentTopicManagementServiceImpl implements StudentTopicManagementService {
 
     final private StudentTopicRepo studentTopicRepo;
     final private UserRepo userRepo;

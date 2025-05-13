@@ -23,7 +23,7 @@ public class StudentTopic {
     @JoinColumn(name = "student_id")
     private User student;
 
-    boolean status = false;
+    private boolean status = false;
 
     static public StudentTopic fromCUDStudentTopic(
             CUDStudentTopicRequest request,

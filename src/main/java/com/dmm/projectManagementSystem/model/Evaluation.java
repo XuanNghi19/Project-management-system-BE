@@ -1,5 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.enums.GradeType;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,6 +29,9 @@ public class Evaluation {
     private LocalDateTime dateCommented;
 
     private Double grade;
+
+    @Enumerated(EnumType.STRING)
+    private GradeType gradeType;
 
     @Column(name = "project_stage")
     @Enumerated(EnumType.STRING)

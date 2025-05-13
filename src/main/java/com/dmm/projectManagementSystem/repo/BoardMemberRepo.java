@@ -11,4 +11,5 @@ import java.util.List;
 public interface BoardMemberRepo extends JpaRepository<BoardMember, Long> {
     List<BoardMember> findAllByCouncil(Council council);
     void deleteAllByCouncil(Council council);
+    List<BoardMember> findByUserId(Long id);
 }
