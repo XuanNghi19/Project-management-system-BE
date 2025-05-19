@@ -3,6 +3,7 @@ package com.dmm.projectManagementSystem.dto.team;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
+import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.model.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,7 @@ import java.util.List;
 @Builder
 public class TeamResponse {
     Long id;
-    User teacher;
+    String teacher_name;
     String groupName;
 
     CRUDTopicSemester topicSemester;
@@ -32,7 +33,7 @@ public class TeamResponse {
     ) {
         return TeamResponse.builder()
                 .id(team.getId())
-                .teacher(team.getTeacher())
+                .teacher_name(team.getTeacher().getIdNum() + "_" + team.getTeacher().getName())
                 .groupName(team.getTeamName())
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(topicSemester))
                 .major(CRUDMajor.fromMajor(major))

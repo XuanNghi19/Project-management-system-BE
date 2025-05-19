@@ -26,5 +26,6 @@ public class TeamMember {
     @JoinColumn(name = "student_id")
     private User student;
 
+    @Enumerated(EnumType.STRING)
     private MembershipPosition position;
 }
