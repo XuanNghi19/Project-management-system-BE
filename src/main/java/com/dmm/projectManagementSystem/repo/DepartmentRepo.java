@@ -8,12 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DepartmentRepo extends JpaRepository<Department, Long> {
 
-    @Query("""
-        select d from Department d where (:name is null or lower(d.name) like lower(concat( '%', :name, '%')))
-        order by d.id desc
-    """)
+    @Query(value = """
+        select * from department where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+        order by id desc
+    """, nativeQuery = true)
     Page<Department> findAllDepartment(@Param("name") String name, Pageable pageable);
+
+    @Query(value = """
+        select * from department where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+        order by id desc
+    """, nativeQuery = true)
+    List<Department> findAllDepartmentByName(@Param("name") String name);
 }

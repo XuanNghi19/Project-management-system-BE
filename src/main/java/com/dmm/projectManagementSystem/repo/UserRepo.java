@@ -38,6 +38,22 @@ public interface UserRepo extends JpaRepository<User, Long> {
             Pageable pageable
     );
 
+
+    @Query("""
+            select u from User u
+            where u.role = :role
+            and (:department is null or u.department = :department)
+            and (:major is null or u.major = :major)
+            and (:course is null or u.course = :course)
+            order by u.id desc
+    """)
+    Page<User> findAllStudent(
+            @Param("role") Role role,
+            @Param("department")  Department department,
+            @Param("major") Major major,
+            @Param("course") Course course,
+            Pageable pageable
+    );
     List<User> findByIdIn(List<Long> listStudentIds);
 }
 

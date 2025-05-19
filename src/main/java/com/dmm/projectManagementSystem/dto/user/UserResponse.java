@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UserResponse {
+    Long id;
     String idNum;
     String name;
     int age;
@@ -32,6 +33,7 @@ public class UserResponse {
             User user
     ) {
         return UserResponse.builder()
+                .id(user.getId())
                 .idNum(user.getIdNum())
                 .name(user.getName())
                 .age(user.getAge())

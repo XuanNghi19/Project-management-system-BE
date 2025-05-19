@@ -12,7 +12,7 @@ public interface TopicService {
 //    public Topic handleGetTopic(Long id);
 //    List<Topic> handleGetAllTopic (Long userId);
 
-    ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, Long teamId, String topicName, String uri);
+    ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, String topicName, String uri);
 
     ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long leaderId, Long topicId, String topicNameChange, String uri);
 

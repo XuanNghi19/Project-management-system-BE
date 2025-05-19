@@ -120,7 +120,7 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     HttpMethod.POST,
                                     String.format("%s/topic/register_topic", apiPrefix),
-                                    String.format("%s/group/create_group", apiPrefix),
+
                                     String.format("%s/group/invite", apiPrefix)
                             ).hasAnyRole(Role.STUDENT.toString())
                             .requestMatchers(
@@ -130,7 +130,10 @@ public class WebSecurityConfig {
                                     String.format("%s/manage_topic/get_evaluations/{projectId}", apiPrefix),
                                     String.format("%s/manage_topic/get_council/{projectId}", apiPrefix),
                                     String.format("%s/manage_topic/get_task", apiPrefix),
-                                    String.format("%s/topic/get_topic", apiPrefix)
+                                    String.format("%s/topic/get_topic", apiPrefix),
+                                    String.format("%s/student/information", apiPrefix),
+                                    String.format("%s/group/create_group", apiPrefix),
+                                    String.format("%s/group/list", apiPrefix)
                             ).hasAnyRole(Role.STUDENT.toString())
                             .requestMatchers(
                                     HttpMethod.PUT,

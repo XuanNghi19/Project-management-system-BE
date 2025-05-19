@@ -5,8 +5,11 @@ import com.dmm.projectManagementSystem.dto.group.res.AcceptInvitationResDTO;
 import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
 import com.dmm.projectManagementSystem.dto.group.res.UserTeamResDTO;
 //import com.dmm.projectManagementSystem.service.student.teamService.EmailService;
+import com.dmm.projectManagementSystem.dto.team.TeamInfoDTO;
+import com.dmm.projectManagementSystem.model.User;
 import com.dmm.projectManagementSystem.service.student.teamService.TeamServiceImpl;
 import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +25,7 @@ public class TeamController {
 
     }
     @ApiMessageResponse(message = "Tạo nhóm làm đồ án")
-    @PostMapping("/create_group")
+    @GetMapping("/create_group")
     public ResponseEntity<ApiResponseStudent<StudentTeamResDTO>> createStudentGroup (@RequestParam Long studentId,
                                                                                      @RequestParam String teamName) {
 
@@ -65,5 +68,17 @@ public class TeamController {
                                             @RequestParam Long teamId) {
         return ResponseEntity.ok(this.teamServiceImpl.handleDeleteGroup(leaderId, teamId));
     }
+    @ApiMessageResponse(message = "Lấy ra danh sách sinh viên")
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponseStudent<List<User>>> getAllStudents(Pageable pageable) {
+       return ResponseEntity.ok(teamServiceImpl.handleGetListUser(pageable));
+    }
+
+    @ApiMessageResponse(message = "Lấy thông tin nhóm của sinh viên")
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponseStudent<TeamInfoDTO>> getTeamInfo(@RequestParam Long studentId) {
+        return ResponseEntity.ok(teamServiceImpl.getTeamInfo(studentId));
+    }
+
 
 }

@@ -20,10 +20,9 @@ public class StudentTopicController {
     @ApiMessageResponse("Đăng ký đề tài cho nhóm")
     @PostMapping("/register_topic")
     public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> registerTopic (@RequestParam Long leaderId,
-                                                                                  @RequestParam Long teamId,
                                                                                   @RequestParam String topicName,
                                                                                   @RequestParam String uri) {
-        return ResponseEntity.ok( this.topicServiceImpl.handleRegisterTopic(leaderId, teamId, topicName, uri));
+        return ResponseEntity.ok( this.topicServiceImpl.handleRegisterTopic(leaderId, topicName, uri));
     }
     @ApiMessageResponse("Cập nhật thông tin cho đề tài")
     @PutMapping("/update_topic")
@@ -43,8 +42,8 @@ public class StudentTopicController {
     @ApiMessageResponse("Lấy thông tin đề tài đã đăng ký")
     @GetMapping("/get_topic")
     public ResponseEntity<ApiResponseStudent<TopicResDTO>> getTopic (
-                                                                     @RequestParam(value = "topicId") Long topicId) {
-        return ResponseEntity.ok(this.topicServiceImpl.handleGetTopic(topicId));
+                                                                     @RequestParam(value = "studentId") Long studentId) {
+        return ResponseEntity.ok(this.topicServiceImpl.handleGetTopic(studentId));
     }
 
 

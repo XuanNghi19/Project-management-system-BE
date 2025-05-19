@@ -50,6 +50,14 @@ public class JwtUtils {
         }
     }
 
+    public String getIdNumFromToken(String token) {
+        try {
+            return SignedJWT.parse(token).getJWTClaimsSet().getSubject();
+        } catch (Exception e) {
+            throw new RuntimeException("Không trích xuất được idNum từ token");
+        }
+    }
+
     // Xác thực tính hợp lệ của token
     public IntrospectResponse introspect(String token) throws JOSEException, ParseException {
         // Tạo một bộ xác thực chữ ký (JWSVerifier) sử dụng secretKey

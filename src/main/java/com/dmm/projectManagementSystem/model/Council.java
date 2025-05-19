@@ -33,7 +33,7 @@ public class Council {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 

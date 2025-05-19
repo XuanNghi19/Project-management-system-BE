@@ -9,13 +9,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MajorRepo extends JpaRepository<Major, Long> {
-    @Query("""
-        select m from Major m where 
-            (:name is null or lower(m.name) like lower(concat( '%', :name, '%')))
-            and (:department is null or m.department = :department)
-        order by m.id desc
-    """)
-    Page<Major> findAllMajor(@Param("name") String name,@Param("department") Department department, Pageable pageable);
+    @Query(value = """
+        select * from major where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+            and (:department_id is null or department_id = :department_id)
+        order by id desc
+    """, nativeQuery = true)
+    Page<Major> findAllMajor(@Param("name") String name, @Param("department_id") Long departmentID, Pageable pageable);
+
+    boolean existsByDepartment(Department department);
+
+    @Query(value = """
+        select * from major where (:name is null or lower(name) like lower(concat( '%', :name, '%')))
+        order by id desc
+    """, nativeQuery = true)
+    List<Major> findAllMajorByName(@Param("name") String name);
 }

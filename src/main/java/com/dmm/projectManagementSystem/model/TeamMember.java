@@ -27,7 +27,5 @@ public class TeamMember {
 
     @Enumerated(EnumType.STRING)
     private MembershipPosition position;
-
-
 }
 

@@ -55,6 +55,8 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
             .fileUrl(council.getFileUrl())
             .location(council.getLocation())
             .startTime(council.getStartTime())
+            .topicSemester(council.getTopicSemester())
+            .departmentName(council.getDepartment().getName())
             .endTime(council.getEndTime())
             .build());
     apiResponseGetCouncil.setMessage("Lấy hội đồng tham gia đánh giá đồ án thành công");

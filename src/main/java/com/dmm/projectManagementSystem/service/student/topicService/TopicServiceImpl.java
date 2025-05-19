@@ -9,6 +9,7 @@ import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,58 +20,70 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TopicServiceImpl implements TopicService {
+    @Autowired
     private final TopicRepo topicRepo;
-
+    @Autowired
     private final TeamRepo teamRepo;
-
-    private TeamMemberRepo teamMemberRepo;
-
+    @Autowired
+    private final TeamMemberRepo teamMemberRepo;
+    @Autowired
     private final FilesUrlRepo filesUrlRepo;
-
+    @Autowired
     private final ClassTopicRepo classTopicRepo;
-
+    @Autowired
     private final UserRepo userRepo;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, Long teamId, String topicName, String uri) {
-        // bổ sung thêm phần tìm theo nhiều điều kiện vd teamId, chứ không phải là có mỗi leaderId
-        Optional<Team> team = teamRepo.findById(teamId);
-        team.orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm của bạn!"));
+    public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, String topicName, String uri) {
+        // Lấy Team từ leaderId
+        Team team = teamMemberRepo.findFirstByStudentId(leaderId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm của bạn!"))
+                .getTeam();
 
-        Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, teamId);
-        leaderTeam.orElseThrow(() -> new NoSuchElementException("Người dùng chưa tạo nhóm để đăng ký đề tài !"));
+        // Kiểm tra người này có thực sự thuộc nhóm và là trưởng nhóm không
+        Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, team.getId());
+        leaderTeam.orElseThrow(() -> new NoSuchElementException("Người dùng chưa tạo nhóm để đăng ký đề tài!"));
+
         MembershipPosition positionInTeam = leaderTeam.get().getPosition();
         ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
-        if (positionInTeam != MembershipPosition.LEADER){
-            apiResponseStudent.setMessage("Không phải là trưởng nhóm nên không đăng ký được đề tài !");
+
+        if (positionInTeam != MembershipPosition.LEADER) {
+            apiResponseStudent.setMessage("Không phải là trưởng nhóm nên không đăng ký được đề tài!");
             return apiResponseStudent;
         }
-          Topic topicRegister = new Topic();
-            topicRegister.setName(topicName);
-            topicRegister.setProjectStage(ProjectStage.IDEATION);
-            topicRegister.setTopicSemester(team.get().getTopicSemester());
 
-            FilesUrl filesUrl = new FilesUrl();
-            filesUrl.setTopic(topicRegister);
-            filesUrl.setProjectStage(ProjectStage.IDEATION);
-            filesUrl.setUri(uri);
-            filesUrlRepo.save(filesUrl);
+        // Tạo đề tài mới
+        Topic topicRegister = new Topic();
+        topicRegister.setName(topicName);
+        topicRegister.setProjectStage(ProjectStage.IDEATION);
+        topicRegister.setTopicSemester(team.getTopicSemester());
 
-            team.get().setTopic(topicRegister);
-            teamRepo.save(team.get());
+        // Tạo file đính kèm (nếu có)
+        FilesUrl filesUrl = new FilesUrl();
+        filesUrl.setTopic(topicRegister);
+        filesUrl.setProjectStage(ProjectStage.IDEATION);
+        filesUrl.setUri(uri);
+        filesUrlRepo.save(filesUrl);
 
-            TopicRegisterResDTO topicRegisterResDTO = TopicRegisterResDTO.fromTopicRes(topicRegister, filesUrl, team.get());
-            topicRepo.save(topicRegister);
-            apiResponseStudent.setData(topicRegisterResDTO);
-            return apiResponseStudent;
+        // Gán topic cho nhóm
+        team.setTopic(topicRegister);
+        teamRepo.save(team);
+
+        // Trả về kết quả
+        TopicRegisterResDTO topicRegisterResDTO = TopicRegisterResDTO.fromTopicRes(topicRegister, filesUrl, team);
+        topicRepo.save(topicRegister);
+        apiResponseStudent.setData(topicRegisterResDTO);
+        return apiResponseStudent;
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long leaderId, Long topicId, String topicNameChange, String uri) {
         Team teamStudent = teamRepo.findByTopicId(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm sinh viên đăng ký"));
-        Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, teamStudent.getId());
-        leaderTeam.orElseThrow(() -> new NoSuchElementException("Người dùng chưa tạo nhóm để đăng ký đề tài !"));
+        Long studentId = teamStudent.getId();
+        Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, studentId);
+        leaderTeam.orElseThrow(() -> new NoSuchElementException("Lỗi không đăng ký được  !"));
         ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
         MembershipPosition positionInTeam = leaderTeam.get().getPosition();
         if (positionInTeam != MembershipPosition.LEADER){
@@ -114,16 +127,29 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<TopicResDTO> handleGetTopic(Long topicId) {
-       Topic topicFound = topicRepo.findById(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy chủ đề trong CSDL !"));
-       Team teamStudent = teamRepo.findByTopicId(topicId).orElseThrow(()-> new NoSuchElementException("Không tìm thấy nhóm sinh viên!"));
-//       TeamMember teamMember = teamMemberRepo.findByStudentIdAndTeamId(userId, teamStudent.getId()).orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm sinh viên đăng ký"));
-       ApiResponseStudent<TopicResDTO> apiResponseGetTopic = new ApiResponseStudent<>();
+    public ApiResponseStudent<TopicResDTO> handleGetTopic(Long studentId) {
+        // Tìm TeamMember dựa vào studentId
+        TeamMember teamMember = teamMemberRepo.findFirstByStudentId(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa tham gia nhóm nào!"));
+
+        // Lấy nhóm mà sinh viên thuộc về
+        Team teamStudent = teamMember.getTeam();
+
+        // Kiểm tra xem nhóm có đăng ký đề tài hay chưa
+        Topic topicFound = teamStudent.getTopic();
+        if (topicFound == null) {
+            throw new NoSuchElementException("Nhóm của sinh viên chưa đăng ký đề tài nào!");
+        }
+
+        // Tạo response
+        ApiResponseStudent<TopicResDTO> apiResponse = new ApiResponseStudent<>();
         TopicResDTO topicResDTO = TopicResDTO.loadFromTopicRes(topicFound, teamStudent);
-        apiResponseGetTopic.setData(topicResDTO);
-        apiResponseGetTopic.setMessage("Lấy thông tin đề tài đăng ký thành công !");
-        return apiResponseGetTopic;
+        apiResponse.setData(topicResDTO);
+        apiResponse.setMessage("Lấy thông tin đề tài đăng ký thành công !");
+        return apiResponse;
     }
+
+
 
     public boolean canRegisterTopic(LocalDateTime startTime, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();

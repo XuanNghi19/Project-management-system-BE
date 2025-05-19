@@ -1,15 +1,23 @@
 package com.dmm.projectManagementSystem.service.student.teamService;
 
 import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
+import com.dmm.projectManagementSystem.dto.Metadata;
 import com.dmm.projectManagementSystem.dto.group.res.AcceptInvitationResDTO;
 import com.dmm.projectManagementSystem.dto.group.StudentTeamResDTO;
 import com.dmm.projectManagementSystem.dto.group.res.TeacherTeamResDTO;
 import com.dmm.projectManagementSystem.dto.group.res.UserTeamResDTO;
+import com.dmm.projectManagementSystem.dto.team.MemberDTO;
+import com.dmm.projectManagementSystem.dto.team.TeamInfoDTO;
+import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
+import com.dmm.projectManagementSystem.enums.Role;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Meta;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,16 +29,22 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
      private final UserRepo userRepo;
-     private final TeamRepo groupRepo;
      private final TopicRepo topicRepo;
      private final TeamMemberRepo teamMemberRepo;
      private final StudentTopicRepo studentTopicRepo;
      private final ClassTopicRepo classTopicRepo;
      private final TeamRepo teamRepo;
 
+    public TeamServiceImpl(UserRepo userRepo, TopicRepo topicRepo, TeamMemberRepo teamMemberRepo, StudentTopicRepo studentTopicRepo, ClassTopicRepo classTopicRepo, TeamRepo teamRepo) {
+        this.userRepo = userRepo;
+        this.topicRepo = topicRepo;
+        this.teamMemberRepo = teamMemberRepo;
+        this.studentTopicRepo = studentTopicRepo;
+        this.classTopicRepo = classTopicRepo;
+        this.teamRepo = teamRepo;
+    }
 
     // Trưởng nhóm tạo nhóm
     @Override
@@ -50,17 +64,23 @@ public class TeamServiceImpl implements TeamService {
         Optional<List<TeamMember>> teamMember = teamMemberRepo.findByStudentId(leaderId);
         Team team  = new Team();
         User user = teacher.orElseThrow(() -> new NoSuchElementException("Không tìm thấy giảng viên!"));
-       if (!teamMember.isPresent() || checkJoinTeam(teamMember.get())){
-           team.setTeacher(teacher.get());
+        team.setTeacher(teacher.get());
            team.setTopic(null);
            team.setTopicSemester(classTopic.getTopicSemester());
            team.setStatus(ProjectStage.PENDING);
            team.setGroupName(teamName);
-           Team teamSaved = groupRepo.save(team);
-       }else {
-           apiResponseStudent.setMessage("Bạn đã tham gia nhóm rồi, không được đăng ký thêm nhóm !");
-           return apiResponseStudent;
-       }
+           Team teamSaved = teamRepo.save(team);
+//       if (!teamMember.isPresent() || checkJoinTeam(teamMember.get())){
+//           team.setTeacher(teacher.get());
+//           team.setTopic(null);
+//           team.setTopicSemester(classTopic.getTopicSemester());
+//           team.setStatus(ProjectStage.PENDING);
+//           team.setGroupName(teamName);
+//           Team teamSaved = groupRepo.save(team);
+//       }else {
+//           apiResponseStudent.setMessage("Bạn đã tham gia nhóm rồi, không được đăng ký thêm nhóm !");
+//           return apiResponseStudent;
+//       }
         TopicSemester topicSemester = team.getTopicSemester();
         TeacherTeamResDTO teacherTeamResDTO = TeacherTeamResDTO.loadFromTeacherRes(user);
        TeamMember teamStudent = TeamMember.builder()
@@ -225,6 +245,65 @@ public class TeamServiceImpl implements TeamService {
         return apiResponseStudent;
     }
 
+    @Override
+    public ApiResponseStudent<TeamInfoDTO> getTeamInfo(Long studentId) {
+        // Tìm thành viên nhóm từ studentId
+        TeamMember teamMember = teamMemberRepo.findFirstByStudentId(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa tham gia nhóm nào"));
+
+        Team team = teamMember.getTeam(); // Lấy team từ teamMember
+
+        List<TeamMember> teamMembers = teamMemberRepo.findByTeamId(team.getId());
+
+        List<Long> userIds = teamMembers.stream()
+                .map(tm -> tm.getStudent().getId())
+                .collect(Collectors.toList());
+
+        Map<Long, User> userMap = userRepo.findByIdIn(userIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
+
+        List<MemberDTO> memberList = teamMembers.stream().map(tm -> {
+            User user = userMap.get(tm.getStudent().getId());
+            return MemberDTO.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .position(tm.getPosition().name())
+                    .build();
+        }).collect(Collectors.toList());
+
+        TeamInfoDTO teamInfo = TeamInfoDTO.builder()
+                .teamId(team.getId())
+                .teamName(team.getGroupName())
+                .members(memberList)
+                .build();
+
+        ApiResponseStudent<TeamInfoDTO> response = new ApiResponseStudent<>();
+        response.setMessage("Lấy thông tin nhóm thành công");
+        response.setData(teamInfo);
+        return response;
+    }
+
+
+
+    public ApiResponseStudent<List<User>> handleGetListUser (Pageable pageable) {
+        Page<User> listStudent = userRepo.findAllStudent(Role.STUDENT, null, null, null, pageable);
+
+        Metadata metadata = new Metadata();
+        metadata.setPage(pageable.getPageNumber());
+        metadata.setPageSize(pageable.getPageSize());
+
+        metadata.setTotalPage(listStudent.getTotalPages());
+        metadata.setTotalElement(listStudent.getTotalElements());
+
+        ApiResponseStudent<List<User>> apiResponseGetStudent  = new ApiResponseStudent<>();
+        apiResponseGetStudent.setMetadata(metadata);
+        apiResponseGetStudent.setMessage("Lấy danh sách sinh viên thành công !");
+        apiResponseGetStudent.setData(listStudent.getContent());
+        return apiResponseGetStudent;
+    }
+
     public boolean canRegisterGroup(LocalDateTime startTime, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startTime) && now.isBefore(endTime);
@@ -239,6 +318,7 @@ public class TeamServiceImpl implements TeamService {
         }
         return true;
     }
+
 
 }
 
