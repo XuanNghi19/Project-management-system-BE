@@ -33,7 +33,6 @@ public class TeamResponse {
         return TeamResponse.builder()
                 .id(team.getId())
                 .teacher(team.getTeacher())
-                .groupName(team.getGroupName())
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(topicSemester))
                 .major(CRUDMajor.fromMajor(major))
                 .teamMemberResponseList(teamMemberList.stream().map(TeamMemberResponse::fromTeamMember).toList())

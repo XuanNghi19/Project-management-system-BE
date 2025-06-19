@@ -2,7 +2,6 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.classTopic.CreateClassTopicRequest;
 import com.dmm.projectManagementSystem.dto.classTopic.UpdateClassTopicRequest;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,12 +10,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "class_topic")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Data
+@Builder
 public class ClassTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +22,7 @@ public class ClassTopic {
     @Column(name = "class_name")
     private String className;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
@@ -39,8 +36,7 @@ public class ClassTopic {
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "major_id")
     private Major major;
 
@@ -76,6 +72,4 @@ public class ClassTopic {
                 .major(major)
                 .build();
     }
-
-
 }

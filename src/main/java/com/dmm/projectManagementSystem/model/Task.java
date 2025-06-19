@@ -37,8 +37,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
 }

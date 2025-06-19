@@ -23,7 +23,7 @@ public class Announcement {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "datePosted")
+    @Column(name = "date_posted")
     private String datePosted;
 
     @Column(name = "project_stage")
@@ -33,9 +33,5 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
-
-    @ManyToOne
-    @JoinColumn(name = "topicID")
-    private Topic topic;
 }
 

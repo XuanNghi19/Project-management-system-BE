@@ -25,8 +25,10 @@ public class Department {
 
     static public Department fromCRUDDepartment(CRUDDepartment crudDepartment) {
         return Department.builder()
+                .id(crudDepartment.getId())
                 .name(crudDepartment.getName())
                 .description(crudDepartment.getDescription())
                 .build();
     }
+
 }

@@ -52,6 +52,8 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     "/api-docs",
                                     "/api-docs/**",
+                                    "/v3/api-docs",
+                                    "/v3/api-docs/**",
                                     "/swagger-resources",
                                     "/swagger-resources/**",
                                     "/configuration/ui",
@@ -61,6 +63,11 @@ public class WebSecurityConfig {
                                     "/webjars/swagger-ui/**",
                                     "/swagger-ui/index.html")
                             .permitAll()
+                            .requestMatchers(
+                                    HttpMethod.POST,
+                                    String.format("%s/user/login", apiPrefix),
+                                    String.format("%s/user/introspect", apiPrefix)
+                            ).permitAll()
                             .requestMatchers(
                                     HttpMethod.POST,
                                     String.format("%s/user_management/add_teacher", apiPrefix),
@@ -149,8 +156,23 @@ public class WebSecurityConfig {
                             ).hasAnyRole(Role.STUDENT.toString())
                             .requestMatchers(
                                     HttpMethod.POST,
-                                    String.format("%s/user/login", apiPrefix)
-                            ).permitAll();
+                                    String.format("%s/meeting", apiPrefix),
+                                    String.format("%s/task", apiPrefix),
+                                    String.format("%s/evaluation", apiPrefix)
+                             ).hasAnyRole(Role.INSTRUCTORS.toString())
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    String.format("%s/class_topic/{teacherId}", apiPrefix),
+                                    String.format("%s/team/{teacherId}", apiPrefix),
+                                    String.format("%s/files/{id}", apiPrefix),
+                                    String.format("%s/board_member/{id}", apiPrefix),
+                                    String.format("%s/instructor_student_topic/{classTopicId}", apiPrefix)
+                            ).hasAnyRole(Role.INSTRUCTORS.toString())
+                            .requestMatchers(
+                                    HttpMethod.PATCH,
+                                    String.format("%s/team/approval", apiPrefix),
+                                    String.format("%s/topic/approval", apiPrefix)
+                            ).hasAnyRole(Role.INSTRUCTORS.toString());
                 });
         return httpSecurity.build();
     }

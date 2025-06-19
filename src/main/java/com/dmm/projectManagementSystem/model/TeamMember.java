@@ -1,7 +1,6 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,23 +8,21 @@ import lombok.*;
 @Table(name = "team_member")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-@Getter
-@Setter
 public class TeamMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "student_id")
     private User student;
 
     @Enumerated(EnumType.STRING)
     private MembershipPosition position;
 }
-

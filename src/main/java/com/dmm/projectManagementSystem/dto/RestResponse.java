@@ -5,8 +5,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
+@Data
 public class RestResponse <T>{
     private T data;
 

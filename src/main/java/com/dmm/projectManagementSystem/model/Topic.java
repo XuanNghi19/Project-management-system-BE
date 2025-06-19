@@ -2,7 +2,6 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,13 +43,14 @@ public class Topic {
     private ProjectStage projectStage;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "grade_id")
     private Grade grade;
 
     @ManyToOne
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "major_id")
     private Major major;
 
@@ -66,7 +66,6 @@ public class Topic {
     private List<Meeting> meeting;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Evaluation> evaluation;
 }
 

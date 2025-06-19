@@ -1,18 +1,15 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.studentTopic.CUDStudentTopicRequest;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "student_topic")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "student_topic")
 public class StudentTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +19,8 @@ public class StudentTopic {
     @JoinColumn(name = "class_topic_id")
     private ClassTopic classTopic;
 
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "student_id")
-    @JsonIgnore
     private User student;
 
     private boolean status = false;
@@ -40,10 +36,5 @@ public class StudentTopic {
                 .student(student)
                 .status(request.isStatus())
                 .build();
-    }
-
-    @Override
-    public String toString() {
-        return "StudentTopic{id=" + id + ", status=" + status + "}";
     }
 }

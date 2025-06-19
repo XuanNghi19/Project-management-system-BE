@@ -30,12 +30,14 @@ public class Evaluation {
 
     private Double grade;
 
+    @Enumerated(EnumType.STRING)
+    private GradeType gradeType;
+
     @Column(name = "project_stage")
     @Enumerated(EnumType.STRING)
     private ProjectStage projectStage;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
 }

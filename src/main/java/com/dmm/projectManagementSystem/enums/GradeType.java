@@ -6,4 +6,3 @@ public enum GradeType {
     DEFENSE_SCORE,
     REVIEW_SCORE
 }
-

@@ -1,7 +1,7 @@
 package com.dmm.projectManagementSystem.enums;
 
 public enum ProjectStage {
-    PENDING,
+    PENDING,               // Đang chờ duyệt
     IDEATION,              // Lên ý tưởng và xác định đề tài
     PLANNING,              // Lập kế hoạch và phân công công việc
     REQUIREMENT_ANALYSIS,  // Nghiên cứu và phân tích yêu cầu

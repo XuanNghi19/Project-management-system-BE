@@ -1,5 +1,12 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.enums.TeamStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.enums.TeamStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,9 +19,8 @@ import java.util.List;
 @Table(name = "team")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-@Getter
-@Setter
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +30,6 @@ public class Team {
 
     @OneToOne
     @JoinColumn(name = "topic_id")
-    @JsonIgnore
     private Topic topic;
 
     @ManyToOne (cascade = CascadeType.PERSIST)
@@ -34,17 +39,18 @@ public class Team {
     @Enumerated(EnumType.STRING)
     private ProjectStage status;
 
+    @Column(name = "team_name")
+    private String teamName;
+
     @ManyToOne
     @JoinColumn(name = "topic_semester_id")
     private TopicSemester topicSemester;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "major_id")
     private Major major;
 
     @OneToMany (mappedBy = "team", cascade = CascadeType.ALL)
-    @JsonIgnore
     List<TeamMember> listStudent;
 }
 

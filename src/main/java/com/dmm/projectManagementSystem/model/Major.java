@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class Major {
     private int reviewPercentage;
 
     @ManyToOne
-    @JoinColumn(name = "departmentID", nullable = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     static public Major fromCRUDMajor(CRUDMajor crudMajor) {

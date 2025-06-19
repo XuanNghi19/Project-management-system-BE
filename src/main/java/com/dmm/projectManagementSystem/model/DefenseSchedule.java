@@ -36,9 +36,8 @@ public class DefenseSchedule {
     private Council council;
 
     @ManyToOne
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "topic_Id")
     private Topic topic;
-
 
     static public DefenseSchedule fromCRUDDefenseSchedule(
             CRUDDefenseSchedule crudDefenseSchedule,

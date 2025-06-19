@@ -41,7 +41,7 @@ public class TopicResDTO {
     public static TopicResDTO loadFromTopicRes (Topic topic, Team team) {
 
         return TopicResDTO.builder()
-                .groupName(team.getGroupName())
+                .groupName(team.getTeamName())
                 .teacher(TeacherTeamResDTO.loadFromTeacherRes(team.getTeacher()))
                 .idNum(topic.getIdNum())
                 .name(topic.getName())

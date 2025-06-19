@@ -4,10 +4,8 @@ import com.dmm.projectManagementSystem.dto.user.UpdateUserRequest;
 import com.dmm.projectManagementSystem.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +20,14 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Builder
+@Getter
+@Setter
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "id_num", unique = true)
     private String idNum;
 
     private String name;
@@ -60,7 +60,6 @@ public class User implements UserDetails {
     private Department department;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "major_id")
     private Major major;
 
@@ -78,11 +77,10 @@ public class User implements UserDetails {
 
     static public User fromCreateUserRequest(
             CreateUserRequest request,
-            String passwordEncode,
+            Department department,
             Role role
     ) {
         return User.builder()
-                .password(passwordEncode)
                 .role(role)
                 .name(request.getName())
                 .age(request.getAge())
@@ -91,19 +89,16 @@ public class User implements UserDetails {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
-                .avatarUrl(request.getAvatarUrl())
                 .address(request.getAddress())
+                .department(department)
                 .active(true)
                 .build();
     }
 
     static public User fromUpdateUserRequest(
-            UpdateUserRequest request,
-            String passwordEncode
+            UpdateUserRequest request
     ) {
         return User.builder()
-                .password(passwordEncode)
-                .role(request.getRole())
                 .name(request.getName())
                 .age(request.getAge())
                 .dob(request.getDob())
@@ -111,7 +106,6 @@ public class User implements UserDetails {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex())
-                .avatarUrl(request.getAvatarUrl())
                 .address(request.getAddress())
                 .active(true)
                 .build();

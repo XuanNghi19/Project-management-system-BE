@@ -1,19 +1,30 @@
 package com.dmm.projectManagementSystem.model;
 
+import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDateTime;
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Data
-@Entity(name = "topic_semester")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "topic_semester")
+@Entity
 public class TopicSemester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String name;
 

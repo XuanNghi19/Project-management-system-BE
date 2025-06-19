@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controllers.student;
+package com.dmm.projectManagementSystem.controller.student;
 
 import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.project.CouncilResDTO;

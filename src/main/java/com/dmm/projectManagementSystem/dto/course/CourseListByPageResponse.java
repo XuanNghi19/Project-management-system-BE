@@ -1,7 +1,5 @@
 package com.dmm.projectManagementSystem.dto.course;
 
-import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
-import com.dmm.projectManagementSystem.dto.department.DepartmentListByPageResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

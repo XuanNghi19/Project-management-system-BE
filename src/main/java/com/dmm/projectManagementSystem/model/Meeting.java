@@ -31,8 +31,7 @@ public class Meeting {
     private String location;
     private String note;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
 }

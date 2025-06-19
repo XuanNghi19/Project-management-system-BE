@@ -1,7 +1,7 @@
 package com.dmm.projectManagementSystem.utils;
 
-import com.dmm.projectManagementSystem.controllers.student.ProjectController;
-import com.dmm.projectManagementSystem.controllers.student.TeamController;
+import com.dmm.projectManagementSystem.controller.student.ProjectController;
+import com.dmm.projectManagementSystem.controller.student.TeamController;
 import com.dmm.projectManagementSystem.dto.RestResponse;
 import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +14,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@RestControllerAdvice
+//@RestControllerAdvice
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
     @Autowired
     private HttpServletResponse httpServletResponse;

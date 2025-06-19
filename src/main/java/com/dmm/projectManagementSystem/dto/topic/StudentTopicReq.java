@@ -6,8 +6,7 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 public class StudentTopicReq {
     private String idNum;
