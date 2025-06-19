@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controller.student;
+package com.dmm.projectManagementSystem.controllers.student;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,21 +1,17 @@
-package com.dmm.projectManagementSystem.controller;
+package com.dmm.projectManagementSystem.controllers;
 
 import com.dmm.projectManagementSystem.config.security.JwtUtils;
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.IntrospectResponse;
 import com.dmm.projectManagementSystem.dto.user.AuthenticationRequest;
 import com.dmm.projectManagementSystem.dto.user.AuthenticationResponse;
-import com.dmm.projectManagementSystem.model.User;
 import com.dmm.projectManagementSystem.service.serviceUtils.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jwt.SignedJWT;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;

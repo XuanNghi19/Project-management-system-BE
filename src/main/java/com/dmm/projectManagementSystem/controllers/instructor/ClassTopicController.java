@@ -1,8 +1,7 @@
-package com.dmm.projectManagementSystem.controller.instructor;
+package com.dmm.projectManagementSystem.controllers.instructor;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.classTopic.ClassTopicDTO;
-import com.dmm.projectManagementSystem.model.ClassTopic;
 import com.dmm.projectManagementSystem.service.instructor.classTopicManagement.ClassTopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

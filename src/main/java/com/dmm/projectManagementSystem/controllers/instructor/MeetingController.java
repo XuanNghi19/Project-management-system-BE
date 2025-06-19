@@ -1,8 +1,7 @@
-package com.dmm.projectManagementSystem.controller.instructor;
+package com.dmm.projectManagementSystem.controllers.instructor;
 
 import com.dmm.projectManagementSystem.dto.meeting.CreateMeetingDTO;
 import com.dmm.projectManagementSystem.model.Meeting;
-import com.dmm.projectManagementSystem.repo.MeetingRepo;
 import com.dmm.projectManagementSystem.service.instructor.meetingManagement.MeetingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

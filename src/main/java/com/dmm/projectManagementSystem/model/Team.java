@@ -32,7 +32,7 @@ public class Team {
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    @ManyToOne (cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
@@ -50,7 +50,9 @@ public class Team {
     @JoinColumn(name = "major_id")
     private Major major;
 
-    @OneToMany (mappedBy = "team", cascade = CascadeType.ALL)
+    @Column(name = "is_single_person")
+    private Boolean isSinglePerson = false;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     List<TeamMember> listStudent;
 }
-

@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controller.admin;
+package com.dmm.projectManagementSystem.controllers.admin;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;

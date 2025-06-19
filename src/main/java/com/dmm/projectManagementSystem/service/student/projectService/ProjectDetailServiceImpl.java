@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ProjectDetailServiceImpl implements ProjectDetailService{
+public class ProjectDetailServiceImpl implements ProjectDetailService {
   private final TopicRepo topicRepo;
   private final DefenseScheduleRepo defenseScheduleRepo;
   private final MeetingRepo meetingRepo;
@@ -30,11 +30,11 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ApiResponseStudent<DefenseScheduleResDTO> handleGetDefenseSchedule (Long topicId) {
+  public ApiResponseStudent<DefenseScheduleResDTO> handleGetDefenseSchedule(Long topicId) {
     Optional<DefenseSchedule> defenseScheduleDB = this.defenseScheduleRepo.findByTopicId(topicId);
     defenseScheduleDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy topic trong DB !"));
     DefenseScheduleResDTO defenseScheduleResDTO = new DefenseScheduleResDTO();
-    ApiResponseStudent<DefenseScheduleResDTO> apiResponseGetDefence  = new ApiResponseStudent<>();
+    ApiResponseStudent<DefenseScheduleResDTO> apiResponseGetDefence = new ApiResponseStudent<>();
     apiResponseGetDefence.setData(defenseScheduleResDTO.convertToDefenseScheduleDTO(defenseScheduleDB.get()));
     apiResponseGetDefence.setMessage("Lấy lịch bảo về đồ án thành công !");
     return apiResponseGetDefence;
@@ -42,30 +42,31 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ApiResponseStudent<CouncilResDTO> handleGetCouncil (Long topicId) {
+  public ApiResponseStudent<CouncilResDTO> handleGetCouncil(Long topicId) {
     Optional<DefenseSchedule> defenseScheduleDB = this.defenseScheduleRepo.findByTopicId(topicId);
     defenseScheduleDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy topic trong DB !"));
     Long councilId = defenseScheduleDB.get().getCouncil().getId();
     Optional<Council> councilDB = this.councilRepo.findById(councilId);
-    councilDB.orElseThrow(() ->new NoSuchElementException("Không tìm thấy hội đồng trong csdl"));
+    councilDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy hội đồng trong csdl"));
     Council council = councilDB.get();
-    ApiResponseStudent<CouncilResDTO> apiResponseGetCouncil  = new ApiResponseStudent<>();
+    ApiResponseStudent<CouncilResDTO> apiResponseGetCouncil = new ApiResponseStudent<>();
     apiResponseGetCouncil.setData(CouncilResDTO.builder()
-            .name(council.getName())
-            .fileUrl(council.getFileUrl())
-            .location(council.getLocation())
-            .startTime(council.getStartTime())
-            .topicSemester(council.getTopicSemester())
-            .departmentName(council.getDepartment().getName())
-            .endTime(council.getEndTime())
-            .build());
+        .name(council.getName())
+        .fileUrl(council.getFileUrl())
+        .location(council.getLocation())
+        .startTime(council.getStartTime())
+        .topicSemester(council.getTopicSemester())
+        .departmentName(council.getDepartment().getName())
+        .endTime(council.getEndTime())
+        .build());
     apiResponseGetCouncil.setMessage("Lấy hội đồng tham gia đánh giá đồ án thành công");
     return apiResponseGetCouncil;
   }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ApiResponseStudent<List<Meeting>> handleGetMeeting (Long topicId, int page, int size, String sort) {
+  public ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.meeting.MeetingResponse>> handleGetMeeting(
+      Long topicId, int page, int size, String sort) {
 
     Optional<Topic> topicDB = this.topicRepo.findById(topicId);
     topicDB.orElseThrow(() -> new NoSuchElementException("Không tìm thấy topic trong DB !"));
@@ -80,16 +81,21 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
     metadata.setTotalPage(pageList.getTotalPages());
     metadata.setTotalElement(pageList.getTotalElements());
 
-    ApiResponseStudent<List<Meeting>> apiResponseGetMeeting  = new ApiResponseStudent<>();
+    // Convert Meeting entity list to MeetingResponse DTO list
+    List<com.dmm.projectManagementSystem.dto.meeting.MeetingResponse> meetingDTOs = pageList.getContent().stream()
+        .map(com.dmm.projectManagementSystem.dto.meeting.MeetingResponse::fromMeeting)
+        .toList();
+
+    ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.meeting.MeetingResponse>> apiResponseGetMeeting = new ApiResponseStudent<>();
     apiResponseGetMeeting.setMetadata(metadata);
     apiResponseGetMeeting.setMessage("Lấy lịch họp thành công");
-    apiResponseGetMeeting.setData(pageList.getContent());
+    apiResponseGetMeeting.setData(meetingDTOs);
     return apiResponseGetMeeting;
   }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ApiResponseStudent<List<Evaluation>> handleGetEvaluation (Long topicId) {
+  public ApiResponseStudent<List<Evaluation>> handleGetEvaluation(Long topicId) {
     List<Evaluation> evaluationDB = this.evaluationRepo.findByTopicId(topicId);
     ApiResponseStudent<List<Evaluation>> apiResponseGetEvaluation = new ApiResponseStudent<>();
     apiResponseGetEvaluation.setData(evaluationDB);
@@ -99,9 +105,10 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ApiResponseStudent<List<Task>> handleGetTask (Long topicId, int page, int size, String sort) {
+  public ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.task.TaskResponse>> handleGetTask(Long topicId,
+      int page, int size, String sort) {
     Topic topicDB = this.topicRepo.findById(topicId)
-    .orElseThrow(() -> new NoSuchElementException("Không tìm thấy chủ đề trong DB !"));
+        .orElseThrow(() -> new NoSuchElementException("Không tìm thấy chủ đề trong DB !"));
 
     Sort.Direction direction = sort.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
@@ -113,10 +120,15 @@ public class ProjectDetailServiceImpl implements ProjectDetailService{
     metadata.setTotalPage(pageList.getTotalPages());
     metadata.setTotalElement(pageList.getTotalElements());
 
-    ApiResponseStudent<List<Task>> apiResponseGetTask  = new ApiResponseStudent<>();
+    // Convert Task entity list to TaskResponse DTO list
+    List<com.dmm.projectManagementSystem.dto.task.TaskResponse> taskDTOs = pageList.getContent().stream()
+        .map(com.dmm.projectManagementSystem.dto.task.TaskResponse::fromTask)
+        .toList();
+
+    ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.task.TaskResponse>> apiResponseGetTask = new ApiResponseStudent<>();
     apiResponseGetTask.setMetadata(metadata);
     apiResponseGetTask.setMessage("Lấy nhiệm vụ được giao thành công");
-    apiResponseGetTask.setData(pageList.getContent());
+    apiResponseGetTask.setData(taskDTOs);
     return apiResponseGetTask;
   }
 

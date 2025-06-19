@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.dmm.projectManagementSystem.enums.TeamStatus;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class TeamInfoDTO {
     private Long teamId;
     private String teamName;
     private List<MemberDTO> members;
+    private TeamStatus status;
 }

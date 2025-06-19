@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controller.instructor;
+package com.dmm.projectManagementSystem.controllers.instructor;
 
 import org.springframework.web.bind.annotation.RestController;
 

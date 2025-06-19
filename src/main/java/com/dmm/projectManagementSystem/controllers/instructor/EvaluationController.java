@@ -1,4 +1,4 @@
-package com.dmm.projectManagementSystem.controller.instructor;
+package com.dmm.projectManagementSystem.controllers.instructor;
 
 import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.evaluation.CreateEvaluationDTO;

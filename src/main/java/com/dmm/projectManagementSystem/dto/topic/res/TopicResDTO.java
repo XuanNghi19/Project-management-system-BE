@@ -36,12 +36,13 @@ public class TopicResDTO {
 
     private TeacherTeamResDTO teacher;
 
-//    List<TeamMember> listStudent;
+    // Individual student info
+    private Long studentId;
+    private String studentName;
 
-    public static TopicResDTO loadFromTopicRes (Topic topic, Team team) {
-
+    public static TopicResDTO loadFromTopicRes(Topic topic, Team team) {
         return TopicResDTO.builder()
-                .groupName(team.getTeamName())
+                .groupName(team.getGroupName())
                 .teacher(TeacherTeamResDTO.loadFromTeacherRes(team.getTeacher()))
                 .idNum(topic.getIdNum())
                 .name(topic.getName())
@@ -54,6 +55,24 @@ public class TopicResDTO {
                 .meeting(topic.getMeeting())
                 .evaluation(topic.getEvaluation())
                 .grade(topic.getGrade())
+                .build();
+    }
+
+    public static TopicResDTO loadFromIndividualTopicRes(Topic topic, User student) {
+        return TopicResDTO.builder()
+                .idNum(topic.getIdNum())
+                .name(topic.getName())
+                .projectStage(topic.getProjectStage())
+                .startTime(topic.getStartTime())
+                .endTime(topic.getEndTime())
+                .startSubmissionDate(topic.getStartSubmissionDate())
+                .endSubmissionDate(topic.getEndSubmissionDate())
+                .topicSemester(topic.getTopicSemester())
+                .meeting(topic.getMeeting())
+                .evaluation(topic.getEvaluation())
+                .grade(topic.getGrade())
+                .studentId(student.getId())
+                .studentName(student.getName())
                 .build();
     }
 }

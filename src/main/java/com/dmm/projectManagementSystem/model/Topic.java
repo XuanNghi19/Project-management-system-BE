@@ -2,6 +2,7 @@ package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.dto.topic.StudentTopicReq;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.dmm.projectManagementSystem.enums.TopicType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,8 +55,19 @@ public class Topic {
     @JoinColumn(name = "major_id")
     private Major major;
 
+    @Column(name = "topic_type")
+    @Enumerated(EnumType.STRING)
+    private TopicType topicType;
 
-    public Topic loadFromStudentTopicReq (StudentTopicReq studentTopicReq){
+    @OneToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ManyToOne
+    @JoinColumn(name = "individual_student_id")
+    private User individualStudent;
+
+    public Topic loadFromStudentTopicReq(StudentTopicReq studentTopicReq) {
         return Topic.builder()
                 .idNum(studentTopicReq.getIdNum())
                 .name(studentTopicReq.getName())
@@ -68,4 +80,3 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
     private List<Evaluation> evaluation;
 }
-

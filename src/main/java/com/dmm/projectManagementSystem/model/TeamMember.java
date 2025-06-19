@@ -1,6 +1,7 @@
 package com.dmm.projectManagementSystem.model;
 
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
+import com.dmm.projectManagementSystem.enums.TeamStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,4 +26,7 @@ public class TeamMember {
 
     @Enumerated(EnumType.STRING)
     private MembershipPosition position;
+
+    @Enumerated(EnumType.STRING)
+    private TeamStatus status;
 }

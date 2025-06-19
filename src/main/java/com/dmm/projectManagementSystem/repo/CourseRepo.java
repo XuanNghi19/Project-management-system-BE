@@ -18,10 +18,10 @@ public interface CourseRepo extends JpaRepository<Course, Long> {
                 select * from course where
                 (:name is null or lower(name) like lower(concat( '%', :name, '%')))
                 and (
-                    (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is null)
-                    or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is not null and start_time >= CAST(:start AS TIMESTAMP) and end_time <= CAST(:end AS TIMESTAMP))
-                    or (CAST(:start AS TIMESTAMP) is not null and CAST(:end AS TIMESTAMP) is null and start_time >= CAST(:start AS TIMESTAMP))
-                    or (CAST(:start AS TIMESTAMP) is null and CAST(:end AS TIMESTAMP) is not null and end_time <= CAST(:end AS TIMESTAMP))
+                    (:start is null and :end is null)
+                    or (:start is not null and :end is not null and start_time >= :start and end_time <= :end)
+                    or (:start is not null and :end is null and start_time >= :start)
+                    or (:start is null and :end is not null and end_time <= :end)
                 )
                 order by id desc
             """, nativeQuery = true)
@@ -29,8 +29,7 @@ public interface CourseRepo extends JpaRepository<Course, Long> {
             @Param("name") String name,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     @Query(value = """
                 select * from course where (:name is null or lower(name) like lower(concat( '%', :name, '%')))

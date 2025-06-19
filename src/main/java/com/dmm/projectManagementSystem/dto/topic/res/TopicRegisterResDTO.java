@@ -1,40 +1,70 @@
 package com.dmm.projectManagementSystem.dto.topic.res;
 
-
-import com.dmm.projectManagementSystem.model.FilesUrl;
-import com.dmm.projectManagementSystem.model.Team;
-import com.dmm.projectManagementSystem.model.Topic;
-import com.dmm.projectManagementSystem.model.TopicSemester;
+import com.dmm.projectManagementSystem.dto.group.res.TeacherTeamResDTO;
+import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.dmm.projectManagementSystem.model.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class TopicRegisterResDTO {
-    String name;
-    FilesUrl filesUrl;
-    TopicSemester topicSemester;
-    Team team;
+    private String name;
+    private ProjectStage projectStage;
+
+    // Simplified FilesUrl info
+    private Long filesUrlId;
+    private String uri;
+
+    // Simplified TopicSemester info
+    private Long topicSemesterId;
+    private String topicSemesterName;
+
+    // Simplified Team info (for team topics)
+    private Long teamId;
+    private String groupName;
+    private TeacherTeamResDTO teacher;
+
+    // Individual student info (for individual topics)
+    private Long studentId;
+    private String studentName;
 
     public static TopicRegisterResDTO fromTopicRes(Topic topic, FilesUrl filesUrl, Team team) {
-        return TopicRegisterResDTO
-                .builder()
+        return TopicRegisterResDTO.builder()
                 .name(topic.getName())
-                .filesUrl(filesUrl)
-                .team(team)
-                .topicSemester(topic.getTopicSemester())
+                .projectStage(topic.getProjectStage())
+                .filesUrlId(filesUrl.getId())
+                .uri(filesUrl.getUri())
+                .topicSemesterId(topic.getTopicSemester().getId())
+                .topicSemesterName(topic.getTopicSemester().getName())
+                .teamId(team.getId())
+                .groupName(team.getGroupName())
+                .teacher(team.getTeacher() != null ? TeacherTeamResDTO.loadFromTeacherRes(team.getTeacher()) : null)
+                .build();
+    }
+
+    public static TopicRegisterResDTO fromIndividualTopicRes(Topic topic, FilesUrl filesUrl, User student) {
+        return TopicRegisterResDTO.builder()
+                .name(topic.getName())
+                .projectStage(topic.getProjectStage())
+                .filesUrlId(filesUrl.getId())
+                .uri(filesUrl.getUri())
+                .topicSemesterId(topic.getTopicSemester().getId())
+                .topicSemesterName(topic.getTopicSemester().getName())
+                .studentId(student.getId())
+                .studentName(student.getName())
                 .build();
     }
 
     public static TopicRegisterResDTO fromTopicResWithoutTeam(Topic topic, FilesUrl filesUrl) {
-        return TopicRegisterResDTO
-                .builder()
+        return TopicRegisterResDTO.builder()
                 .name(topic.getName())
-                .filesUrl(filesUrl)
-                .topicSemester(topic.getTopicSemester())
+                .projectStage(topic.getProjectStage())
+                .filesUrlId(filesUrl.getId())
+                .uri(filesUrl.getUri())
+                .topicSemesterId(topic.getTopicSemester().getId())
+                .topicSemesterName(topic.getTopicSemester().getName())
                 .build();
     }
 }

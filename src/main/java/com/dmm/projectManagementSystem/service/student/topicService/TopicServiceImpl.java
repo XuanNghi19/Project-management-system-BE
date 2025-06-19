@@ -6,6 +6,7 @@ import com.dmm.projectManagementSystem.dto.topic.res.TopicRegisterResDTO;
 import com.dmm.projectManagementSystem.dto.topic.res.TopicResDTO;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
+import com.dmm.projectManagementSystem.enums.TopicType;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -32,13 +34,31 @@ public class TopicServiceImpl implements TopicService {
     private final ClassTopicRepo classTopicRepo;
     @Autowired
     private final UserRepo userRepo;
+    @Autowired
+    private final AnnouncementRepo announcementRepo;
+    @Autowired
+    private final StudentTopicRepo studentTopicRepo;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, String topicName, String uri) {
+        // Kiểm tra xem sinh viên đã đăng ký đề tài chưa
+        if (hasRegisteredTopic(leaderId)) {
+            ApiResponseStudent<TopicRegisterResDTO> response = new ApiResponseStudent<>();
+            response.setMessage("Bạn đã đăng ký đề tài rồi!");
+            return response;
+        }
+
         // Lấy Team từ leaderId
-        Team team = teamMemberRepo.findFirstByStudentId(leaderId)
-                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm của bạn!"))
-                .getTeam();
+        Optional<TeamMember> teamMemberOpt = teamMemberRepo.findFirstByStudentId(leaderId);
+        if (teamMemberOpt.isEmpty()) {
+            ApiResponseStudent<TopicRegisterResDTO> response = new ApiResponseStudent<>();
+            response.setMessage(
+                    "Bạn không thuộc nhóm nào! Vui lòng sử dụng API đăng ký đề tài cá nhân: POST /topic/register_individual_topic");
+            return response;
+        }
+
+        Team team = teamMemberOpt.get().getTeam();
 
         // Kiểm tra người này có thực sự thuộc nhóm và là trưởng nhóm không
         Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, team.getId());
@@ -52,11 +72,35 @@ public class TopicServiceImpl implements TopicService {
             return apiResponseStudent;
         }
 
-        // Tạo đề tài mới
+        // Kiểm tra số lượng thành viên trong nhóm
+        List<TeamMember> teamMembers = teamMemberRepo.findByTeamId(team.getId());
+        if (teamMembers.size() == 1) {
+            // Nếu nhóm chỉ có 1 người, chuyển thành đề tài cá nhân và xóa nhóm
+            ApiResponseStudent<TopicRegisterResDTO> individualResponse = handleRegisterIndividualTopic(leaderId,
+                    topicName, uri);
+
+            // Xóa nhóm 1 người sau khi đã tạo đề tài cá nhân thành công
+            if (individualResponse.getData() != null) {
+                // Xóa team member trước
+                teamMemberRepo.deleteByTeamId(team.getId());
+                // Xóa team
+                teamRepo.deleteById(team.getId());
+
+                // Cập nhật thông báo
+                individualResponse.setMessage("Nhóm 1 người đã được chuyển thành đề tài cá nhân thành công!");
+            }
+
+            return individualResponse;
+        }
+
+        // Tạo đề tài mới cho nhóm
         Topic topicRegister = new Topic();
         topicRegister.setName(topicName);
         topicRegister.setProjectStage(ProjectStage.IDEATION);
         topicRegister.setTopicSemester(team.getTopicSemester());
+        topicRegister.setTopicType(TopicType.TEAM);
+        topicRegister.setTeam(team);
+        topicRepo.save(topicRegister);
 
         // Tạo file đính kèm (nếu có)
         FilesUrl filesUrl = new FilesUrl();
@@ -69,50 +113,147 @@ public class TopicServiceImpl implements TopicService {
         team.setTopic(topicRegister);
         teamRepo.save(team);
 
+        // Thêm thông báo
+        Announcement announcement = Announcement.builder()
+                .title("Đề tài đã được đăng ký")
+                .content("Nhóm '" + team.getGroupName() + "' đã đăng ký đề tài: '" + topicName + "'.")
+                .datePosted(java.time.LocalDateTime.now().toString())
+                .projectStage(topicRegister.getProjectStage())
+                .team(team)
+                .build();
+        announcementRepo.save(announcement);
+
         // Trả về kết quả
         TopicRegisterResDTO topicRegisterResDTO = TopicRegisterResDTO.fromTopicRes(topicRegister, filesUrl, team);
-        topicRepo.save(topicRegister);
         apiResponseStudent.setData(topicRegisterResDTO);
         return apiResponseStudent;
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long leaderId, Long topicId, String topicNameChange, String uri) {
-        Team teamStudent = teamRepo.findByTopicId(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm sinh viên đăng ký"));
-        Long studentId = teamStudent.getId();
-        Optional<TeamMember> leaderTeam = teamMemberRepo.findByStudentIdAndTeamId(leaderId, studentId);
-        leaderTeam.orElseThrow(() -> new NoSuchElementException("Lỗi không đăng ký được  !"));
-        ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
-        MembershipPosition positionInTeam = leaderTeam.get().getPosition();
-        if (positionInTeam != MembershipPosition.LEADER){
-            apiResponseStudent.setMessage("Không phải là trưởng nhóm nên không đăng ký được đề tài !");
-            return apiResponseStudent;
+    public ApiResponseStudent<TopicRegisterResDTO> handleRegisterIndividualTopic(Long studentId, String topicName,
+            String uri) {
+        // Kiểm tra xem sinh viên đã đăng ký đề tài chưa
+        if (hasRegisteredTopic(studentId)) {
+            ApiResponseStudent<TopicRegisterResDTO> response = new ApiResponseStudent<>();
+            response.setMessage("Bạn đã đăng ký đề tài rồi!");
+            return response;
         }
-        Topic topic = topicRepo.findById(topicId)
-                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy đề tài trong CSDL !"));
 
-        if (topicNameChange != null && !topicNameChange.isBlank() && !topicNameChange.equals(topic.getName())) {
-            topic.setName(topicNameChange);
-            topicRepo.save(topic);
-        }
-        FilesUrl updateFilesUrl = filesUrlRepo.findByTopicId(topic.getId()).orElseThrow(() -> new NoSuchElementException("Không tìm thấy file trong giai đoạn này của chủ đề !"));
-        if (uri != null && !uri.isBlank() && !uri.equals(updateFilesUrl.getUri())) {
-            updateFilesUrl.setUri(uri);
-            filesUrlRepo.save(updateFilesUrl);
-        }
-        TopicRegisterResDTO topicUpdated = TopicRegisterResDTO.fromTopicResWithoutTeam(topic, updateFilesUrl);
-        apiResponseStudent.setData(topicUpdated);
-        apiResponseStudent.setMessage("Cập nhật đề tài thành công !");
+        // Lấy thông tin sinh viên
+        User student = userRepo.findById(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên!"));
+
+        // Lấy thông tin lớp học của sinh viên
+        StudentTopic studentTopic = studentTopicRepo.findByStudentId(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa được phân vào lớp!"));
+
+        // Tạo đề tài cá nhân
+        Topic topicRegister = new Topic();
+        topicRegister.setName(topicName);
+        topicRegister.setProjectStage(ProjectStage.IDEATION);
+        topicRegister.setTopicSemester(studentTopic.getClassTopic().getTopicSemester());
+        topicRegister.setTopicType(TopicType.INDIVIDUAL);
+        topicRegister.setIndividualStudent(student);
+        topicRepo.save(topicRegister);
+
+        // Tạo file đính kèm (nếu có)
+        FilesUrl filesUrl = new FilesUrl();
+        filesUrl.setTopic(topicRegister);
+        filesUrl.setProjectStage(ProjectStage.IDEATION);
+        filesUrl.setUri(uri);
+        filesUrlRepo.save(filesUrl);
+
+        // Cập nhật trạng thái sinh viên
+        studentTopic.setStatus(true);
+        studentTopicRepo.save(studentTopic);
+
+        // Thêm thông báo
+        Announcement announcement = Announcement.builder()
+                .title("Đề tài cá nhân đã được đăng ký")
+                .content("Sinh viên '" + student.getName() + "' đã đăng ký đề tài cá nhân: '" + topicName + "'.")
+                .datePosted(java.time.LocalDateTime.now().toString())
+                .projectStage(topicRegister.getProjectStage())
+                .build();
+        announcementRepo.save(announcement);
+
+        // Trả về kết quả
+        TopicRegisterResDTO topicRegisterResDTO = TopicRegisterResDTO.fromIndividualTopicRes(topicRegister, filesUrl,
+                student);
+        ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
+        apiResponseStudent.setData(topicRegisterResDTO);
+        apiResponseStudent.setMessage("Đăng ký đề tài cá nhân thành công!");
         return apiResponseStudent;
     }
 
-    // có cần phải thêm người nộp cho phần này
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<ReportResDTO> handleAddFilesUrl (Long topicId, String uri) {
-        Topic topicDB = topicRepo.findById(topicId).orElseThrow(() -> new NoSuchElementException("Không tìm được đề tài nhóm đăng ký !"));
+    public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long studentId, String topicNameChange,
+            String uri) {
+        // Tìm đề tài của sinh viên (có thể là nhóm hoặc cá nhân)
+        Topic topic = findTopicByStudentId(studentId);
+        if (topic == null) {
+            throw new NoSuchElementException("Bạn chưa đăng ký đề tài nào!");
+        }
+
+        boolean isTopicNameUpdated = false;
+        boolean isUriUpdated = false;
+
+        // Cập nhật tên đề tài nếu có thay đổi
+        if (topicNameChange != null && !topicNameChange.isBlank() && !topicNameChange.equals(topic.getName())) {
+            topic.setName(topicNameChange);
+            isTopicNameUpdated = true;
+        }
+
+        // Cập nhật file url nếu có thay đổi
+        FilesUrl updateFilesUrl = filesUrlRepo.findByTopicId(topic.getId())
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy file trong giai đoạn này của chủ đề!"));
+        if (uri != null && !uri.isBlank() && !uri.equals(updateFilesUrl.getUri())) {
+            updateFilesUrl.setUri(uri);
+            isUriUpdated = true;
+        }
+
+        if (isTopicNameUpdated || isUriUpdated) {
+            topicRepo.save(topic);
+            filesUrlRepo.save(updateFilesUrl);
+
+            // Create announcement
+            StringBuilder announcementContent = new StringBuilder();
+            if (topic.getTopicType() == TopicType.TEAM) {
+                announcementContent.append("Trưởng nhóm đã cập nhật thông tin đề tài: ");
+            } else {
+                announcementContent.append("Sinh viên đã cập nhật thông tin đề tài: ");
+            }
+
+            if (isTopicNameUpdated) {
+                announcementContent.append("Tên đề tài được thay đổi thành '").append(topic.getName()).append("'. ");
+            }
+            if (isUriUpdated) {
+                announcementContent.append("File đính kèm đã được cập nhật. ");
+            }
+
+            Announcement announcement = Announcement.builder()
+                    .title("Cập nhật thông tin đề tài")
+                    .content(announcementContent.toString())
+                    .datePosted(java.time.LocalDateTime.now().toString())
+                    .projectStage(topic.getProjectStage())
+                    .team(topic.getTeam())
+                    .build();
+            announcementRepo.save(announcement);
+        }
+
+        TopicRegisterResDTO topicUpdated = TopicRegisterResDTO.fromTopicResWithoutTeam(topic, updateFilesUrl);
+        ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
+        apiResponseStudent.setData(topicUpdated);
+        apiResponseStudent.setMessage("Cập nhật đề tài thành công!");
+        return apiResponseStudent;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ApiResponseStudent<ReportResDTO> handleAddFilesUrl(Long topicId, String uri) {
+        Topic topicDB = topicRepo.findById(topicId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm được đề tài nhóm đăng ký !"));
         FilesUrl filesUrl = FilesUrl.builder()
                 .projectStage(topicDB.getProjectStage())
                 .topic(topicDB)
@@ -128,28 +269,133 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicResDTO> handleGetTopic(Long studentId) {
-        // Tìm TeamMember dựa vào studentId
-        TeamMember teamMember = teamMemberRepo.findFirstByStudentId(studentId)
-                .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa tham gia nhóm nào!"));
-
-        // Lấy nhóm mà sinh viên thuộc về
-        Team teamStudent = teamMember.getTeam();
-
-        // Kiểm tra xem nhóm có đăng ký đề tài hay chưa
-        Topic topicFound = teamStudent.getTopic();
-        if (topicFound == null) {
-            throw new NoSuchElementException("Nhóm của sinh viên chưa đăng ký đề tài nào!");
+        Topic topic = findTopicByStudentId(studentId);
+        if (topic == null) {
+            throw new NoSuchElementException("Bạn chưa đăng ký đề tài nào!");
         }
 
         // Tạo response
         ApiResponseStudent<TopicResDTO> apiResponse = new ApiResponseStudent<>();
-        TopicResDTO topicResDTO = TopicResDTO.loadFromTopicRes(topicFound, teamStudent);
+        TopicResDTO topicResDTO;
+
+        if (topic.getTopicType() == TopicType.TEAM) {
+            topicResDTO = TopicResDTO.loadFromTopicRes(topic, topic.getTeam());
+        } else {
+            topicResDTO = TopicResDTO.loadFromIndividualTopicRes(topic, topic.getIndividualStudent());
+        }
+
         apiResponse.setData(topicResDTO);
-        apiResponse.setMessage("Lấy thông tin đề tài đăng ký thành công !");
+        apiResponse.setMessage("Lấy thông tin đề tài đăng ký thành công!");
         return apiResponse;
     }
 
+    @Override
+    public boolean hasRegisteredTopic(Long studentId) {
+        // Kiểm tra xem sinh viên đã đăng ký đề tài chưa (cả nhóm và cá nhân)
+        Optional<TeamMember> teamMember = teamMemberRepo.findFirstByStudentId(studentId);
+        if (teamMember.isPresent() && teamMember.get().getTeam().getTopic() != null) {
+            return true; // Đã đăng ký đề tài nhóm
+        }
 
+        // Kiểm tra đề tài cá nhân
+        Optional<Topic> individualTopic = topicRepo.findByIndividualStudentId(studentId);
+        return individualTopic.isPresent();
+    }
+
+    private Topic findTopicByStudentId(Long studentId) {
+        // Tìm đề tài nhóm trước
+        Optional<TeamMember> teamMember = teamMemberRepo.findFirstByStudentId(studentId);
+        if (teamMember.isPresent() && teamMember.get().getTeam().getTopic() != null) {
+            return teamMember.get().getTeam().getTopic();
+        }
+
+        // Tìm đề tài cá nhân
+        return topicRepo.findByIndividualStudentId(studentId).orElse(null);
+    }
+
+    @Override
+    public ApiResponseStudent<String> checkAndHandleSinglePersonTeam(Long leaderId) {
+        ApiResponseStudent<String> response = new ApiResponseStudent<>();
+
+        try {
+            // Tìm team từ leaderId
+            TeamMember leaderTeamMember = teamMemberRepo.findFirstByStudentId(leaderId)
+                    .orElseThrow(() -> new NoSuchElementException("Không tìm thấy nhóm của bạn!"));
+
+            Team team = leaderTeamMember.getTeam();
+
+            // Kiểm tra xem người này có phải là trưởng nhóm không
+            if (leaderTeamMember.getPosition() != MembershipPosition.LEADER) {
+                response.setMessage("Bạn không phải là trưởng nhóm!");
+                return response;
+            }
+
+            // Kiểm tra số lượng thành viên
+            List<TeamMember> teamMembers = teamMemberRepo.findByTeamId(team.getId());
+
+            if (teamMembers.size() == 1) {
+                // Đánh dấu nhóm là nhóm 1 người
+                team.setIsSinglePerson(true);
+                teamRepo.save(team);
+
+                response.setMessage(
+                        "Nhóm của bạn chỉ có 1 người. Khi đăng ký đề tài, nhóm sẽ được chuyển thành đề tài cá nhân.");
+                response.setData("SINGLE_PERSON_TEAM");
+            } else {
+                response.setMessage("Nhóm của bạn có " + teamMembers.size()
+                        + " thành viên. Có thể đăng ký đề tài nhóm bình thường.");
+                response.setData("MULTI_PERSON_TEAM");
+            }
+
+        } catch (Exception e) {
+            response.setMessage("Có lỗi xảy ra: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    @Override
+    public ApiResponseStudent<String> checkStudentStatus(Long studentId) {
+        ApiResponseStudent<String> response = new ApiResponseStudent<>();
+
+        try {
+            // Kiểm tra xem sinh viên đã đăng ký đề tài chưa
+            if (hasRegisteredTopic(studentId)) {
+                response.setMessage("Bạn đã đăng ký đề tài rồi!");
+                response.setData("ALREADY_REGISTERED");
+                return response;
+            }
+
+            // Kiểm tra xem sinh viên có thuộc nhóm nào không
+            Optional<TeamMember> teamMember = teamMemberRepo.findFirstByStudentId(studentId);
+
+            if (teamMember.isEmpty()) {
+                response.setMessage(
+                        "Bạn không thuộc nhóm nào. Vui lòng sử dụng API đăng ký đề tài cá nhân: POST /topic/register_individual_topic");
+                response.setData("INDIVIDUAL_TOPIC");
+                return response;
+            }
+
+            Team team = teamMember.get().getTeam();
+            List<TeamMember> teamMembers = teamMemberRepo.findByTeamId(team.getId());
+
+            if (teamMembers.size() == 1) {
+                response.setMessage(
+                        "Nhóm của bạn chỉ có 1 người. Khi đăng ký đề tài, nhóm sẽ được chuyển thành đề tài cá nhân. Vui lòng sử dụng API: POST /topic/register_topic");
+                response.setData("SINGLE_PERSON_TEAM");
+            } else {
+                response.setMessage("Bạn thuộc nhóm '" + team.getGroupName() + "' với " + teamMembers.size()
+                        + " thành viên. Vui lòng sử dụng API đăng ký đề tài nhóm: POST /topic/register_topic");
+                response.setData("MULTI_PERSON_TEAM");
+            }
+
+        } catch (Exception e) {
+            response.setMessage("Có lỗi xảy ra: " + e.getMessage());
+            response.setData("ERROR");
+        }
+
+        return response;
+    }
 
     public boolean canRegisterTopic(LocalDateTime startTime, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();
