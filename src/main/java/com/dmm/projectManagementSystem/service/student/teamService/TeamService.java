@@ -9,6 +9,7 @@ import com.dmm.projectManagementSystem.dto.team.TeamInfoDTO;
 import com.dmm.projectManagementSystem.dto.team.InvitationDTO;
 import com.dmm.projectManagementSystem.dto.announcement.AnnouncementResponse;
 import com.dmm.projectManagementSystem.dto.announcement.AnnouncementStudentResDTO;
+import com.dmm.projectManagementSystem.dto.studentTopic.StudentTopicFullUserDTO;
 
 import java.util.List;
 
@@ -18,18 +19,21 @@ public interface TeamService {
     // public boolean handleRemoveStudentFromGroup();
     ApiResponseStudent<TeamInfoDTO> getTeamInfo(Long studentId);
 
-    ApiResponseStudent<Void> handleDeleteGroup(Long leaderId, Long teamId);
+    ApiResponseStudent<Void> handleDeleteGroup(Long leaderId);
 
     ApiResponseStudent<List<UserTeamResDTO>> inviteMember(Long leaderId, Long memberId);
 
-    ApiResponseStudent<AcceptInvitationResDTO> handleAcceptJoinTeam(Long leaderId, Long idUser, Long teamId);
+    ApiResponseStudent<AcceptInvitationResDTO> handleAcceptJoinTeam(Long leaderId, Long idUser);
 
-    ApiResponseStudent<Void> handleRejectJoinTeam(Long leaderId, Long memberId, Long teamId);
+    ApiResponseStudent<Void> handleRejectJoinTeam(Long leaderId, Long memberId);
 
     ApiResponseStudent<Void> handleRemoveStudentFromGroup(Long leaderId, Long memberId, Long teamId);
 
     ApiResponseStudent<List<InvitationDTO>> getInvitations(Long studentId);
 
     ApiResponseStudent<List<AnnouncementStudentResDTO>> getAnnouncementsByStudentId(Long studentId);
+
+    ApiResponseStudent<List<StudentTopicFullUserDTO>> getAllStudentsInStudentTopic(
+            org.springframework.data.domain.Pageable pageable);
 
 }

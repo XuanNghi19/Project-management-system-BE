@@ -4,11 +4,14 @@ import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.topic.res.ReportResDTO;
 import com.dmm.projectManagementSystem.dto.topic.res.TopicRegisterResDTO;
 import com.dmm.projectManagementSystem.dto.topic.res.TopicResDTO;
+import com.dmm.projectManagementSystem.dto.topic.res.TopicFilesResDTO;
 import com.dmm.projectManagementSystem.service.student.topicService.TopicServiceImpl;
 import com.dmm.projectManagementSystem.utils.annotation.ApiMessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("${api.prefix}/topic")
@@ -18,35 +21,43 @@ public class StudentTopicController {
     private TopicServiceImpl topicServiceImpl;
 
     @ApiMessageResponse("Đăng ký đề tài cho nhóm")
-    @PostMapping("/register_topic")
-    public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> registerTopic(@RequestParam Long leaderId,
-            @RequestParam String topicName,
-            @RequestParam String uri) {
-        return ResponseEntity.ok(this.topicServiceImpl.handleRegisterTopic(leaderId, topicName, uri));
+    @PostMapping(value = "/register_topic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> registerTopic(
+            @RequestParam("leaderId") Long leaderId,
+            @RequestParam("topicName") String topicName,
+            @RequestParam("file") MultipartFile file) {
+        System.out.println("==> Đã vào controller registerTopic");
+        try {
+            return ResponseEntity.ok(this.topicServiceImpl.handleRegisterTopic(leaderId, topicName, file));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi tải tệp lên: " + e.getMessage(), e);
+        }
     }
 
     @ApiMessageResponse("Đăng ký đề tài cá nhân")
-    @PostMapping("/register_individual_topic")
-    public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> registerIndividualTopic(@RequestParam Long studentId,
-            @RequestParam String topicName,
-            @RequestParam String uri) {
-        return ResponseEntity.ok(this.topicServiceImpl.handleRegisterIndividualTopic(studentId, topicName, uri));
+    @PostMapping(value = "/register_individual_topic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> registerIndividualTopic(
+            @RequestParam("studentId") Long studentId,
+            @RequestParam("topicName") String topicName,
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(this.topicServiceImpl.handleRegisterIndividualTopic(studentId, topicName, file));
     }
 
     @ApiMessageResponse("Cập nhật thông tin cho đề tài")
-    @PutMapping("/update_topic")
+    @PutMapping(value = "/update_topic")
     public ResponseEntity<ApiResponseStudent<TopicRegisterResDTO>> updateTopic(
             @RequestParam("studentId") Long studentId,
-            @RequestParam(value = "topicNameChange", required = false) String topicNameChange,
-            @RequestParam(value = "uri", required = false) String uri) {
-        return ResponseEntity.ok(this.topicServiceImpl.handleUpdateTopic(studentId, topicNameChange, uri));
+            @RequestParam(value = "topicNameChange", required = false) String topicNameChange) {
+        return ResponseEntity.ok(this.topicServiceImpl.handleUpdateTopic(studentId, topicNameChange));
     }
 
     @ApiMessageResponse("Báo cáo tiến độ đề tài")
-    @PutMapping("/report")
-    public ResponseEntity<ApiResponseStudent<ReportResDTO>> reportProgress(@RequestParam("topicId") Long topicId,
-            @RequestParam(value = "uri", required = false) String uri) {
-        return ResponseEntity.ok(this.topicServiceImpl.handleAddFilesUrl(topicId, uri));
+    @PutMapping(value = "/report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseStudent<ReportResDTO>> reportProgress(
+            @RequestParam("studentId") Long studentId,
+            @RequestParam(value = "file", required = true) MultipartFile file) {
+        return ResponseEntity.ok(this.topicServiceImpl.handleAddFilesUrl(studentId, file));
     }
 
     @ApiMessageResponse("Lấy thông tin đề tài đã đăng ký")
@@ -72,6 +83,13 @@ public class StudentTopicController {
     @GetMapping("/check_status")
     public ResponseEntity<ApiResponseStudent<String>> checkStudentStatus(@RequestParam Long studentId) {
         return ResponseEntity.ok(this.topicServiceImpl.checkStudentStatus(studentId));
+    }
+
+    @ApiMessageResponse("Lấy danh sách file và thông tin đề tài")
+    @GetMapping("/get_files_of_topic")
+    public ResponseEntity<ApiResponseStudent<TopicFilesResDTO>> getFilesOfTopic(
+            @RequestParam("studentId") Long studentId) {
+        return ResponseEntity.ok(this.topicServiceImpl.getFilesOfTopicByStudentId(studentId));
     }
 
 }

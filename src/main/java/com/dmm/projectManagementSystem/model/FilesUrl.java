@@ -28,5 +28,8 @@ public class FilesUrl {
     @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
-}
 
+    @ManyToOne
+    @JoinColumn(name = "submitted_by")
+    private User submittedBy;
+}

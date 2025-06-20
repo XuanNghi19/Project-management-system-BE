@@ -28,10 +28,6 @@ public class TopicResDTO {
 
     private TopicSemester topicSemester;
 
-    private List<Meeting> meeting;
-
-    private List<Evaluation> evaluation;
-
     private String groupName;
 
     private TeacherTeamResDTO teacher;
@@ -41,9 +37,18 @@ public class TopicResDTO {
     private String studentName;
 
     public static TopicResDTO loadFromTopicRes(Topic topic, Team team) {
+        TeacherTeamResDTO teacherDTO = null;
+        if (team.getTeacher() != null) {
+            teacherDTO = TeacherTeamResDTO.builder()
+                    .idNum(team.getTeacher().getIdNum())
+                    .name(team.getTeacher().getName())
+                    .course(team.getTeacher().getCourse())
+                    .department(team.getTeacher().getDepartment())
+                    .build();
+        }
         return TopicResDTO.builder()
                 .groupName(team.getGroupName())
-                .teacher(TeacherTeamResDTO.loadFromTeacherRes(team.getTeacher()))
+                .teacher(teacherDTO)
                 .idNum(topic.getIdNum())
                 .name(topic.getName())
                 .projectStage(topic.getProjectStage())
@@ -52,8 +57,6 @@ public class TopicResDTO {
                 .startSubmissionDate(topic.getStartSubmissionDate())
                 .endSubmissionDate(topic.getEndSubmissionDate())
                 .topicSemester(topic.getTopicSemester())
-                .meeting(topic.getMeeting())
-                .evaluation(topic.getEvaluation())
                 .grade(topic.getGrade())
                 .build();
     }
@@ -68,8 +71,6 @@ public class TopicResDTO {
                 .startSubmissionDate(topic.getStartSubmissionDate())
                 .endSubmissionDate(topic.getEndSubmissionDate())
                 .topicSemester(topic.getTopicSemester())
-                .meeting(topic.getMeeting())
-                .evaluation(topic.getEvaluation())
                 .grade(topic.getGrade())
                 .studentId(student.getId())
                 .studentName(student.getName())

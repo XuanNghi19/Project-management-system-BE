@@ -35,13 +35,18 @@ public class DataInitializer implements CommandLineRunner {
 
             User user = new User();
             user.setIdNum("SV0024");
-            user.setName("Nguyễn Văn A");
+            user.setName("Nguyễn Văn Anh");
             user.setPassword(passwordEncoder.encode("123456"));
             user.setActive(true);
             user.setRole(Role.STUDENT);
             user.setEmail("a1@example.com");
             user.setActive(true);
             user.setDepartment(department);
+            user.setAddress("Hà Nội");
+            user.setAge(22);
+            user.setDob("04-08-2003");
+            user.setCccd("019203008626");
+            user.setPhoneNumber("0367082538");
 
             userRepository.save(user);
             System.out.println("Đã tạo user mặc định: SV0024");

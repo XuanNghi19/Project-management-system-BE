@@ -202,7 +202,12 @@ public class WebSecurityConfig {
                                                                         String.format("%s/topic/check_single_person_team",
                                                                                         apiPrefix),
                                                                         String.format("%s/topic/check_status",
+                                                                                        apiPrefix),
+                                                                        String.format("%s/topic/get_files_of_topic",
+                                                                                        apiPrefix),
+                                                                        String.format("%s/group/student-topic/all",
                                                                                         apiPrefix)
+
 
                                                         ).hasAnyRole(Role.STUDENT.toString())
                                                         .requestMatchers(

@@ -7,6 +7,7 @@ import com.dmm.projectManagementSystem.controllers.student.TeamController;
 import com.dmm.projectManagementSystem.dto.RestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,4 +36,10 @@ public class GlobalException {
                 "message", ex.getReason()
         ));
     }
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<String> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body("Unsupported media type: " + ex.getMessage());
+    }
+
 }

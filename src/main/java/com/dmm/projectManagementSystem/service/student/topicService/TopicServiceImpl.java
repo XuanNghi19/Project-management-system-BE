@@ -4,16 +4,26 @@ import com.dmm.projectManagementSystem.dto.ApiResponseStudent;
 import com.dmm.projectManagementSystem.dto.topic.res.ReportResDTO;
 import com.dmm.projectManagementSystem.dto.topic.res.TopicRegisterResDTO;
 import com.dmm.projectManagementSystem.dto.topic.res.TopicResDTO;
+import com.dmm.projectManagementSystem.dto.topic.res.TopicFilesResDTO;
+import com.dmm.projectManagementSystem.dto.topic.res.FileInfoDTO;
 import com.dmm.projectManagementSystem.enums.MembershipPosition;
 import com.dmm.projectManagementSystem.enums.ProjectStage;
 import com.dmm.projectManagementSystem.enums.TopicType;
 import com.dmm.projectManagementSystem.model.*;
 import com.dmm.projectManagementSystem.repo.*;
+import com.dmm.projectManagementSystem.service.serviceUtils.FirebaseService;
+import com.dmm.projectManagementSystem.service.serviceUtils.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,10 +48,16 @@ public class TopicServiceImpl implements TopicService {
     private final AnnouncementRepo announcementRepo;
     @Autowired
     private final StudentTopicRepo studentTopicRepo;
+    @Autowired
+    private final FirebaseService firebaseService;
+    @Autowired
+    private final LocalFileService localFileService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, String topicName, String uri) {
+    public ApiResponseStudent<TopicRegisterResDTO> handleRegisterTopic(Long leaderId, String topicName,
+            MultipartFile file) {
+
         // Kiểm tra xem sinh viên đã đăng ký đề tài chưa
         if (hasRegisteredTopic(leaderId)) {
             ApiResponseStudent<TopicRegisterResDTO> response = new ApiResponseStudent<>();
@@ -77,7 +93,7 @@ public class TopicServiceImpl implements TopicService {
         if (teamMembers.size() == 1) {
             // Nếu nhóm chỉ có 1 người, chuyển thành đề tài cá nhân và xóa nhóm
             ApiResponseStudent<TopicRegisterResDTO> individualResponse = handleRegisterIndividualTopic(leaderId,
-                    topicName, uri);
+                    topicName, file);
 
             // Xóa nhóm 1 người sau khi đã tạo đề tài cá nhân thành công
             if (individualResponse.getData() != null) {
@@ -93,6 +109,16 @@ public class TopicServiceImpl implements TopicService {
             return individualResponse;
         }
 
+        // Xử lý upload file
+        String fileUrl = "";
+        try {
+            if (file != null && !file.isEmpty()) {
+                fileUrl = localFileService.saveFile(file);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu file local: " + e.getMessage(), e);
+        }
+
         // Tạo đề tài mới cho nhóm
         Topic topicRegister = new Topic();
         topicRegister.setName(topicName);
@@ -106,7 +132,7 @@ public class TopicServiceImpl implements TopicService {
         FilesUrl filesUrl = new FilesUrl();
         filesUrl.setTopic(topicRegister);
         filesUrl.setProjectStage(ProjectStage.IDEATION);
-        filesUrl.setUri(uri);
+        filesUrl.setUri(fileUrl);
         filesUrlRepo.save(filesUrl);
 
         // Gán topic cho nhóm
@@ -132,7 +158,7 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponseStudent<TopicRegisterResDTO> handleRegisterIndividualTopic(Long studentId, String topicName,
-            String uri) {
+            MultipartFile file) {
         // Kiểm tra xem sinh viên đã đăng ký đề tài chưa
         if (hasRegisteredTopic(studentId)) {
             ApiResponseStudent<TopicRegisterResDTO> response = new ApiResponseStudent<>();
@@ -148,6 +174,16 @@ public class TopicServiceImpl implements TopicService {
         StudentTopic studentTopic = studentTopicRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa được phân vào lớp!"));
 
+        // Xử lý upload file
+        String fileUrl = "";
+        try {
+            if (file != null && !file.isEmpty()) {
+                fileUrl = localFileService.saveFile(file);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu file local: " + e.getMessage(), e);
+        }
+
         // Tạo đề tài cá nhân
         Topic topicRegister = new Topic();
         topicRegister.setName(topicName);
@@ -161,7 +197,7 @@ public class TopicServiceImpl implements TopicService {
         FilesUrl filesUrl = new FilesUrl();
         filesUrl.setTopic(topicRegister);
         filesUrl.setProjectStage(ProjectStage.IDEATION);
-        filesUrl.setUri(uri);
+        filesUrl.setUri(fileUrl);
         filesUrlRepo.save(filesUrl);
 
         // Cập nhật trạng thái sinh viên
@@ -188,16 +224,25 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long studentId, String topicNameChange,
-            String uri) {
+    public ApiResponseStudent<TopicRegisterResDTO> handleUpdateTopic(Long studentId, String topicNameChange) {
         // Tìm đề tài của sinh viên (có thể là nhóm hoặc cá nhân)
         Topic topic = findTopicByStudentId(studentId);
         if (topic == null) {
             throw new NoSuchElementException("Bạn chưa đăng ký đề tài nào!");
         }
 
+        // Nếu là đề tài nhóm, chỉ cho phép trưởng nhóm cập nhật
+        if (topic.getTopicType() == TopicType.TEAM) {
+            // Kiểm tra vai trò
+            Optional<TeamMember> teamMemberOpt = teamMemberRepo.findFirstByStudentId(studentId);
+            if (teamMemberOpt.isEmpty() || teamMemberOpt.get().getPosition() != MembershipPosition.LEADER) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN,
+                        "Chỉ trưởng nhóm mới được cập nhật đề tài nhóm!");
+            }
+        }
+
         boolean isTopicNameUpdated = false;
-        boolean isUriUpdated = false;
 
         // Cập nhật tên đề tài nếu có thay đổi
         if (topicNameChange != null && !topicNameChange.isBlank() && !topicNameChange.equals(topic.getName())) {
@@ -205,17 +250,8 @@ public class TopicServiceImpl implements TopicService {
             isTopicNameUpdated = true;
         }
 
-        // Cập nhật file url nếu có thay đổi
-        FilesUrl updateFilesUrl = filesUrlRepo.findByTopicId(topic.getId())
-                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy file trong giai đoạn này của chủ đề!"));
-        if (uri != null && !uri.isBlank() && !uri.equals(updateFilesUrl.getUri())) {
-            updateFilesUrl.setUri(uri);
-            isUriUpdated = true;
-        }
-
-        if (isTopicNameUpdated || isUriUpdated) {
+        if (isTopicNameUpdated) {
             topicRepo.save(topic);
-            filesUrlRepo.save(updateFilesUrl);
 
             // Create announcement
             StringBuilder announcementContent = new StringBuilder();
@@ -228,9 +264,6 @@ public class TopicServiceImpl implements TopicService {
             if (isTopicNameUpdated) {
                 announcementContent.append("Tên đề tài được thay đổi thành '").append(topic.getName()).append("'. ");
             }
-            if (isUriUpdated) {
-                announcementContent.append("File đính kèm đã được cập nhật. ");
-            }
 
             Announcement announcement = Announcement.builder()
                     .title("Cập nhật thông tin đề tài")
@@ -242,7 +275,7 @@ public class TopicServiceImpl implements TopicService {
             announcementRepo.save(announcement);
         }
 
-        TopicRegisterResDTO topicUpdated = TopicRegisterResDTO.fromTopicResWithoutTeam(topic, updateFilesUrl);
+        TopicRegisterResDTO topicUpdated = TopicRegisterResDTO.fromTopicResWithoutTeam(topic, null);
         ApiResponseStudent<TopicRegisterResDTO> apiResponseStudent = new ApiResponseStudent<>();
         apiResponseStudent.setData(topicUpdated);
         apiResponseStudent.setMessage("Cập nhật đề tài thành công!");
@@ -251,13 +284,31 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponseStudent<ReportResDTO> handleAddFilesUrl(Long topicId, String uri) {
-        Topic topicDB = topicRepo.findById(topicId)
-                .orElseThrow(() -> new NoSuchElementException("Không tìm được đề tài nhóm đăng ký !"));
+    public ApiResponseStudent<ReportResDTO> handleAddFilesUrl(Long studentId, MultipartFile file) {
+        Topic topic = findTopicByStudentId(studentId);
+        if (topic == null) {
+            throw new NoSuchElementException("Không tìm thấy đề tài cho sinh viên này!");
+        }
+        User submitter = userRepo.findById(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sinh viên!"));
+        String fileUrl = "";
+        try {
+            if (file != null && !file.isEmpty()) {
+                fileUrl = localFileService.saveFile(file);
+            } else {
+                ApiResponseStudent<ReportResDTO> response = new ApiResponseStudent<>();
+                response.setMessage("Tệp không được để trống.");
+                return response;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu file local: " + e.getMessage(), e);
+        }
+
         FilesUrl filesUrl = FilesUrl.builder()
-                .projectStage(topicDB.getProjectStage())
-                .topic(topicDB)
-                .uri(uri)
+                .projectStage(topic.getProjectStage())
+                .topic(topic)
+                .uri(fileUrl)
+                .submittedBy(submitter)
                 .build();
         filesUrlRepo.save(filesUrl);
         ReportResDTO reportResDTO = ReportResDTO.fromReportRes(filesUrl);
@@ -277,7 +328,6 @@ public class TopicServiceImpl implements TopicService {
         // Tạo response
         ApiResponseStudent<TopicResDTO> apiResponse = new ApiResponseStudent<>();
         TopicResDTO topicResDTO;
-
         if (topic.getTopicType() == TopicType.TEAM) {
             topicResDTO = TopicResDTO.loadFromTopicRes(topic, topic.getTeam());
         } else {
@@ -400,5 +450,26 @@ public class TopicServiceImpl implements TopicService {
     public boolean canRegisterTopic(LocalDateTime startTime, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startTime) && now.isBefore(endTime);
+    }
+
+    public ApiResponseStudent<TopicFilesResDTO> getFilesOfTopicByStudentId(Long studentId) {
+        Topic topic = findTopicByStudentId(studentId);
+        if (topic == null) {
+            throw new NoSuchElementException("Không tìm thấy đề tài cho sinh viên này!");
+        }
+        List<FilesUrl> files = filesUrlRepo.findAllByTopic(topic);
+        List<FileInfoDTO> fileDtos = files.stream()
+                .map(f -> FileInfoDTO.builder()
+                        .id(f.getId())
+                        .uri(f.getUri())
+                        .projectStage(f.getProjectStage() != null ? f.getProjectStage().name() : null)
+                        .submittedByName(f.getSubmittedBy() != null ? f.getSubmittedBy().getName() : null)
+                        .build())
+                .toList();
+        TopicFilesResDTO dto = TopicFilesResDTO.from(topic, fileDtos);
+        ApiResponseStudent<TopicFilesResDTO> response = new ApiResponseStudent<>();
+        response.setData(dto);
+        response.setMessage("Lấy danh sách file và thông tin đề tài thành công!");
+        return response;
     }
 }

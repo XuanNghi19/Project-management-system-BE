@@ -61,10 +61,17 @@ public class TopicRegisterResDTO {
         return TopicRegisterResDTO.builder()
                 .name(topic.getName())
                 .projectStage(topic.getProjectStage())
-                .filesUrlId(filesUrl.getId())
-                .uri(filesUrl.getUri())
-                .topicSemesterId(topic.getTopicSemester().getId())
-                .topicSemesterName(topic.getTopicSemester().getName())
+                .filesUrlId(filesUrl != null ? filesUrl.getId() : null)
+                .uri(filesUrl != null ? filesUrl.getUri() : null)
+                .topicSemesterId(topic.getTopicSemester() != null ? topic.getTopicSemester().getId() : null)
+                .topicSemesterName(topic.getTopicSemester() != null ? topic.getTopicSemester().getName() : null)
+                .teamId(topic.getTeam() != null ? topic.getTeam().getId() : null)
+                .groupName(topic.getTeam() != null ? topic.getTeam().getGroupName() : null)
+                .teacher(topic.getTeam() != null && topic.getTeam().getTeacher() != null
+                        ? TeacherTeamResDTO.loadFromTeacherRes(topic.getTeam().getTeacher())
+                        : null)
+                .studentId(topic.getIndividualStudent() != null ? topic.getIndividualStudent().getId() : null)
+                .studentName(topic.getIndividualStudent() != null ? topic.getIndividualStudent().getName() : null)
                 .build();
     }
 }

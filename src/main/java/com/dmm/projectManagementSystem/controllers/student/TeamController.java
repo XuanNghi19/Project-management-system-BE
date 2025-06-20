@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -54,17 +55,15 @@ public class TeamController {
     @ApiMessageResponse("Bạn chấp nhận tham gia nhóm thành công !")
     @PutMapping("/accept")
     public ResponseEntity<ApiResponseStudent<AcceptInvitationResDTO>> acceptInvitation(@RequestParam Long leaderId,
-            @RequestParam Long userId,
-            @RequestParam Long teamId) {
-        return ResponseEntity.ok(this.teamServiceImpl.handleAcceptJoinTeam(leaderId, userId, teamId));
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(this.teamServiceImpl.handleAcceptJoinTeam(leaderId, userId));
     }
 
     @ApiMessageResponse("Từ chối tham gia nhóm ")
     @PutMapping("/decline")
     public ResponseEntity<ApiResponseStudent<Void>> rejectInvitation(@RequestParam Long leaderId,
-            @RequestParam Long memberId,
-            @RequestParam Long teamId) {
-        return ResponseEntity.ok(this.teamServiceImpl.handleRejectJoinTeam(leaderId, memberId, teamId));
+            @RequestParam Long memberId) {
+        return ResponseEntity.ok(this.teamServiceImpl.handleRejectJoinTeam(leaderId, memberId));
     }
 
     @ApiMessageResponse("Rời khỏi nhóm")
@@ -78,14 +77,13 @@ public class TeamController {
     @ApiMessageResponse(message = "Hủy nhóm sinh viên")
     @DeleteMapping("/delete_team")
     public ResponseEntity<ApiResponseStudent<Void>> deleteTeam(
-            @RequestParam Long leaderId,
-            @RequestParam Long teamId) {
-        return ResponseEntity.ok(this.teamServiceImpl.handleDeleteGroup(leaderId, teamId));
+            @RequestParam Long leaderId) {
+        return ResponseEntity.ok(this.teamServiceImpl.handleDeleteGroup(leaderId));
     }
 
     @ApiMessageResponse(message = "Lấy ra danh sách sinh viên")
     @GetMapping("/list")
-    public ResponseEntity<ApiResponseStudent<List<User>>> getAllStudents(Pageable pageable) {
+    public ResponseEntity<ApiResponseStudent<List<Map<String, Object>>>> getAllStudents(Pageable pageable) {
         return ResponseEntity.ok(teamServiceImpl.handleGetListUser(pageable));
     }
 
@@ -112,6 +110,13 @@ public class TeamController {
     public ResponseEntity<ApiResponseStudent<List<AnnouncementStudentResDTO>>> getAnnouncements(
             @RequestParam Long studentId) {
         return ResponseEntity.ok(teamServiceImpl.getAnnouncementsByStudentId(studentId));
+    }
+
+    @ApiMessageResponse(message = "Lấy tất cả sinh viên trong StudentTopic")
+    @GetMapping("/student-topic/all")
+    public ResponseEntity<ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.studentTopic.StudentTopicFullUserDTO>>> getAllStudentsInStudentTopic(
+            org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(teamServiceImpl.getAllStudentsInStudentTopic(pageable));
     }
 
 }
