@@ -4,6 +4,7 @@ import com.dmm.projectManagementSystem.dto.ApiResponse;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.service.serviceUtils.LookupService;
@@ -165,6 +166,28 @@ public class LookupController {
     ) {
         try {
             UserResponse response = lookupService.searchSingleStudent(idNum);
+            return ApiResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .result(response)
+                    .message(HttpStatus.OK.toString())
+                    .build();
+        } catch (Exception ex) {
+            return ApiResponse.<String>builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .message(HttpStatus.BAD_REQUEST.toString())
+                    .result(ex.getMessage())
+                    .build();
+        }
+    }
+
+    @Operation(summary = "search đồ án, theo tên đồ án")
+    @GetMapping("search_topic")
+    public ApiResponse<?> searchTopic(
+            @Parameter(description = "search_value")
+            @RequestParam(value = "name", required = false) String name
+    ) {
+        try {
+            List<TopicResponse> response = lookupService.searchTopic(name);
             return ApiResponse.builder()
                     .code(HttpStatus.OK.value())
                     .result(response)

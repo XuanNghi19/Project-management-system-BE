@@ -3,6 +3,7 @@ package com.dmm.projectManagementSystem.service.serviceUtils;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import com.dmm.projectManagementSystem.dto.user.UserResponse;
 
@@ -18,4 +19,5 @@ public interface LookupService {
     List<UserResponse> searchStudent(String name);
 
     UserResponse searchSingleStudent(String idNum) throws Exception;
+    List<TopicResponse> searchTopic(String name);
 }

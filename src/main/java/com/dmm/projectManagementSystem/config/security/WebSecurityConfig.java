@@ -115,6 +115,7 @@ public class WebSecurityConfig {
                                     String.format("%s/lookup/search_instructor", apiPrefix),
                                     String.format("%s/lookup/search_student", apiPrefix),
                                     String.format("%s/lookup/search_single_student", apiPrefix),
+                                    String.format("%s/lookup/search_topic", apiPrefix),
                                     String.format("%s/department_management/get_all_department", apiPrefix),
                                     String.format("%s/major_management/get_all_major", apiPrefix),
                                     String.format("%s/topic_semester_management/get_all_topic_semester", apiPrefix),

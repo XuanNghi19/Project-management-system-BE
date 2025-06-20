@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TopicRepo extends JpaRepository<Topic, Long> {
     Topic findByIdNum(String idNum);
@@ -31,4 +33,7 @@ public interface TopicRepo extends JpaRepository<Topic, Long> {
             @Param("project_stage") String projectStage,
             Pageable pageable
     );
+
+    @Query(value = "select * from topic where (:name is null or lower(name) like lower(concat('%', :name, '%')))", nativeQuery = true)
+    List<Topic> findByName(String name);
 }

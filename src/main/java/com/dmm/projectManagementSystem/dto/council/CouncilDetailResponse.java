@@ -26,6 +26,8 @@ public class CouncilDetailResponse {
     CRUDTopicSemester topicSemester;
     CRUDDepartment department;
 
+    String fileUrl;
+
     List<CRUDDefenseSchedule> defenseScheduleList;
 
     List<CRUDBoardMember> boardMemberList;
@@ -43,6 +45,7 @@ public class CouncilDetailResponse {
                 .endTime(council.getEndTime())
                 .topicSemester(CRUDTopicSemester.fromTopicSemester(council.getTopicSemester()))
                 .department(CRUDDepartment.fromDepartment(council.getDepartment()))
+                .fileUrl(council.getFileUrl())
                 .defenseScheduleList(defenseScheduleList)
                 .boardMemberList(boardMemberList)
                 .build();

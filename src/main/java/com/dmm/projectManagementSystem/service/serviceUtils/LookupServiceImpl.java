@@ -3,6 +3,7 @@ package com.dmm.projectManagementSystem.service.serviceUtils;
 import com.dmm.projectManagementSystem.dto.course.CRUDCourse;
 import com.dmm.projectManagementSystem.dto.department.CRUDDepartment;
 import com.dmm.projectManagementSystem.dto.major.CRUDMajor;
+import com.dmm.projectManagementSystem.dto.topic.TopicResponse;
 import com.dmm.projectManagementSystem.dto.topicSemester.CRUDTopicSemester;
 import com.dmm.projectManagementSystem.dto.user.UserResponse;
 import com.dmm.projectManagementSystem.enums.Role;
@@ -21,6 +22,7 @@ public class LookupServiceImpl implements LookupService {
     final private TopicSemesterRepo topicSemesterRepo;
     final private CourseRepo courseRepo;
     final private UserRepo userRepo;
+    final private TopicRepo topicRepo;
 
     @Override
     public List<CRUDDepartment> searchDepartment(String name) {
@@ -55,5 +57,13 @@ public class LookupServiceImpl implements LookupService {
     @Override
     public UserResponse searchSingleStudent(String idNum) throws Exception {
         return userRepo.findByIdNum(idNum).map(UserResponse::fromUser).orElseThrow(() -> new Exception("Mã sinh viên không hợp lệ: " + idNum));
+    }
+
+    @Override
+    public List<TopicResponse> searchTopic(String name) {
+        return topicRepo.findByName(name)
+                .stream()
+                .map(TopicResponse::fromTopic)
+                .toList();
     }
 }
