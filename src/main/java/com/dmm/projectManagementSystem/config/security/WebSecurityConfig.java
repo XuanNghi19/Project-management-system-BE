@@ -206,8 +206,9 @@ public class WebSecurityConfig {
                                                                         String.format("%s/topic/get_files_of_topic",
                                                                                         apiPrefix),
                                                                         String.format("%s/group/student-topic/all",
+                                                                                        apiPrefix),
+                                                                        String.format("%s/student/grade/by-student",
                                                                                         apiPrefix)
-
 
                                                         ).hasAnyRole(Role.STUDENT.toString())
                                                         .requestMatchers(

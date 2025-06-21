@@ -311,9 +311,32 @@ public class TopicServiceImpl implements TopicService {
                 .submittedBy(submitter)
                 .build();
         filesUrlRepo.save(filesUrl);
+
+        // Thêm thông báo khi nộp file
+        String announcementTitle = "Báo cáo tiến độ mới được nộp";
+        String announcementContent;
+
+        if (topic.getTopicType() == TopicType.TEAM) {
+            announcementContent = "Nhóm '" + topic.getTeam().getGroupName() + "' đã nộp báo cáo tiến độ cho đề tài '"
+                    + topic.getName() + "' (Giai đoạn: " + topic.getProjectStage().name() + ").";
+        } else {
+            announcementContent = "Sinh viên '" + submitter.getName() + "' đã nộp báo cáo tiến độ cho đề tài '"
+                    + topic.getName() + "' (Giai đoạn: " + topic.getProjectStage().name() + ").";
+        }
+
+        Announcement announcement = Announcement.builder()
+                .title(announcementTitle)
+                .content(announcementContent)
+                .datePosted(java.time.LocalDateTime.now().toString())
+                .projectStage(topic.getProjectStage())
+                .team(topic.getTeam())
+                .build();
+        announcementRepo.save(announcement);
+
         ReportResDTO reportResDTO = ReportResDTO.fromReportRes(filesUrl);
         ApiResponseStudent<ReportResDTO> reportResponse = new ApiResponseStudent<>();
         reportResponse.setData(reportResDTO);
+        reportResponse.setMessage("Nộp báo cáo tiến độ thành công!");
         return reportResponse;
     }
 

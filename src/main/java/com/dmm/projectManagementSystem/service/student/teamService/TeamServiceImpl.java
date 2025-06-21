@@ -274,11 +274,13 @@ public class TeamServiceImpl implements TeamService {
 
                 // Thêm thông báo vào bảng Announcement khi sinh viên từ chối
                 User user = userRepo.findById(memberId).orElse(null);
+                User leader = userRepo.findById(leaderId).orElse(null);
                 Announcement announcement = Announcement.builder()
                                 .title("Thành viên đã từ chối tham gia nhóm")
                                 .content("Sinh viên '" + (user != null ? user.getName() : "")
-                                                + "' đã từ chối tham gia nhóm '"
-                                                + team.getGroupName() + "'.")
+                                                + "' đã từ chối lời mời tham gia nhóm '"
+                                                + team.getGroupName() + "' từ trưởng nhóm '"
+                                                + (leader != null ? leader.getName() : "") + "'.")
                                 .datePosted(java.time.LocalDateTime.now().toString())
                                 .projectStage(team.getStatus())
                                 .team(team)
@@ -334,6 +336,11 @@ public class TeamServiceImpl implements TeamService {
                 if (team.getStatus() != ProjectStage.PENDING) {
                         apiResponseStudent.setMessage("Nhóm đã được duyệt, không thể hủy nhóm!");
                         return apiResponseStudent;
+                }
+                // Kiểm tra nhóm đã đăng ký đề tài chưa
+                if (team.getTopic() != null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Nhóm đã đăng ký đề tài, không thể hủy nhóm!");
                 }
                 Long teamId = team.getId();
                 // Xóa tất cả announcement liên quan đến team
