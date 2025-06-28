@@ -208,6 +208,8 @@ public class WebSecurityConfig {
                                                                         String.format("%s/group/student-topic/all",
                                                                                         apiPrefix),
                                                                         String.format("%s/student/grade/by-student",
+                                                                                        apiPrefix),
+                                                                        String.format("%s/group/check-team-status",
                                                                                         apiPrefix)
 
                                                         ).hasAnyRole(Role.STUDENT.toString())

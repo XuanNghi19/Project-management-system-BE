@@ -376,6 +376,12 @@ public class TeamServiceImpl implements TeamService {
                 TeamMember teamMember = teamMemberRepo.findFirstByStudentId(studentId)
                                 .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa tham gia nhóm nào"));
 
+                // Chỉ cho phép xem nếu là LEADER hoặc MEMBER đã ACCEPTED
+                if (teamMember.getPosition() != MembershipPosition.LEADER &&
+                                (teamMember.getStatus() == null || teamMember.getStatus() != TeamStatus.ACCEPTED)) {
+                        throw new NoSuchElementException("Bạn chưa tham gia nhóm nào!");
+                }
+
                 Team team = teamMember.getTeam();
                 List<TeamMember> teamMembers = teamMemberRepo.findByTeamId(team.getId());
 
@@ -522,6 +528,13 @@ public class TeamServiceImpl implements TeamService {
                 // Tìm teamId từ studentId
                 TeamMember teamMember = teamMemberRepo.findFirstByStudentId(studentId)
                                 .orElseThrow(() -> new NoSuchElementException("Sinh viên chưa tham gia nhóm nào"));
+
+                // Chỉ cho phép xem nếu là LEADER hoặc MEMBER đã ACCEPTED
+                if (teamMember.getPosition() != MembershipPosition.LEADER &&
+                                (teamMember.getStatus() == null || teamMember.getStatus() != TeamStatus.ACCEPTED)) {
+                        throw new NoSuchElementException("Bạn chưa tham gia nhóm nào!");
+                }
+
                 Long teamId = teamMember.getTeam().getId();
                 return getPendingMembersInfo(teamId);
         }
@@ -550,13 +563,27 @@ public class TeamServiceImpl implements TeamService {
 
         public ApiResponseStudent<List<com.dmm.projectManagementSystem.dto.announcement.AnnouncementStudentResDTO>> getAnnouncementsByStudentId(
                         Long studentId) {
-                // Lấy tất cả các teamId mà sinh viên là thành viên hoặc được mời
+                // Lấy tất cả các teamMember của sinh viên
                 List<TeamMember> teamMembers = teamMemberRepo.findByStudentId(studentId).orElse(List.of());
-                List<Long> teamIds = teamMembers.stream().map(tm -> tm.getTeam().getId()).distinct().toList();
-                List<Announcement> announcements = teamIds.stream()
+
+                // Lọc các team mà sinh viên là LEADER hoặc MEMBER đã ACCEPTED
+                List<Long> allowedTeamIds = teamMembers.stream()
+                                .filter(tm -> tm.getPosition() == MembershipPosition.LEADER ||
+                                                (tm.getPosition() == MembershipPosition.MEMBER
+                                                                && tm.getStatus() == TeamStatus.ACCEPTED))
+                                .map(tm -> tm.getTeam().getId())
+                                .distinct()
+                                .toList();
+
+                // Lấy thông báo của các team này
+                List<Announcement> announcements = allowedTeamIds.stream()
                                 .flatMap(teamId -> announcementRepo
                                                 .findAllByTeam(teamRepo.findById(teamId).orElse(null)).stream())
                                 .toList();
+
+                // Nếu muốn lấy thêm các thông báo cá nhân (ví dụ: lời mời), có thể bổ sung ở
+                // đây
+
                 List<AnnouncementStudentResDTO> result = announcements.stream()
                                 .map(a -> AnnouncementStudentResDTO.builder()
                                                 .id(a.getId())
@@ -608,6 +635,42 @@ public class TeamServiceImpl implements TeamService {
                 response.setData(result);
                 response.setMetadata(metadata);
                 response.setMessage("Lấy danh sách sinh viên trong StudentTopic thành công!");
+                return response;
+        }
+
+        @Override
+        public ApiResponseStudent<String> checkStudentTeamStatus(Long studentId) {
+                ApiResponseStudent<String> response = new ApiResponseStudent<>();
+
+                try {
+                        // Kiểm tra xem sinh viên có thuộc nhóm nào không
+                        Optional<TeamMember> teamMember = teamMemberRepo.findFirstByStudentId(studentId);
+
+                        if (teamMember.isEmpty()) {
+                                response.setMessage("Sinh viên chưa tham gia nhóm nào");
+                                response.setData("NO_TEAM");
+                                return response;
+                        }
+
+                        Team team = teamMember.get().getTeam();
+                        List<TeamMember> allTeamMembers = teamMemberRepo.findByTeamId(team.getId());
+
+                        // Kiểm tra vai trò trong nhóm
+                        if (teamMember.get().getPosition() == MembershipPosition.LEADER) {
+                                response.setMessage("Bạn là trưởng nhóm '" + team.getGroupName() + "' với " +
+                                                allTeamMembers.size() + " thành viên");
+                                response.setData("TEAM_LEADER");
+                        } else {
+                                response.setMessage("Bạn là thành viên nhóm '" + team.getGroupName() + "' với " +
+                                                allTeamMembers.size() + " thành viên");
+                                response.setData("TEAM_MEMBER");
+                        }
+
+                } catch (Exception e) {
+                        response.setMessage("Có lỗi xảy ra: " + e.getMessage());
+                        response.setData("ERROR");
+                }
+
                 return response;
         }
 

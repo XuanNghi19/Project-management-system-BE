@@ -36,4 +36,6 @@ public interface TeamService {
     ApiResponseStudent<List<StudentTopicFullUserDTO>> getAllStudentsInStudentTopic(
             org.springframework.data.domain.Pageable pageable);
 
+    // Kiểm tra sinh viên có thuộc nhóm nào không
+    ApiResponseStudent<String> checkStudentTeamStatus(Long studentId);
 }

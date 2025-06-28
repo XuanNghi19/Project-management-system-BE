@@ -119,4 +119,10 @@ public class TeamController {
         return ResponseEntity.ok(teamServiceImpl.getAllStudentsInStudentTopic(pageable));
     }
 
+    @ApiMessageResponse(message = "Kiểm tra trạng thái nhóm của sinh viên")
+    @GetMapping("/check-team-status")
+    public ResponseEntity<ApiResponseStudent<String>> checkStudentTeamStatus(@RequestParam Long studentId) {
+        return ResponseEntity.ok(teamServiceImpl.checkStudentTeamStatus(studentId));
+    }
+
 }
